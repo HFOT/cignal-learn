@@ -1572,7 +1572,7 @@ function renderLvBar(){
 }
 
 function renderMain(){
-  _rubyEnabled = (state.subj !== 'jp');
+  _rubyMode = (state.subj === 'jp') ? 'jp' : 'std';
   var main = document.getElementById('main');
   var level = SUBJECTS[state.subj].levels[state.lv];
   var qs = level.questions;
@@ -1823,9 +1823,28 @@ var FURIGANA_RE = (function(){
   var keys = Object.keys(FURIGANA).sort(function(a,b){ return b.length - a.length; });
   return new RegExp('(' + keys.join('|') + ')', 'g');
 })();
-var _rubyEnabled = true; // 国語では false（読みが答えになるため）
+
+// 国語用：用語・表現技法だけ（漢字の「読み問題」の答えになる語は入れない）
+var FURIGANA_JP = {
+  '比喩':'ひゆ','直喩':'ちょくゆ','明喩':'めいゆ','隠喩':'いんゆ','暗喩':'あんゆ',
+  '擬人法':'ぎじんほう','反復':'はんぷく','対句':'ついく','倒置法':'とうちほう','倒置':'とうち',
+  '体言止め':'たいげんどめ','擬音語':'ぎおんご','擬声語':'ぎせいご','擬態語':'ぎたいご',
+  '表現技法':'ひょうげんぎほう','部首':'ぶしゅ','文節':'ぶんせつ','単語':'たんご','段落':'だんらく',
+  '文章':'ぶんしょう','主語':'しゅご','述語':'じゅつご','修飾語':'しゅうしょくご',
+  '句点':'くてん','読点':'とうてん','母音字':'ぼいんじ','子音字':'しいんじ',
+  '成り立ち':'なりたち','会意文字':'かいいもじ','象形文字':'しょうけいもじ','余韻':'よいん'
+};
+var FURIGANA_JP_RE = (function(){
+  var keys = Object.keys(FURIGANA_JP).sort(function(a,b){ return b.length - a.length; });
+  return new RegExp('(' + keys.join('|') + ')', 'g');
+})();
+
+var _rubyMode = 'std'; // 'std'(理社数) | 'jp'(国語の用語のみ) | 'off'
 function furigana(s){
-  if(!_rubyEnabled) return s;
+  if(_rubyMode === 'off') return s;
+  if(_rubyMode === 'jp'){
+    return s.replace(FURIGANA_JP_RE, function(m){ return '<ruby>' + m + '<rt>' + FURIGANA_JP[m] + '</rt></ruby>'; });
+  }
   return s.replace(FURIGANA_RE, function(m){ return '<ruby>' + m + '<rt>' + FURIGANA[m] + '</rt></ruby>'; });
 }
 
@@ -2407,7 +2426,7 @@ function testRenderSetBar(){
 }
 
 function testRenderMain(){
-  _rubyEnabled = (testState.subj !== 'jp');
+  _rubyMode = (testState.subj === 'jp') ? 'jp' : 'std';
   var main = document.getElementById('main');
   var setData = TEST_DATA[testState.subj].sets[testState.set];
   var qs = setData.questions;
@@ -2991,7 +3010,7 @@ function mockRenderPatternBar(){
 }
 
 function mockRenderMain(){
-  _rubyEnabled = (mockState.subj !== 'jp');
+  _rubyMode = (mockState.subj === 'jp') ? 'jp' : 'std';
   var main = document.getElementById('main');
 
   if(mockState.phase === 'intro'){
@@ -3747,7 +3766,7 @@ function summaryRenderSubjTabs(){
 }
 
 function summaryRenderMain(){
-  _rubyEnabled = (summarySubj !== 'jp');
+  _rubyMode = (summarySubj === 'jp') ? 'jp' : 'std';
   var main = document.getElementById('main');
   var data = SUMMARY_DATA[summarySubj];
   var html = '<div class="summary-scroll">';
@@ -4157,7 +4176,7 @@ function cardRenderSubjTabs(){
 }
 
 function cardRenderMain(){
-  _rubyEnabled = (cardState.subj !== 'jp');
+  _rubyMode = (cardState.subj === 'jp') ? 'jp' : 'std';
   var main = document.getElementById('main');
   var prefix = cardPrefix();
   var cards = cardCurrentCards();

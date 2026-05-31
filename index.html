@@ -137,6 +137,26 @@ button{font-family:inherit;color:inherit}
 .pv-hint{font-size:12px;color:var(--warn);background:rgba(240,185,11,0.08);border-radius:5px;padding:6px 10px;margin-bottom:8px}
 .pv-mark{font-size:12px;margin-top:6px;font-weight:600}
 .pv-mark.ok{color:var(--ok)} .pv-mark.ng{color:var(--ng)}
+/* 予習カード内の選択肢（テーマ準拠のダークスタイル） */
+.pv-card .choice-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.pv-card .choice-pill{padding:7px 12px;background:var(--paper-2);border:1px solid var(--border);color:var(--ink);border-radius:6px;cursor:pointer;font-size:13px;transition:all .12s}
+.pv-card .choice-pill:hover{border-color:var(--accent)}
+.pv-card .choice-pill.sel{background:rgba(68,104,255,0.2);border-color:var(--accent);color:var(--accent)}
+.pv-card .choice-pill .kana{font-weight:700;margin-right:5px;color:var(--muted)}
+/* 教科書ふうの段階解説 */
+.pv-lesson{margin-bottom:12px}
+.pv-step{background:var(--paper-2);border-radius:8px;padding:10px 13px;margin-bottom:8px;border-left:3px solid var(--border-h)}
+.pv-step .ps-h{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.pv-step .ps-b{font-size:13px;line-height:1.85}
+.pv-ex{background:rgba(68,104,255,0.06);border:1px dashed var(--accent);border-radius:8px;padding:9px 12px;font-size:12.5px;line-height:1.8;margin-bottom:6px}
+.pv-ex .pe-label{font-size:10px;color:var(--accent);font-weight:700;display:block;margin-bottom:2px}
+.pv-solve{display:flex;align-items:center;gap:8px;margin:14px 0 8px;color:var(--ok);font-size:13px;font-weight:700}
+.pv-solve::before,.pv-solve::after{content:'';flex:1;height:1px;background:var(--border)}
+/* カレンダー：試験日・開始日バッジ */
+.cal-cell.exam-day{background:rgba(232,76,76,0.14);border-color:var(--ng)}
+.cal-cell.start-day{background:rgba(68,104,255,0.12);border-color:var(--accent)}
+.cal-badge{font-size:8px;font-weight:700;line-height:1;padding:1px 4px;border-radius:3px;color:#fff}
+.cal-badge.exam{background:var(--ng)} .cal-badge.start{background:var(--accent)}
 
 /* ===== 科目行 + ステータス（同じ行） ===== */
 .subj-row{
@@ -4805,6 +4825,10 @@ function applyPhase(p){
 
 // ============ 毎日1時間カレンダー ============
 var DAILY_KEY = 'cignal_daily_done';
+var EXAM_DATE   = '2026-06-04'; // 1学期 中間テスト
+var DAILY_START = '2026-06-05'; // 毎日1時間コース スタート日（試験のあと）
+function parseDK(s){ var a=s.split('-'); return new Date(+a[0], (+a[1])-1, +a[2]); }
+function daysBetween(a,b){ return Math.round((parseDK(b)-parseDK(a))/86400000); }
 var dailyDone = {};
 var dailyViewMonth = null; // 表示中の月（1日のDate）
 var dailyState = { phase:'cal', day:1, items:[], answers:{}, scores:{}, unknown:{}, reviewScore:0, reviewMax:0, pv:[], pvAnswers:{} };
@@ -4812,41 +4836,99 @@ var DAILY_SUBJS = ['en','math','jp','sci','soc'];
 // 科目別の問題数（重要科目ほど多め。計27問 ≒ 約30分）
 var DAILY_WEIGHTS = {en:5, math:6, jp:6, sci:5, soc:5};
 
-// ===== 予習（先取り）データ：次に習う範囲 =====
+// ===== 予習（先取り）データ：次に習う範囲を「教科書ふうに段階解説 → 問題」 =====
+// 各単元: steps[{h:見出し, b:本文}] で段階的に説明 → ex(例) → check(問題)
 var PREVIEW_DATA = {
   en: [
-    {t:'一般動詞', point:'play(する)・like(好む)・have(持つ)など、動作や状態を表す動詞。be動詞とちがって主語のあとに置く。例: I play tennis.（私はテニスをする）', check:{q:'「私はサッカーが好きです」を英語にすると？', choices:['I am soccer.','I like soccer.','I soccer like.','I do soccer.'], correct:1}},
-    {t:'一般動詞の否定・疑問', point:'否定は do not(don\'t) を動詞の前に。疑問は Do you 〜? で始める。例: I don\'t play tennis. / Do you like music?', check:{q:'「あなたは犬が好きですか」を英語にすると？', choices:['Are you like dogs?','Do you like dogs?','You like dogs?','Like you dogs?'], correct:1}},
-    {t:'代名詞の目的格', point:'「〜を・〜に」の形。me(私を)・you(あなたを)・him(彼を)・her(彼女を)・it(それを)。例: I know him.', check:{q:'「私は彼女を知っている」→ I know ___.', choices:['she','her','hers','he'], correct:1}}
+    {t:'一般動詞', steps:[
+      {h:'① 一般動詞ってなに？', b:'be動詞(am/is/are)いがいで、動作や気持ちを表すことばだよ。play(する)・like(好き)・have(持つ)・study(勉強する)・go(行く) など、たくさんあるよ。'},
+      {h:'② どこに置く？', b:'主語のすぐあとに置くのがルール。〈主語＋動詞＋…〉の順番。例: I play tennis.（わたしはテニスをする）。Iのすぐあとにplayがくるね。'},
+      {h:'③ ここに注意！', b:'be動詞と一般動詞はいっしょに使わないよ。×I am play tennis. ○I play tennis.。「am+一般動詞」はまちがいのもと。'}
+    ], ex:'I like music.（わたしは音楽が好き）/ We have a cat.（わたしたちはネコを飼っている）/ She plays soccer.（彼女はサッカーをする）', check:{q:'「私はサッカーが好きです」を英語にすると？', choices:['I am soccer.','I like soccer.','I soccer like.','I do soccer.'], correct:1}},
+    {t:'一般動詞の否定・疑問', steps:[
+      {h:'① 否定文（〜しない）', b:'動詞の前に do not（短く don\'t）を入れるだけ。I play → I don\'t play.。「〜しない」が言えるようになるよ。'},
+      {h:'② 疑問文（〜しますか？）', b:'文のはじめに Do を置く。You like dogs. → Do you like dogs?（犬は好き？）。最後に「?」をつけるのも忘れずに。'},
+      {h:'③ 答え方', b:'Yes, I do. / No, I don\'t. で答えるよ。doを使って答えるのがポイント。'}
+    ], ex:'I don\'t play games.（ゲームをしない）/ Do you study English?（英語を勉強する？）— Yes, I do.', check:{q:'「あなたは犬が好きですか」を英語にすると？', choices:['Are you like dogs?','Do you like dogs?','You like dogs?','Like you dogs?'], correct:1}},
+    {t:'代名詞の目的格', steps:[
+      {h:'① 目的格ってなに？', b:'「〜を・〜に」を表す代名詞のかたち。動詞のあとにくるよ。'},
+      {h:'② かたちを覚えよう', b:'I→me(私を)、you→you(あなたを)、he→him(彼を)、she→her(彼女を)、it→it(それを)、we→us、they→them。'},
+      {h:'③ 使う場所', b:'動詞や前置詞のあと。例: I know him.（彼を知っている）/ Look at me.（私を見て）。'}
+    ], ex:'I like her.（彼女が好き）/ Help me, please.（私を手伝って）/ We see them.（彼らが見える）', check:{q:'「私は彼女を知っている」→ I know ___.', choices:['she','her','hers','he'], correct:1}}
   ],
   math: [
-    {t:'文字式', point:'文字を使って数量を表す。かけ算の×は省く: 3×a=3a。わり算は分数で: a÷2 は 2分の a。1×a は a。', check:{q:'5×x を文字式で表すと？', choices:['5x','x5','5+x','x5乗'], correct:0}},
-    {t:'文字式のきまり', point:'数は文字の前に書く。同じ文字はまとめる: a+a=2a。同じ文字のかけ算は累乗: a×a=aの2乗。', check:{q:'a+a+a を文字式で表すと？', choices:['3a','a3','aの3乗','3+a'], correct:0}},
-    {t:'式の値', point:'文字に数を代入して計算する。x=2 のとき 3x = 3×2 = 6。', check:{q:'x=4 のとき 2x の値は？', choices:['6','8','24','2'], correct:1}}
+    {t:'文字式', steps:[
+      {h:'① 文字で数を表す', b:'わからない数や、いろいろ変わる数を a や x などの文字で表すよ。これを文字式というよ。'},
+      {h:'② かけ算は×を省く', b:'3×a は 3a と書く。×記号は書かない。数は文字の前に置くよ（a×3 も 3a）。'},
+      {h:'③ わり算は分数で', b:'a÷2 は 2分の a と書く。1×a は a、a×1 も a（1は省く）。'}
+    ], ex:'5×x = 5x / y÷3 = 3分のy / 1×b = b / a×a = aの2乗', check:{q:'5×x を文字式で表すと？', choices:['5x','x5','5+x','x5乗'], correct:0}},
+    {t:'文字式のきまり', steps:[
+      {h:'① 同じ文字はまとめる', b:'a+a は 2a、a+a+a は 3a。同じ文字のたし算は、いくつ分かを前に書くよ。'},
+      {h:'② 同じ文字のかけ算は累乗', b:'a×a は aの2乗、a×a×a は aの3乗。何回かけたかが右上の小さい数になるよ。'},
+      {h:'③ ならべ方', b:'数→文字の順に、アルファベット順にそろえると読みやすい。例: b×3×a = 3ab。'}
+    ], ex:'a+a+a = 3a / x×x = xの2乗 / 2×y×x = 2xy', check:{q:'a+a+a を文字式で表すと？', choices:['3a','a3','aの3乗','3+a'], correct:0}},
+    {t:'式の値', steps:[
+      {h:'① 代入ってなに？', b:'文字のところに数を当てはめることを「代入」というよ。'},
+      {h:'② 計算してみる', b:'x=2 のとき 3x は、xに2を入れて 3×2 = 6。これが「式の値」。'},
+      {h:'③ ×を戻して計算', b:'省いた×を戻すのがコツ。2x なら 2×x。x=4 なら 2×4 = 8。'}
+    ], ex:'x=3 のとき x+5 = 8 / a=2 のとき 5a = 10 / x=4 のとき 2x = 8', check:{q:'x=4 のとき 2x の値は？', choices:['6','8','24','2'], correct:1}}
   ],
   jp: [
-    {t:'品詞（名詞・動詞）', point:'名詞＝もの・ことの名前（本・学校）。動詞＝動作や存在（走る・ある）。文の中での働きで品詞を分ける。', check:{q:'次のうち動詞はどれ？', choices:['学校','美しい','走る','とても'], correct:2}},
-    {t:'形容詞・形容動詞', point:'形容詞＝「〜い」で言い切る（美しい・楽しい）。形容動詞＝「〜だ」で言い切る（静かだ・きれいだ）。', check:{q:'「静かだ」は何という品詞？', choices:['名詞','形容詞','形容動詞','副詞'], correct:2}},
-    {t:'説明文の組み立て', point:'説明文は「はじめ（話題）→ なか（説明・例）→ おわり（まとめ）」の組み立てが多い。筆者の考えはおわりに出やすい。', check:{q:'説明文で筆者の考えがまとまっているのはふつうどこ？', choices:['はじめ','なか','おわり','題名'], correct:2}}
+    {t:'品詞（名詞・動詞）', steps:[
+      {h:'① 品詞ってなに？', b:'ことばを はたらきごとに 仲間分けしたものを品詞というよ。名詞・動詞・形容詞…などがあるよ。'},
+      {h:'② 名詞', b:'もの・こと・人の名前を表すことば。例: 本・学校・友だち・東京。「が・を・は」をつけられるよ。'},
+      {h:'③ 動詞', b:'動作や存在を表すことば。言い切ると「ウ段の音」で終わる。例: 走る・食べる・ある・見る。'}
+    ], ex:'名詞: 山／音楽／先生  動詞: 歩く／話す／いる', check:{q:'次のうち動詞はどれ？', choices:['学校','美しい','走る','とても'], correct:2}},
+    {t:'形容詞・形容動詞', steps:[
+      {h:'① ようすを表すことば', b:'人やものの「ようす・性質」を表すなかまだよ。終わり方で2つに分かれるよ。'},
+      {h:'② 形容詞', b:'言い切ると「〜い」で終わる。例: 美しい・楽しい・高い・赤い。'},
+      {h:'③ 形容動詞', b:'言い切ると「〜だ」で終わる。例: 静かだ・きれいだ・元気だ・便利だ。'}
+    ], ex:'形容詞: 寒い／うれしい  形容動詞: しずかだ／ゆたかだ', check:{q:'「静かだ」は何という品詞？', choices:['名詞','形容詞','形容動詞','副詞'], correct:2}},
+    {t:'説明文の組み立て', steps:[
+      {h:'① 説明文の形', b:'ものごとをわかりやすく伝える文章。だいたい3つのまとまりでできているよ。'},
+      {h:'② はじめ・なか・おわり', b:'はじめ＝話題の提示、なか＝くわしい説明や例、おわり＝まとめ・筆者の考え。'},
+      {h:'③ 読み方のコツ', b:'筆者の言いたいことは「おわり」に出やすい。だから最後の段落に注目するよ。'}
+    ], ex:'はじめ「〜とは何だろう」→ なか「たとえば…」→ おわり「だから…が大切だ」', check:{q:'説明文で筆者の考えがまとまっているのはふつうどこ？', choices:['はじめ','なか','おわり','題名'], correct:2}}
   ],
   sci: [
-    {t:'身のまわりの物質', point:'有機物＝燃やすと二酸化炭素を出す（砂糖・紙・木）。無機物＝それ以外（食塩・金属・ガラス）。', check:{q:'有機物はどれ？', choices:['食塩','鉄','砂糖','ガラス'], correct:2}},
-    {t:'金属の性質', point:'金属は ①みがくと光る ②電気や熱を通す ③たたくと広がる ④引っぱると伸びる。※磁石につくとは限らない。', check:{q:'金属に共通する性質でないものは？', choices:['電気を通す','みがくと光る','磁石につく','熱を通す'], correct:2}},
-    {t:'状態変化', point:'固体⇄液体⇄気体と姿が変わること。体積は変わるが、質量は変わらない。水は 氷→水→水蒸気。', check:{q:'状態変化で変わらないものは？', choices:['体積','質量','すがた','見た目'], correct:1}}
+    {t:'身のまわりの物質', steps:[
+      {h:'① 物質を分けてみよう', b:'身のまわりのものは「有機物」と「無機物」に分けられるよ。'},
+      {h:'② 有機物', b:'燃やすと黒くこげて、二酸化炭素を出すなかま。炭素をふくむよ。例: 砂糖・紙・木・プラスチック。'},
+      {h:'③ 無機物', b:'有機物いがいのもの。燃えても二酸化炭素を出さない。例: 食塩・金属・ガラス・水。'}
+    ], ex:'有機物: 砂糖・ろう・エタノール  無機物: 鉄・食塩・ガラス', check:{q:'有機物はどれ？', choices:['食塩','鉄','砂糖','ガラス'], correct:2}},
+    {t:'金属の性質', steps:[
+      {h:'① 金属の共通点', b:'鉄・銅・アルミニウムなど、金属にはみんな同じ性質があるよ。'},
+      {h:'② 4つの性質', b:'①みがくと光る（金属光沢）②電気を通す ③熱を通す ④たたくとのびて広がる。'},
+      {h:'③ ここに注意！', b:'「磁石につく」は金属ぜんぶの性質ではないよ。鉄はつくけど、銅やアルミはつかない。'}
+    ], ex:'銅は電気をよく通す／アルミはみがくと光る／鉄だけ磁石につく', check:{q:'金属に共通する性質でないものは？', choices:['電気を通す','みがくと光る','磁石につく','熱を通す'], correct:2}},
+    {t:'状態変化', steps:[
+      {h:'① 3つのすがた', b:'物質には固体・液体・気体の3つのすがたがあるよ。水なら 氷・水・水蒸気。'},
+      {h:'② すがたが変わる', b:'温度であたためたり冷やしたりすると、固体⇄液体⇄気体とすがたが変わる。これを状態変化というよ。'},
+      {h:'③ 変わるもの・変わらないもの', b:'すがたが変わると体積は変わる（ふつう気体で大きくなる）。でも質量は変わらないよ。'}
+    ], ex:'氷→水→水蒸気（すがたは変化、質量はそのまま）', check:{q:'状態変化で変わらないものは？', choices:['体積','質量','すがた','見た目'], correct:1}}
   ],
   soc: [
-    {t:'世界の国々', point:'世界には約190の国がある。それぞれ国名・首都・国旗をもつ。面積が最大の国はロシア。', check:{q:'世界で面積が最も大きい国は？', choices:['中国','アメリカ','ロシア','カナダ'], correct:2}},
-    {t:'日本の位置', point:'日本はユーラシア大陸の東、太平洋の北西にある島国。緯度・経度で位置を表せる。', check:{q:'日本はどの大陸の東にある？', choices:['アフリカ','ユーラシア','北アメリカ','オーストラリア'], correct:1}},
-    {t:'時差のしくみ', point:'地球は1日で1回転する。経度15度ごとに1時間の時差。西へ行くほど時刻は遅れる。', check:{q:'経度差30度の2地点の時差は？', choices:['1時間','2時間','30時間','15時間'], correct:1}}
+    {t:'世界の国々', steps:[
+      {h:'① 世界の国の数', b:'世界には約190の国があるよ。それぞれ国名・首都・国旗をもっているよ。'},
+      {h:'② 大陸と海洋', b:'陸地は6つの大陸（ユーラシア・アフリカ・北アメリカ・南アメリカ・オーストラリア・南極）、海は3つの大洋（太平洋・大西洋・インド洋）。'},
+      {h:'③ 大きい国・小さい国', b:'面積が最大の国はロシア。いちばん小さい国はバチカン市国。'}
+    ], ex:'ロシア＝世界最大／太平洋＝世界最大の海', check:{q:'世界で面積が最も大きい国は？', choices:['中国','アメリカ','ロシア','カナダ'], correct:2}},
+    {t:'日本の位置', steps:[
+      {h:'① 日本はどこ？', b:'日本はユーラシア大陸の東、太平洋の北西にある島国だよ。'},
+      {h:'② 緯度と経度', b:'地球上の位置は、よこの線「緯度」とたての線「経度」で表すよ。赤道が緯度0度。'},
+      {h:'③ 日本のだいたいの位置', b:'北緯およそ20〜46度、東経およそ123〜154度のあたり。北半球にあるよ。'}
+    ], ex:'赤道＝緯度0度／本初子午線＝経度0度（イギリス）', check:{q:'日本はどの大陸の東にある？', choices:['アフリカ','ユーラシア','北アメリカ','オーストラリア'], correct:1}},
+    {t:'時差のしくみ', steps:[
+      {h:'① なぜ時差ができる？', b:'地球は1日(24時間)で1回転(360度)しているから、場所によって時刻がちがうよ。'},
+      {h:'② 15度で1時間', b:'360度÷24時間＝15度。つまり経度が15度ちがうと、時刻が1時間ずれるよ。'},
+      {h:'③ 東と西', b:'東へ行くほど時刻は進み、西へ行くほどおくれるよ。日付の基準は本初子午線(経度0度)。'}
+    ], ex:'経度15度＝1時間／経度30度＝2時間の時差', check:{q:'経度差30度の2地点の時差は？', choices:['1時間','2時間','30時間','15時間'], correct:1}}
   ]
 };
-// その日の予習（2教科分・進むほど次の単元へ）
+// その日の予習（5教科ぜんぶ・進むほど次の単元へローテーション）
 function buildDayPreview(day){
-  var topicIdx = Math.floor((day-1)/5) % 3;
-  var s1 = DAILY_SUBJS[(day-1)%5];
-  var s2 = DAILY_SUBJS[day%5];
-  var picks = [s1]; if(s2 !== s1) picks.push(s2);
-  return picks.map(function(subj){ return { subj:subj, topic: PREVIEW_DATA[subj][topicIdx] }; });
+  var topicIdx = (day-1) % 3; // 3単元を1日ずつ進める
+  return DAILY_SUBJS.map(function(subj){ return { subj:subj, topic: PREVIEW_DATA[subj][topicIdx] }; });
 }
 
 function loadDaily(){ try{ dailyDone = JSON.parse(localStorage.getItem(DAILY_KEY) || '{}'); }catch(e){ dailyDone = {}; } }
@@ -4921,19 +5003,38 @@ function renderDailyCalendar(){
     var k = dayKey(dt);
     var cls = 'cal-cell';
     if(dailyDone[k]) cls += ' done';
+    if(k === EXAM_DATE && !dailyDone[k]) cls += ' exam-day';
+    if(k === DAILY_START && !dailyDone[k]) cls += ' start-day';
     if(k === todayKey) cls += ' today';
     if(dt > today && k !== todayKey) cls += ' future';
-    html += '<div class="'+cls+'"><span class="cal-d">'+d+'</span>'+(dailyDone[k]?'<span class="cal-check">✓</span>':'')+'</div>';
+    var badge = (k===EXAM_DATE) ? '<span class="cal-badge exam">中間</span>'
+              : (k===DAILY_START) ? '<span class="cal-badge start">開始</span>' : '';
+    html += '<div class="'+cls+'"><span class="cal-d">'+d+'</span>'+badge+(dailyDone[k]?'<span class="cal-check">✓</span>':'')+'</div>';
   }
   html += '</div>';
 
-  // 本日の学習
+  // 本日の学習（日付に応じてメッセージ切替）
+  var menuLine, subLine, btnLabel = '▶ 本日の学習を始める';
+  if(doneToday){
+    menuLine = '今日はおつかれさま！'; subLine = 'また明日つづきをやろう。';
+  } else if(todayKey < EXAM_DATE){
+    menuLine = '中間試験まで あと'+daysBetween(todayKey, EXAM_DATE)+'日';
+    subLine = '毎日1時間コースは <b>6/5</b>（試験のあと）スタート。今日は中間対策をがんばろう！下のボタンで先取り体験もできるよ。';
+    btnLabel = '▶ 先取りでやってみる';
+  } else if(todayKey === EXAM_DATE){
+    menuLine = '今日は中間試験！💪';
+    subLine = '全力を出してきてね。毎日1時間コースは明日 <b>6/5</b> スタート。';
+    btnLabel = '▶ 先取りでやってみる';
+  } else {
+    menuLine = 'Day '+pDay+'：5教科ミックス復習（'+dailyTierLabel(pDay)+'）';
+    subLine = '①5教科の復習（計27問・約30分）→ ②次の単元の予習（教科書ふうに解説つき）。予習しておくと授業で強い！（達成 +10分）';
+  }
   html += '<div class="daily-today"><div class="dt-date">'+todayKey+'（'+wds[today.getDay()]+'）</div>'+
-    '<div class="dt-menu">'+(doneToday ? '今日はおつかれさま！' : ('Day '+pDay+'：5教科ミックス復習（'+dailyTierLabel(pDay)+'）'))+'</div>'+
-    '<div class="dt-sub">'+(doneToday ? 'また明日つづきをやろう。' : '①5教科の復習（計27問・約30分）→ ②次の単元の予習。予習しておくと授業で強い！（達成 +10分）')+'</div>'+
+    '<div class="dt-menu">'+menuLine+'</div>'+
+    '<div class="dt-sub">'+subLine+'</div>'+
     (doneToday
       ? '<button class="daily-done-btn completed">✓ 本日完了ずみ！</button>'
-      : '<button class="daily-done-btn" id="dailyStartBtn">▶ 本日の学習を始める</button>') +
+      : '<button class="daily-done-btn" id="dailyStartBtn">'+btnLabel+'</button>') +
     '</div></div>';
 
   main.innerHTML = html;
@@ -5059,14 +5160,22 @@ function dailyReviewDone(){
 function renderDailyPreview(){
   var main = document.getElementById('main');
   var pv = dailyState.pv, KANA=['ア','イ','ウ','エ'];
-  var html = '<div class="daily-wrap"><div class="daily-head"><div class="daily-title">Day '+dailyState.day+'<em>② 予習：次の単元を先取り</em></div></div>';
-  html += '<div class="dt-sub" style="margin-bottom:12px;color:var(--muted);font-size:12px">要点とヒントを見ながら解いてみよう。先に知っておくと授業がよくわかる！</div>';
+  var html = '<div class="daily-wrap"><div class="daily-head"><div class="daily-title">Day '+dailyState.day+'<em>② 予習：次の単元を先取り（5教科）</em></div></div>';
+  html += '<div class="dt-sub" style="margin-bottom:12px;color:var(--muted);font-size:12px">教科書のように1ステップずつ読んで → 最後に問題を解いてみよう。先に知っておくと授業がぐっとわかる！</div>';
   for(var p=0;p<pv.length;p++){
     var it=pv[p], t=it.topic;
     _rubyMode=(it.subj==='jp')?'jp':'std';
     html += '<div class="pv-card"><div class="pv-subj"><span class="pv-tag">予習</span>'+SUBJ_NAME[it.subj]+' — '+furigana(escapeHtml(t.t))+'</div>';
-    html += '<div class="pv-point"><span class="pp-label">要点</span>'+furigana(escapeHtml(t.point))+'</div>';
-    html += '<div class="pv-q">問題: '+furigana(escapeHtml(t.check.q))+'</div>';
+    // 段階解説（教科書ふう）
+    html += '<div class="pv-lesson">';
+    for(var s=0;s<t.steps.length;s++){
+      html += '<div class="pv-step"><div class="ps-h">'+furigana(escapeHtml(t.steps[s].h))+'</div><div class="ps-b">'+furigana(escapeHtml(t.steps[s].b))+'</div></div>';
+    }
+    if(t.ex){ html += '<div class="pv-ex"><span class="pe-label">れい</span>'+furigana(escapeHtml(t.ex))+'</div>'; }
+    html += '</div>';
+    // では、問題を解いてみよう
+    html += '<div class="pv-solve">では、問題を解いてみよう</div>';
+    html += '<div class="pv-q">'+furigana(escapeHtml(t.check.q))+'</div>';
     html += '<button class="pv-hint-btn" data-pvh="'+p+'">💡 ヒントを見る</button><div class="pv-hint" id="pvh-'+p+'" style="display:none"></div>';
     html += '<div class="choice-row">';
     for(var c=0;c<t.check.choices.length;c++){ var sel=(dailyState.pvAnswers[p]===c)?' sel':''; html += '<button class="choice-pill'+sel+'" data-pvc="'+p+'" data-c="'+c+'"><span class="kana">'+KANA[c]+'</span>'+furigana(escapeHtml(t.check.choices[c]))+'</button>'; }

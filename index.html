@@ -435,6 +435,14 @@ button{font-family:inherit;color:inherit}
 .ifrac .ifd{padding:1px 4px 0;font-size:0.82em}
 /* ふりがな（ルビ） */
 ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-height:1}
+/* 文章問題の本文 */
+.reading-passage{
+  background:var(--paper-2);border:1px solid var(--border);border-left:4px solid var(--accent);
+  border-radius:8px;padding:14px 16px;margin:14px 0;font-size:14px;line-height:2;
+}
+.reading-passage .rp-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:8px;border-bottom:1px dashed var(--border);padding-bottom:6px}
+.exam-paper .reading-passage{background:#f4f1e8;border-color:#cfc8b4;border-left-color:#1b1b1b;color:#1b1b1b}
+.exam-paper .reading-passage .rp-label{color:#555;border-color:#cfc8b4}
 
 /* ===== 模試: 本物のテスト用紙風 ===== */
 .exam-paper{
@@ -2101,6 +2109,18 @@ var TEST_DATA = {
         {text:'「ぎもん」を漢字で書きなさい。', type:'choice', choices:['義問','疑問','議問','技問'], correct:1, point:10},
         {text:'「雪のように白い」のような比喩を何というか。', type:'writing', keywords:['直喩','明喩'], point:10},
         {text:'「記」の部首名をひらがなで書きなさい。', type:'writing', keywords:['ごんべん','言'], point:10}
+      ]},
+      {name:'Set 6 文章', questions:[
+        {passage:'言葉には、相手に気持ちを伝える力がある。同じ内容でも、言い方ひとつで印象は大きく変わる。だから、話すときは相手の立場を考えることが大切だ。', text:'この文章で筆者がいちばん伝えたいことはどれか。', type:'choice', choices:['言い方を変えても印象は変わらない','話すときは相手の立場を考えることが大切だ','言葉に力はない','文章は長いほどよい'], correct:1, point:10},
+        {passage:'言葉には、相手に気持ちを伝える力がある。同じ内容でも、言い方ひとつで印象は大きく変わる。だから、話すときは相手の立場を考えることが大切だ。', text:'「印象が大きく変わる」のは、何によってか。本文の言葉で書きなさい。', type:'writing', keywords:['言い方'], point:10},
+        {passage:'言葉には、相手に気持ちを伝える力がある。同じ内容でも、言い方ひとつで印象は大きく変わる。だから、話すときは相手の立場を考えることが大切だ。', text:'「だから」は、前の内容とあとの内容をどうつなぐ言葉か。', type:'choice', choices:['理由から結果へつなぐ','話題を変える','例をあげる','反対のことを言う'], correct:0, point:10},
+        {passage:'ぼくは初めて一人で電車に乗った。ホームに立つと胸がどきどきした。電車が来て、ドアが開く。深く息をすって、思いきって足を踏み出した。', text:'「胸がどきどきした」のはなぜだと考えられるか。', type:'choice', choices:['ねむかったから','きんちょうしていたから','たいくつだったから','おこっていたから'], correct:1, point:10},
+        {passage:'ぼくは初めて一人で電車に乗った。ホームに立つと胸がどきどきした。電車が来て、ドアが開く。深く息をすって、思いきって足を踏み出した。', text:'「思いきって」とは、どんな気持ちを表しているか。', type:'choice', choices:['あきらめる気持ち','勇気を出す気持ち','いやいやな気持ち','ねむい気持ち'], correct:1, point:10},
+        {passage:'ぼくは初めて一人で電車に乗った。ホームに立つと胸がどきどきした。電車が来て、ドアが開く。深く息をすって、思いきって足を踏み出した。', text:'「ぼく」は何に乗ったか。本文から書きぬきなさい。', type:'writing', keywords:['電車'], point:10},
+        {passage:'風がささやく。木がおどる。空は青いカンバスだ。', text:'「風がささやく」「木がおどる」に使われている表現技法は何か。', type:'writing', keywords:['擬人法'], point:10},
+        {passage:'風がささやく。木がおどる。空は青いカンバスだ。', text:'「空は青いカンバスだ」のように、たとえる言葉を使わない比喩を何というか。', type:'writing', keywords:['隠喩','暗喩'], point:10},
+        {passage:'風がささやく。木がおどる。空は青いカンバスだ。', text:'この文章は、同じ組み立ての短い文を並べている。このような技法を何というか。', type:'choice', choices:['対句','反復','倒置','体言止め'], correct:0, point:10},
+        {passage:'妹は花が好きだ。庭にチューリップを植えた。毎朝、水をやり、大きくなるのを楽しみにしている。', text:'妹が毎朝していることは何か。', type:'writing', keywords:['水','水やり'], point:10}
       ]}
     ]
   },
@@ -2465,9 +2485,18 @@ function testRenderMain(){
 
   // Test sheet: left=questions, right=answers
   html += '<div class="test-sheet">';
+  var lastPassage = null;
   for(var i=0; i<qs.length; i++){
     var q = qs[i];
     var hint = getTestHint(testState.subj, testState.set, i);
+
+    // 文章問題: 本文を表示（連続して同じ本文なら1回だけ）
+    if(q.passage && q.passage !== lastPassage){
+      html += '<div class="reading-passage"><div class="rp-label">次の文章を読んで、あとの問いに答えなさい。</div>'+furigana(escapeHtml(q.passage)).replace(/\n/g,'<br>')+'</div>';
+      lastPassage = q.passage;
+    } else if(!q.passage){
+      lastPassage = null;
+    }
 
     html += '<div class="test-row">';
 
@@ -3055,7 +3084,7 @@ function mockRenderMain(){
 
   // 大問グループ（記述・計算 / 選択 / 聞き取り）
   var groups = [
-    {instr:'次の計算をし、問いに答えなさい。', idx:[], test:function(q){return q.type==='writing'||q.type==='fraction';}},
+    {instr:'次の問いに答えなさい。', idx:[], test:function(q){return q.type==='writing'||q.type==='fraction';}},
     {instr:'次の各問いに対する答えを、記号で選んで答えなさい。', idx:[], test:function(q){return q.type==='choice';}},
     {instr:'英文を聞いて、聞こえた文を書きなさい。', idx:[], test:function(q){return q.type==='listening';}}
   ];
@@ -3125,6 +3154,10 @@ function mockRenderMain(){
       var i = groups[g].idx[k];
       var q = qs[i];
       html += '<div class="exam-q"><span class="exam-qno">('+(k+1)+')</span><div class="exam-qbody">';
+      // 文章問題: 本文を表示
+      if(q.passage){
+        html += '<div class="reading-passage"><div class="rp-label">次の文章を読んで答えなさい。</div>'+furigana(escapeHtml(q.passage)).replace(/\n/g,'<br>')+'</div>';
+      }
       html += '<div class="exam-qtext">';
       if(q.type === 'listening'){
         html += '<button class="audio-btn" data-audio="'+escapeHtml(q.audio)+'">&#x1f50a; 放送を聞く</button>';

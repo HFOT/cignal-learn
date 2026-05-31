@@ -78,7 +78,7 @@ button{font-family:inherit;color:inherit}
 @media (max-width:900px){ .roadmap{display:none} }
 
 /* ===== 毎日1時間カレンダー ===== */
-.daily-wrap{max-width:720px;margin:0 auto;padding:6px 4px 24px}
+.daily-wrap{max-width:780px;margin:0 auto;padding:6px 4px 24px}
 .daily-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .daily-title{font-size:18px;font-weight:700}
 .daily-title em{font-style:normal;color:var(--ok);margin-left:6px;font-size:13px}
@@ -90,6 +90,82 @@ button{font-family:inherit;color:inherit}
 .cal-nav button{background:var(--paper-2);border:1px solid var(--border);border-radius:6px;width:30px;height:30px;cursor:pointer;color:var(--ink);font-size:14px}
 .cal-nav .cal-month{font-size:15px;font-weight:700;min-width:130px;text-align:center}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+/* カレンダー＋RPGの横並び（カレンダーは小さめ） */
+.daily-main{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-top:6px}
+.daily-cal-col{flex:1 1 330px;min-width:280px}
+.daily-cal-col .cal-nav{margin:2px 0 8px}
+.daily-cal-col .cal-nav button{width:26px;height:26px;font-size:13px}
+.daily-cal-col .cal-nav .cal-month{font-size:13px;min-width:110px}
+.daily-cal-col .cal-grid{gap:4px}
+.daily-cal-col .cal-cell{font-size:11px;border-radius:6px;gap:1px}
+.daily-cal-col .cal-cell .cal-d{font-size:12px}
+.daily-cal-col .cal-cell.done .cal-check{font-size:12px}
+.daily-cal-col .cal-badge{font-size:7px;padding:1px 3px}
+.rpg-col{flex:1 1 210px;min-width:195px;display:flex;flex-direction:column;gap:12px}
+.rpg-card{background:linear-gradient(135deg,rgba(124,92,255,0.16),rgba(68,104,255,0.07));border:1px solid var(--border-h);border-radius:12px;padding:13px 15px}
+.rpg-card .rc-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rpg-card .rc-badge{width:44px;height:44px;border-radius:11px;background:linear-gradient(135deg,#7c5cff,#4468ff);display:flex;align-items:center;justify-content:center;flex-direction:column;line-height:1;color:#fff;flex:0 0 auto;box-shadow:0 3px 10px rgba(124,92,255,.35)}
+.rpg-card .rc-badge b{font-size:17px;font-weight:800}
+.rpg-card .rc-badge small{font-size:7px;font-weight:600;opacity:.85;letter-spacing:.05em}
+.rpg-card .rc-title{font-size:14px;font-weight:700}
+.rpg-card .rc-sub{font-size:10px;color:var(--muted)}
+.rpg-bar{height:9px;background:var(--paper-2);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.rpg-bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7c5cff,#4cc2ff);border-radius:6px;transition:width .8s ease}
+.rpg-exp-txt{font-size:10px;color:var(--muted);margin-top:4px;text-align:right;font-family:'JetBrains Mono',monospace}
+.rpg-enemy{background:var(--paper);border:1px solid var(--border);border-radius:12px;padding:12px 15px;text-align:center}
+.rpg-enemy .re-label{font-size:10px;color:var(--muted);letter-spacing:.08em;margin-bottom:2px}
+.rpg-enemy .re-emoji{font-size:38px;line-height:1;margin:2px 0;transition:filter .4s,opacity .4s}
+.rpg-enemy .re-emoji.defeated{filter:grayscale(1);opacity:.35}
+.rpg-enemy .re-name{font-size:13px;font-weight:700;margin-bottom:8px}
+.rpg-hp{display:flex;align-items:center;gap:6px}
+.rpg-hp .hp-tag{font-size:9px;font-weight:800;color:#ff5d5d}
+.rpg-hp .rpg-bar{flex:1}
+.rpg-hp .rpg-bar > i{background:linear-gradient(90deg,#ff5d5d,#ff9f43);width:100%}
+.rpg-hp-txt{font-size:10px;color:var(--muted);margin-top:5px;font-family:'JetBrains Mono',monospace}
+.rpg-result{background:linear-gradient(135deg,rgba(124,92,255,0.1),transparent);border:1px solid var(--border-h);border-radius:12px;padding:16px;text-align:center;margin-bottom:14px}
+.rpg-result .rr-emoji{font-size:48px;line-height:1;transition:filter .5s,opacity .5s}
+.rpg-result .rr-emoji.defeated{filter:grayscale(1);opacity:.35}
+.rpg-result .rr-msg{font-size:16px;font-weight:800;margin:8px 0 4px}
+.rpg-result .rr-sub{font-size:12px;color:var(--muted)}
+.rpg-result .rpg-bar{max-width:240px;margin:10px auto 0}
+.rpg-result .rpg-bar > i{background:linear-gradient(90deg,#ff5d5d,#ff9f43)}
+.rpg-levelup{color:var(--warn);font-weight:800;font-size:14px;margin-top:8px}
+/* === 毎日1時間 新フロー === */
+.cal-box{max-width:460px;margin:0 auto}
+.daily-flow{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
+.daily-flow span{background:var(--paper-2);border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-weight:600}
+.daily-flow i{color:var(--border-h);font-style:normal;font-size:13px}
+/* ① タイムアタック */
+.ta-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+.ta-title{font-size:18px;font-weight:700}
+.ta-title em{font-style:normal;color:var(--accent);margin-left:6px;font-size:12px}
+.ta-timer{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:800;color:var(--ok);min-width:78px;text-align:center;background:var(--paper-2);border:1px solid var(--border);border-radius:10px;padding:4px 10px}
+.ta-timer.urgent{color:#fff;background:#e84c4c;border-color:#e84c4c;animation:taPulse .6s infinite alternate}
+@keyframes taPulse{from{transform:scale(1)}to{transform:scale(1.07)}}
+.ta-sub{font-size:12px;color:var(--muted);margin-bottom:6px}
+.ta-progress{font-size:12px;color:var(--muted);margin-bottom:10px;font-family:'JetBrains Mono',monospace}
+.ta-card{background:var(--paper);border:1px solid var(--border-h);border-radius:14px;padding:20px;box-shadow:0 3px 12px var(--shadow);min-height:150px}
+.ta-subj{font-size:11px;font-weight:700;color:var(--accent);margin-bottom:6px}
+.ta-q{font-size:18px;font-weight:700;margin-bottom:16px;line-height:1.6}
+.ta-choices{display:flex;flex-direction:column;gap:8px}
+.ta-choices .choice-pill{padding:11px 14px;background:var(--paper-2);border:1px solid var(--border);color:var(--ink);border-radius:8px;cursor:pointer;font-size:15px;text-align:left}
+.ta-choices .choice-pill:hover{border-color:var(--accent)}
+.ta-choices .choice-pill .kana{font-weight:700;margin-right:8px;color:var(--muted)}
+.ta-choices .choice-pill.ta-ok{background:rgba(62,209,132,0.2);border-color:var(--ok);color:var(--ok)}
+.ta-choices .choice-pill.ta-ng{background:rgba(232,76,76,0.18);border-color:var(--ng);color:var(--ng)}
+.ta-choices .choice-pill:disabled{cursor:default}
+.ta-feedback{font-size:15px;font-weight:700;margin-top:12px;min-height:20px;text-align:center}
+.ta-feedback.ok{color:var(--ok)} .ta-feedback.ng{color:var(--ng)}
+/* ② 復習：正解ロック行・再挑戦・バナー */
+.test-row.row-locked{opacity:.62}
+.dq-retry{font-size:11px;color:var(--ng);font-weight:700;margin-top:4px}
+.daily-banner{border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;text-align:center;margin-bottom:12px}
+.daily-banner.ok{background:rgba(62,209,132,0.15);color:var(--ok);border:1px solid var(--ok)}
+.daily-banner.ng{background:rgba(240,185,11,0.12);color:var(--warn);border:1px solid var(--warn)}
+/* ③ 予習：理解した✓ */
+.pv-understand{margin-top:12px;width:100%;padding:9px;font-size:13px;font-weight:700;cursor:pointer;background:var(--paper-2);border:1px dashed var(--border-h);border-radius:8px;color:var(--muted);transition:all .15s}
+.pv-understand:hover{border-color:var(--ok);color:var(--ok)}
+.pv-understand.on{background:rgba(62,209,132,0.15);border-style:solid;border-color:var(--ok);color:var(--ok)}
 .cal-wd{text-align:center;font-size:11px;color:var(--muted);padding:4px 0;font-weight:600}
 .cal-wd.sun{color:var(--ng)} .cal-wd.sat{color:var(--accent)}
 .cal-cell{
@@ -4831,7 +4907,7 @@ function parseDK(s){ var a=s.split('-'); return new Date(+a[0], (+a[1])-1, +a[2]
 function daysBetween(a,b){ return Math.round((parseDK(b)-parseDK(a))/86400000); }
 var dailyDone = {};
 var dailyViewMonth = null; // 表示中の月（1日のDate）
-var dailyState = { phase:'cal', day:1, items:[], answers:{}, scores:{}, unknown:{}, reviewScore:0, reviewMax:0, pv:[], pvAnswers:{} };
+var dailyState = { phase:'cal', day:1, ta:null, items:[], answers:{}, scores:{}, reviewChecked:false, reviewRewarded:false, pv:[], pvAnswers:{}, understood:{} };
 var DAILY_SUBJS = ['en','math','jp','sci','soc'];
 // 科目別の問題数（重要科目ほど多め。計27問 ≒ 約30分）
 var DAILY_WEIGHTS = {en:5, math:6, jp:6, sci:5, soc:5};
@@ -4860,18 +4936,18 @@ var PREVIEW_DATA = {
     {t:'文字式', steps:[
       {h:'① 文字で数を表す', b:'わからない数や、いろいろ変わる数を a や x などの文字で表すよ。これを文字式というよ。'},
       {h:'② かけ算は×を省く', b:'3×a は 3a と書く。×記号は書かない。数は文字の前に置くよ（a×3 も 3a）。'},
-      {h:'③ わり算は分数で', b:'a÷2 は 2分の a と書く。1×a は a、a×1 も a（1は省く）。'}
-    ], ex:'5×x = 5x / y÷3 = 3分のy / 1×b = b / a×a = aの2乗', check:{q:'5×x を文字式で表すと？', choices:['5x','x5','5+x','x5乗'], correct:0}},
+      {h:'③ わり算は分数で', b:'a÷2 は a/2（aを2でわった分数）と書くよ。1×a は a、a×1 も a（1は省く）。'}
+    ], ex:'5×x = 5x、y÷3 = y/3、1×b = b、a×a = a²', check:{q:'5×x を文字式で表すと？', choices:['5x','x5','5+x','x5乗'], correct:0}},
     {t:'文字式のきまり', steps:[
       {h:'① 同じ文字はまとめる', b:'a+a は 2a、a+a+a は 3a。同じ文字のたし算は、いくつ分かを前に書くよ。'},
-      {h:'② 同じ文字のかけ算は累乗', b:'a×a は aの2乗、a×a×a は aの3乗。何回かけたかが右上の小さい数になるよ。'},
+      {h:'② 同じ文字のかけ算は累乗', b:'a×a は a²（aの2乗）、a×a×a は a³。何回かけたかが右上の小さい数になるよ。'},
       {h:'③ ならべ方', b:'数→文字の順に、アルファベット順にそろえると読みやすい。例: b×3×a = 3ab。'}
-    ], ex:'a+a+a = 3a / x×x = xの2乗 / 2×y×x = 2xy', check:{q:'a+a+a を文字式で表すと？', choices:['3a','a3','aの3乗','3+a'], correct:0}},
+    ], ex:'a+a+a = 3a、x×x = x²、2×y×x = 2xy', check:{q:'a+a+a を文字式で表すと？', choices:['3a','a3','aの3乗','3+a'], correct:0}},
     {t:'式の値', steps:[
       {h:'① 代入ってなに？', b:'文字のところに数を当てはめることを「代入」というよ。'},
       {h:'② 計算してみる', b:'x=2 のとき 3x は、xに2を入れて 3×2 = 6。これが「式の値」。'},
       {h:'③ ×を戻して計算', b:'省いた×を戻すのがコツ。2x なら 2×x。x=4 なら 2×4 = 8。'}
-    ], ex:'x=3 のとき x+5 = 8 / a=2 のとき 5a = 10 / x=4 のとき 2x = 8', check:{q:'x=4 のとき 2x の値は？', choices:['6','8','24','2'], correct:1}}
+    ], ex:'x=3 のとき x+5 = 8、a=2 のとき 5a = 10、x=4 のとき 2x = 8', check:{q:'x=4 のとき 2x の値は？', choices:['6','8','24','2'], correct:1}}
   ],
   jp: [
     {t:'品詞（名詞・動詞）', steps:[
@@ -4968,8 +5044,31 @@ function buildDayItems(day){
   return items;
 }
 
+// ===== ① タイムアタック用：過去問（選択式のみ＝サクサク解ける）プール =====
+var TA_SECONDS = 5*60; // 5分
+function buildTimeAttackPool(day){
+  var pool=[];
+  var maxSet = Math.max.apply(null, dailyTierSets(day));
+  DAILY_SUBJS.forEach(function(subj){
+    (TEST_DATA[subj].sets||[]).forEach(function(s, si){
+      if(!s || si>maxSet) return;
+      s.questions.forEach(function(q){ if(q.choices && q.type!=='listening' && q.type!=='fraction') pool.push({subj:subj, q:q}); });
+    });
+  });
+  return mockSeededShuffle(pool, day*7+3);
+}
+function fmtMMSS(sec){ var m=Math.floor(sec/60), s=sec%60; return m+':'+('0'+s).slice(-2); }
+
+// 数学用：分数(a/2, y/3, 3/4 など)を縦組み表示にする
+function mathFrac(s){
+  var out = escapeHtml(s).replace(/([0-9A-Za-z]+)\s*\/\s*([0-9A-Za-z]+)/g,
+    '<span class="ifrac"><span class="ifn">$1</span><span class="ifd">$2</span></span>');
+  return furigana(out);
+}
+
 function renderDaily(){
-  if(dailyState.phase === 'review') renderDailyQuiz();
+  if(dailyState.phase === 'ta') renderDailyTimeAttack();
+  else if(dailyState.phase === 'review') renderDailyReview();
   else if(dailyState.phase === 'preview') renderDailyPreview();
   else renderDailyCalendar();
 }
@@ -4992,6 +5091,7 @@ function renderDailyCalendar(){
     '<div class="daily-stats"><div class="daily-stat"><b>'+dailyStreak()+'</b><span>連続</span></div>'+
     '<div class="daily-stat"><b>'+doneCount+'</b><span>合計</span></div></div></div>';
 
+  html += '<div class="cal-box">';
   html += '<div class="cal-nav"><button id="calPrev">‹</button><span class="cal-month">'+y+'年 '+(m+1)+'月</span><button id="calNext">›</button></div>';
 
   var wds = ['日','月','火','水','木','金','土'];
@@ -5011,12 +5111,13 @@ function renderDailyCalendar(){
               : (k===DAILY_START) ? '<span class="cal-badge start">開始</span>' : '';
     html += '<div class="'+cls+'"><span class="cal-d">'+d+'</span>'+badge+(dailyDone[k]?'<span class="cal-check">✓</span>':'')+'</div>';
   }
-  html += '</div>';
+  html += '</div>';      // .cal-grid
+  html += '</div>';      // .cal-box
 
   // 本日の学習（日付に応じてメッセージ切替）
-  var menuLine, subLine, btnLabel = '▶ 本日の学習を始める';
+  var menuLine, subLine, btnLabel = '▶ 本日の学習を始める', canStart = true;
   if(doneToday){
-    menuLine = '今日はおつかれさま！'; subLine = 'また明日つづきをやろう。';
+    menuLine = '今日はおつかれさま！'; subLine = 'また明日つづきをやろう。'; canStart = false;
   } else if(todayKey < EXAM_DATE){
     menuLine = '中間試験まで あと'+daysBetween(todayKey, EXAM_DATE)+'日';
     subLine = '毎日1時間コースは <b>6/5</b>（試験のあと）スタート。今日は中間対策をがんばろう！下のボタンで先取り体験もできるよ。';
@@ -5026,15 +5127,16 @@ function renderDailyCalendar(){
     subLine = '全力を出してきてね。毎日1時間コースは明日 <b>6/5</b> スタート。';
     btnLabel = '▶ 先取りでやってみる';
   } else {
-    menuLine = 'Day '+pDay+'：5教科ミックス復習（'+dailyTierLabel(pDay)+'）';
-    subLine = '①5教科の復習（計27問・約30分）→ ②次の単元の予習（教科書ふうに解説つき）。予習しておくと授業で強い！（達成 +10分）';
+    menuLine = 'Day '+pDay+'：今日の1時間（'+dailyTierLabel(pDay)+'）';
+    subLine = '① 5分タイムアタック（過去問スピード）→ ② 今日の復習（全問正解で次へ）→ ③ 予習（次の単元を先取り）';
   }
   html += '<div class="daily-today"><div class="dt-date">'+todayKey+'（'+wds[today.getDay()]+'）</div>'+
     '<div class="dt-menu">'+menuLine+'</div>'+
     '<div class="dt-sub">'+subLine+'</div>'+
-    (doneToday
-      ? '<button class="daily-done-btn completed">✓ 本日完了ずみ！</button>'
-      : '<button class="daily-done-btn" id="dailyStartBtn">'+btnLabel+'</button>') +
+    (canStart
+      ? '<button class="daily-done-btn" id="dailyStartBtn">'+btnLabel+'</button>'+
+        '<div class="daily-flow"><span>① 5分タイムアタック</span><i>›</i><span>② 今日の復習</span><i>›</i><span>③ 予習</span></div>'
+      : '<button class="daily-done-btn completed">✓ 本日完了ずみ！</button>') +
     '</div></div>';
 
   main.innerHTML = html;
@@ -5047,55 +5149,138 @@ function renderDailyCalendar(){
     dailyState.items = buildDayItems(pDay);
     dailyState.answers = {};
     dailyState.scores = {};
-    dailyState.unknown = {};
+    dailyState.reviewChecked = false;
+    dailyState.reviewRewarded = false;
     dailyState.pv = buildDayPreview(pDay);
     dailyState.pvAnswers = {};
-    dailyState.phase = 'review';
-    renderDailyQuiz();
+    dailyState.understood = {};
+    dailyState.ta = { pool: buildTimeAttackPool(pDay), idx:0, solved:0, correct:0, endAt:0, timer:null };
+    dailyState.phase = 'ta';
+    renderDailyTimeAttack();
   };
 }
 
 var SUBJ_NAME = {en:'英語', math:'数学', jp:'国語', sci:'理科', soc:'社会'};
-function renderDailyQuiz(){
+// ===== ① 5分タイムアタック（過去問スピード） =====
+function renderDailyTimeAttack(){
   var main = document.getElementById('main');
-  var items = dailyState.items;
-  var KANA = ['ア','イ','ウ','エ','オ','カ'];
+  var ta = dailyState.ta;
+  if(!ta || !ta.pool.length){ endTimeAttack(); return; }
+  if(ta.endAt === 0) ta.endAt = Date.now() + TA_SECONDS*1000;
+  var html = '<div class="daily-wrap"><div class="ta-head">'+
+    '<div class="ta-title">① 5分タイムアタック<em>過去問スピード</em></div>'+
+    '<div class="ta-timer" id="taTimer">5:00</div></div>';
+  html += '<div class="ta-sub">どんどん答えて、5分でどこまで進めるかチャレンジ！（まちがえても止まらず次へ）</div>';
+  html += '<div class="ta-progress"><span id="taSolved">解いた 0問</span> ・ <span id="taCorrect">正解 0</span></div>';
+  html += '<div class="ta-card" id="taCard"></div>';
+  html += '<div class="actions" style="justify-content:center;margin-top:10px"><button class="btn" id="taQuit">やめて復習へ →</button></div>';
+  html += '</div>';
+  main.innerHTML = html;
+  document.getElementById('taQuit').onclick = function(){ endTimeAttack(); };
+  taShowQuestion();
+  if(ta.timer) clearInterval(ta.timer);
+  ta.timer = setInterval(function(){
+    var tEl = document.getElementById('taTimer');
+    if(!tEl || dailyState.phase !== 'ta'){ clearInterval(ta.timer); ta.timer=null; return; }
+    var remMs = ta.endAt - Date.now();
+    if(remMs <= 0){ tEl.textContent='0:00'; endTimeAttack(); return; }
+    var sec = Math.ceil(remMs/1000);
+    tEl.textContent = fmtMMSS(sec);
+    tEl.classList.toggle('urgent', sec<=30);
+  }, 250);
+}
+function taShowQuestion(){
+  var ta = dailyState.ta, KANA=['ア','イ','ウ','エ','オ','カ'];
+  var card = document.getElementById('taCard'); if(!card) return;
+  var item = ta.pool[ta.idx % ta.pool.length], q = item.q;
+  _rubyMode = (item.subj==='jp') ? 'jp' : 'std';
+  var h = '<div class="ta-subj">'+SUBJ_NAME[item.subj]+'</div>';
+  h += '<div class="ta-q">'+fracText(q.text)+'</div>';
+  h += '<div class="choice-row ta-choices">';
+  for(var c=0;c<q.choices.length;c++){ h += '<button class="choice-pill" data-tac="'+c+'"><span class="kana">'+KANA[c]+'</span>'+fracText(q.choices[c])+'</button>'; }
+  h += '</div><div class="ta-feedback" id="taFb"></div>';
+  _rubyMode = 'std';
+  card.innerHTML = h;
+  card.querySelectorAll('.choice-pill[data-tac]').forEach(function(b){
+    b.onclick = function(){
+      if(card.dataset.locked) return; card.dataset.locked = '1';
+      var c = parseInt(b.dataset.tac,10), ok = (c === q.correct);
+      ta.solved++; if(ok) ta.correct++;
+      card.querySelectorAll('.choice-pill').forEach(function(p){ p.disabled = true; });
+      b.classList.add(ok ? 'ta-ok' : 'ta-ng');
+      if(!ok){ var cor = card.querySelectorAll('.choice-pill')[q.correct]; if(cor) cor.classList.add('ta-ok'); }
+      var fb = document.getElementById('taFb'); if(fb){ fb.textContent = ok ? '○ 正解！' : '× 正解は '+KANA[q.correct]; fb.className = 'ta-feedback '+(ok?'ok':'ng'); }
+      var sv = document.getElementById('taSolved'); if(sv) sv.textContent = '解いた '+ta.solved+'問';
+      var cr = document.getElementById('taCorrect'); if(cr) cr.textContent = '正解 '+ta.correct;
+      setTimeout(function(){ if(dailyState.phase!=='ta') return; ta.idx++; var cd=document.getElementById('taCard'); if(cd) cd.removeAttribute('data-locked'); taShowQuestion(); }, 650);
+    };
+  });
+}
+function endTimeAttack(){
+  var ta = dailyState.ta || {solved:0, correct:0};
+  if(ta.timer){ clearInterval(ta.timer); ta.timer = null; }
+  var main = document.getElementById('main');
+  main.innerHTML = '<div class="daily-wrap"><div class="result"><h2>⏱ タイムアタック終了！</h2>'+
+    '<div class="score">'+ta.solved+' 問</div>'+
+    '<div class="msg" style="line-height:2">5分で <b>'+ta.solved+'問</b> 解いた！（正解 '+ta.correct+'）<br>つぎは「今日の復習」。<b>全問正解</b>できたら予習に進めるよ。</div>'+
+    '<div class="actions" style="justify-content:center"><button class="btn primary" id="taToReview">② 今日の復習へ →</button></div></div></div>';
+  document.getElementById('taToReview').onclick = function(){ dailyState.phase='review'; dailyState.reviewChecked=false; renderDailyReview(); };
+}
 
-  var html = '<div class="daily-wrap"><div class="daily-head"><div class="daily-title">Day '+dailyState.day+'<em>① 復習：5教科ミックス・'+dailyTierLabel(dailyState.day)+'</em></div></div>';
+// ===== ② 今日の復習（表示は従来どおり・全問正解で予習へ） =====
+function renderDailyReview(){
+  var main = document.getElementById('main');
+  var items = dailyState.items, KANA = ['ア','イ','ウ','エ','オ','カ'];
+  var checked = dailyState.reviewChecked;
+  var allCorrect = items.length>0 && items.every(function(it,i){ return (dailyState.scores[i]||0) >= 10; });
+  var wrongCount = 0; for(var w=0; w<items.length; w++){ if((dailyState.scores[w]||0) < 10) wrongCount++; }
+
+  var html = '<div class="daily-wrap"><div class="daily-head"><div class="daily-title">Day '+dailyState.day+'<em>② 今日の復習：全問正解で予習へ</em></div></div>';
+  if(checked){
+    html += allCorrect
+      ? '<div class="daily-banner ok">🎉 全問正解！予習に進もう</div>'
+      : '<div class="daily-banner ng">まちがいが '+wrongCount+'問。直して「答え合わせ」！（正解した問題は ○ で固定されるよ）</div>';
+  } else {
+    html += '<div class="dt-sub" style="margin-bottom:10px;color:var(--muted);font-size:12px">5教科を解いて「答え合わせ」。まちがえた問題は正解できるまで直そう。全部○で予習へ（目安40分）。</div>';
+  }
   html += '<div class="test-sheet">';
   var lastSubj = null;
   for(var i=0; i<items.length; i++){
-    var it = items[i], q = it.q;
-    if(it.subj !== lastSubj){
-      html += '<div class="exam-daimon-head" style="margin:14px 0 8px">'+SUBJ_NAME[it.subj]+'</div>';
-      lastSubj = it.subj;
-    }
+    var it = items[i], q = it.q, sc = dailyState.scores[i]||0, locked = (sc >= 10);
+    if(it.subj !== lastSubj){ html += '<div class="exam-daimon-head" style="margin:14px 0 8px">'+SUBJ_NAME[it.subj]+'</div>'; lastSubj = it.subj; }
     _rubyMode = (it.subj === 'jp') ? 'jp' : 'std';
-    html += '<div class="test-row"><div class="test-q"><span class="num">'+(i+1)+'</span><div style="flex:1;min-width:0">';
+    html += '<div class="test-row'+(locked?' row-locked':'')+'"><div class="test-q"><span class="num">'+(i+1)+'</span><div style="flex:1;min-width:0">';
     if(q.type === 'listening'){ html += '🎧 '+escapeHtml(q.text)+'<button class="audio-btn" data-audio="'+escapeHtml(q.audio)+'" style="margin-left:8px">&#x1f50a; 再生</button>'; }
     else { html += fracText(q.text); }
     html += '</div></div><div class="test-a" id="dqa-'+i+'">';
-    if(q.type === 'fraction'){
-      var fa = dailyState.answers[i] || {}; var fsign = fa.sign === -1 ? -1 : 1;
-      html += '<div class="frac-input"><button class="frac-sign'+(fsign===-1?' minus':'')+'" data-dq="'+i+'">'+(fsign===-1?'−':'＋')+'</button><div class="frac-stack">';
-      html += '<input class="frac-num" data-dq="'+i+'" inputmode="numeric" value="'+escapeHtml(String(fa.n!=null?fa.n:''))+'" placeholder="分子"><div class="frac-bar"></div>';
-      html += '<input class="frac-den" data-dq="'+i+'" inputmode="numeric" value="'+escapeHtml(String(fa.d!=null?fa.d:''))+'" placeholder="分母"></div></div>';
-    } else if(q.type === 'writing' || q.type === 'listening'){
-      var val = dailyState.answers[i] !== undefined ? String(dailyState.answers[i]) : '';
-      html += '<div class="hw-input-wrap"><input type="text" data-dq="'+i+'" value="'+escapeHtml(val)+'" placeholder="答え"><button class="hw-ico-btn" data-dqhw="'+i+'" title="手書き入力">✍</button></div>';
+    if(locked){
+      var ctxt; if(q.type==='fraction'){ var rc=fracReduce(q.num,q.den); ctxt=(rc[0]<0?'−':'')+Math.abs(rc[0])+'/'+rc[1]; }
+      else ctxt = q.choices ? q.choices[q.correct] : (q.keywords ? q.keywords.join(', ') : '');
+      html += '<span class="mark ok">○</span> <span class="correct-answer show" style="display:inline">'+fracText(ctxt)+'</span>';
     } else {
-      html += '<div class="choice-row">';
-      for(var c=0;c<q.choices.length;c++){ var sel=(dailyState.answers[i]===c)?' sel':''; html += '<button class="choice-pill'+sel+'" data-dqc="'+i+'" data-c="'+c+'"><span class="kana">'+KANA[c]+'</span>'+fracText(q.choices[c])+'</button>'; }
-      html += '</div>';
+      if(q.type === 'fraction'){
+        var fa = dailyState.answers[i] || {}; var fsign = fa.sign === -1 ? -1 : 1;
+        html += '<div class="frac-input"><button class="frac-sign'+(fsign===-1?' minus':'')+'" data-dq="'+i+'">'+(fsign===-1?'−':'＋')+'</button><div class="frac-stack">';
+        html += '<input class="frac-num" data-dq="'+i+'" inputmode="numeric" value="'+escapeHtml(String(fa.n!=null?fa.n:''))+'" placeholder="分子"><div class="frac-bar"></div>';
+        html += '<input class="frac-den" data-dq="'+i+'" inputmode="numeric" value="'+escapeHtml(String(fa.d!=null?fa.d:''))+'" placeholder="分母"></div></div>';
+      } else if(q.type === 'writing' || q.type === 'listening'){
+        var val = dailyState.answers[i] !== undefined ? String(dailyState.answers[i]) : '';
+        html += '<div class="hw-input-wrap"><input type="text" data-dq="'+i+'" value="'+escapeHtml(val)+'" placeholder="答え"><button class="hw-ico-btn" data-dqhw="'+i+'" title="手書き入力">✍</button></div>';
+      } else {
+        html += '<div class="choice-row">';
+        for(var c=0;c<q.choices.length;c++){ var sel=(dailyState.answers[i]===c)?' sel':''; html += '<button class="choice-pill'+sel+'" data-dqc="'+i+'" data-c="'+c+'"><span class="kana">'+KANA[c]+'</span>'+fracText(q.choices[c])+'</button>'; }
+        html += '</div>';
+      }
+      if(checked){ html += '<div class="dq-retry">× もう一度！</div>'; }
     }
-    html += '<button class="dq-unknown'+(dailyState.unknown[i]?' on':'')+'" data-dqu="'+i+'">？わからない</button>';
     html += '</div></div>';
   }
   _rubyMode = 'std';
-  html += '</div><div class="actions" style="justify-content:center;margin-top:14px;gap:8px"><button class="btn" id="dqBack">カレンダーに戻る</button><button class="btn primary" id="dqSubmit">復習おわり → 予習へ</button></div></div>';
+  html += '</div><div class="actions" style="justify-content:center;margin-top:14px;gap:8px"><button class="btn" id="dqBack">カレンダーに戻る</button>'+
+    (allCorrect ? '<button class="btn primary" id="dqToPreview">③ 予習へ進む →</button>'
+                : '<button class="btn primary" id="dqCheck">答え合わせ</button>')+
+    '</div></div>';
   main.innerHTML = html;
-
-  main.querySelectorAll('.dq-unknown[data-dqu]').forEach(function(b){ b.onclick=function(){ var qi=parseInt(b.dataset.dqu,10); dailyState.unknown[qi]=!dailyState.unknown[qi]; b.classList.toggle('on', dailyState.unknown[qi]); }; });
 
   main.querySelectorAll('.audio-btn[data-audio]').forEach(function(b){ b.onclick=function(){ speakEnglish(b.dataset.audio, b); }; });
   main.querySelectorAll('input[type="text"][data-dq]').forEach(function(inp){ var qi=parseInt(inp.dataset.dq,10); inp.oninput=function(){ dailyState.answers[qi]=inp.value; }; });
@@ -5109,77 +5294,49 @@ function renderDailyQuiz(){
     box.querySelector('.frac-den').oninput=function(){ var a=ensure(); this.value=this.value.replace(/[^0-9]/g,''); a.d=this.value; };
   });
   document.getElementById('dqBack').onclick = function(){ dailyState.phase='cal'; renderDailyCalendar(); };
-  document.getElementById('dqSubmit').onclick = function(){ dailyReviewDone(); };
+  var ck = document.getElementById('dqCheck'); if(ck) ck.onclick = function(){ dailyReviewCheck(); };
+  var tp = document.getElementById('dqToPreview'); if(tp) tp.onclick = function(){ dailyState.phase='preview'; renderDailyPreview(); };
+}
+// 答え合わせ：正解(満点)した問題は固定。全問正解でゲーム時間付与＆予習へ進めるように
+function dailyReviewCheck(){
+  var items = dailyState.items;
+  for(var i=0;i<items.length;i++){
+    if((dailyState.scores[i]||0) >= 10) continue;       // すでに正解済みは固定
+    dailyState.scores[i] = gradeAnswer(items[i].q, dailyState.answers[i]);
+  }
+  dailyState.reviewChecked = true;
+  var allOK = items.length>0 && items.every(function(it,i){ return (dailyState.scores[i]||0) >= 10; });
+  if(allOK && !dailyState.reviewRewarded){ dailyState.reviewRewarded = true; earnYen(10); }
+  renderDailyReview();
 }
 
-// ① 復習の採点 → 弱点（まちがい・わからない）で再調整 or ②予習へ
-function dailyReviewDone(){
-  var items = dailyState.items, total=0, full=0, weak=[];
-  for(var i=0;i<items.length;i++){
-    var sc=gradeAnswer(items[i].q, dailyState.answers[i]); dailyState.scores[i]=sc; total+=sc; if(sc>=10) full++;
-    if(sc<10 || dailyState.unknown[i]) weak.push(items[i]);
-  }
-  dailyState.reviewScore = total; dailyState.reviewMax = items.length*10;
-  var pct = dailyState.reviewMax?Math.round(total/dailyState.reviewMax*100):0;
-
-  var main = document.getElementById('main');
-  var html = '<div class="daily-wrap"><div class="result"><h2>① 復習おわり</h2>'+
-    '<div class="score">'+total+' / '+dailyState.reviewMax+'</div>'+
-    '<div class="test-result-grid">'+
-      '<div class="test-result-cell"><div class="val">'+full+'</div><div class="lbl">正解</div></div>'+
-      '<div class="test-result-cell"><div class="val">'+weak.length+'</div><div class="lbl">要復習</div></div>'+
-      '<div class="test-result-cell"><div class="val">'+pct+'%</div><div class="lbl">得点率</div></div></div>'+
-    '<div class="msg">'+(weak.length? 'わからない・まちがいが <b>'+weak.length+'問</b>。もう一度やると定着するよ。' : '全部できた！すばらしい。')+'</div>'+
-    '<div class="actions" style="justify-content:center;flex-wrap:wrap;gap:8px">'+
-      (weak.length? '<button class="btn" id="dqRedo">弱点だけ もう一度（'+weak.length+'問）</button>' : '')+
-      '<button class="btn primary" id="dqToPreview">② 予習へ進む →</button>'+
-    '</div></div>';
-  html += '<div class="test-sheet" style="margin-top:14px">';
-  for(var i=0;i<items.length;i++){
-    var q=items[i].q, sc=dailyState.scores[i]||0;
-    _rubyMode=(items[i].subj==='jp')?'jp':'std';
-    var mk = sc>=10?'○':(sc>0?'△':'×'), mc = sc>=10?'ok':(sc>0?'partial':'ng');
-    var ctxt; if(q.type==='fraction'){var rc=fracReduce(q.num,q.den); ctxt=(rc[0]<0?'−':'')+Math.abs(rc[0])+'/'+rc[1];} else ctxt=q.type==='choice'?q.choices[q.correct]:q.keywords.join(', ');
-    var uTag = dailyState.unknown[i]? ' <span style="color:var(--warn);font-size:10px">？わからない</span>':'';
-    html += '<div class="test-row"><div class="test-q"><span class="num">'+(i+1)+'</span><div style="flex:1">'+fracText(q.text)+uTag+'</div></div><div class="test-a"><span class="mark '+mc+'">'+mk+'</span>'+(sc<10?'<div class="correct-answer show">正解: '+fracText(ctxt)+'</div>':'')+'</div></div>';
-  }
-  _rubyMode='std';
-  html += '</div></div>';
-  main.innerHTML = html;
-  if(weak.length){
-    document.getElementById('dqRedo').onclick = function(){
-      dailyState.items = weak.slice();
-      dailyState.answers = {}; dailyState.scores = {}; dailyState.unknown = {};
-      dailyState.phase = 'review'; renderDailyQuiz();
-    };
-  }
-  document.getElementById('dqToPreview').onclick = function(){ dailyState.phase='preview'; renderDailyPreview(); };
-}
-
-// ② 予習（調べて予習）：要点とヒントを見ながら次の単元を解く
+// ③ 予習（調べて予習）：要点とヒントを見ながら次の単元を解く
 function renderDailyPreview(){
   var main = document.getElementById('main');
   var pv = dailyState.pv, KANA=['ア','イ','ウ','エ'];
-  var html = '<div class="daily-wrap"><div class="daily-head"><div class="daily-title">Day '+dailyState.day+'<em>② 予習：次の単元を先取り（5教科）</em></div></div>';
+  var html = '<div class="daily-wrap"><div class="daily-head"><div class="daily-title">Day '+dailyState.day+'<em>③ 予習：次の単元を先取り（5教科）</em></div></div>';
   html += '<div class="dt-sub" style="margin-bottom:12px;color:var(--muted);font-size:12px">教科書のように1ステップずつ読んで → 最後に問題を解いてみよう。先に知っておくと授業がぐっとわかる！</div>';
   for(var p=0;p<pv.length;p++){
     var it=pv[p], t=it.topic;
     _rubyMode=(it.subj==='jp')?'jp':'std';
-    html += '<div class="pv-card"><div class="pv-subj"><span class="pv-tag">予習</span>'+SUBJ_NAME[it.subj]+' — '+furigana(escapeHtml(t.t))+'</div>';
+    // 数学だけ分数(a/2 等)を縦組み表示
+    var F = (it.subj==='math') ? mathFrac : function(x){ return furigana(escapeHtml(x)); };
+    html += '<div class="pv-card"><div class="pv-subj"><span class="pv-tag">予習</span>'+SUBJ_NAME[it.subj]+' — '+F(t.t)+'</div>';
     // 段階解説（教科書ふう）
     html += '<div class="pv-lesson">';
     for(var s=0;s<t.steps.length;s++){
-      html += '<div class="pv-step"><div class="ps-h">'+furigana(escapeHtml(t.steps[s].h))+'</div><div class="ps-b">'+furigana(escapeHtml(t.steps[s].b))+'</div></div>';
+      html += '<div class="pv-step"><div class="ps-h">'+F(t.steps[s].h)+'</div><div class="ps-b">'+F(t.steps[s].b)+'</div></div>';
     }
-    if(t.ex){ html += '<div class="pv-ex"><span class="pe-label">れい</span>'+furigana(escapeHtml(t.ex))+'</div>'; }
+    if(t.ex){ html += '<div class="pv-ex"><span class="pe-label">れい</span>'+F(t.ex)+'</div>'; }
     html += '</div>';
     // では、問題を解いてみよう
     html += '<div class="pv-solve">では、問題を解いてみよう</div>';
-    html += '<div class="pv-q">'+furigana(escapeHtml(t.check.q))+'</div>';
+    html += '<div class="pv-q">'+F(t.check.q)+'</div>';
     html += '<button class="pv-hint-btn" data-pvh="'+p+'">💡 ヒントを見る</button><div class="pv-hint" id="pvh-'+p+'" style="display:none"></div>';
     html += '<div class="choice-row">';
-    for(var c=0;c<t.check.choices.length;c++){ var sel=(dailyState.pvAnswers[p]===c)?' sel':''; html += '<button class="choice-pill'+sel+'" data-pvc="'+p+'" data-c="'+c+'"><span class="kana">'+KANA[c]+'</span>'+furigana(escapeHtml(t.check.choices[c]))+'</button>'; }
-    html += '</div><div class="pv-mark" id="pvm-'+p+'"></div></div>';
+    for(var c=0;c<t.check.choices.length;c++){ var sel=(dailyState.pvAnswers[p]===c)?' sel':''; html += '<button class="choice-pill'+sel+'" data-pvc="'+p+'" data-c="'+c+'"><span class="kana">'+KANA[c]+'</span>'+F(t.check.choices[c])+'</button>'; }
+    html += '</div><div class="pv-mark" id="pvm-'+p+'"></div>';
+    html += '<button class="pv-understand'+(dailyState.understood[p]?' on':'')+'" data-pvu="'+p+'">'+(dailyState.understood[p]?'✓ 理解した！':'理解した ✓')+'</button></div>';
   }
   _rubyMode='std';
   html += '<div class="actions" style="justify-content:center;gap:8px;margin-top:6px"><button class="btn" id="pvBack">← 復習へ戻る</button><button class="btn primary" id="pvDone">✓ 本日完了</button></div></div>';
@@ -5187,7 +5344,8 @@ function renderDailyPreview(){
 
   main.querySelectorAll('.pv-hint-btn[data-pvh]').forEach(function(b){ b.onclick=function(){ var p=parseInt(b.dataset.pvh,10); var t=pv[p].topic; var wrong=t.check.choices[(t.check.correct+1)%t.check.choices.length]; var el=document.getElementById('pvh-'+p); el.textContent='要点をもう一度読もう。「'+wrong+'」はちがうよ。'; el.style.display='block'; }; });
   main.querySelectorAll('.choice-pill[data-pvc]').forEach(function(b){ b.onclick=function(){ var p=parseInt(b.dataset.pvc,10),c=parseInt(b.dataset.c,10); dailyState.pvAnswers[p]=c; var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(x){x.classList.remove('sel');}); b.classList.add('sel'); var ok=(c===pv[p].topic.check.correct); var m=document.getElementById('pvm-'+p); m.textContent=ok?'○ 正解！この調子で先取りしよう':'× もう一度。要点にヒントがあるよ'; m.className='pv-mark '+(ok?'ok':'ng'); }; });
-  document.getElementById('pvBack').onclick=function(){ dailyState.phase='review'; renderDailyQuiz(); };
+  main.querySelectorAll('.pv-understand[data-pvu]').forEach(function(b){ b.onclick=function(){ var p=parseInt(b.dataset.pvu,10); dailyState.understood[p]=!dailyState.understood[p]; b.classList.toggle('on',dailyState.understood[p]); b.textContent=dailyState.understood[p]?'✓ 理解した！':'理解した ✓'; }; });
+  document.getElementById('pvBack').onclick=function(){ dailyState.phase='review'; renderDailyReview(); };
   document.getElementById('pvDone').onclick=function(){ dailyFinish(); };
 }
 
@@ -5195,13 +5353,19 @@ function dailyFinish(){
   var todayKey=dayKey(new Date());
   var firstDone=!dailyDone[todayKey];
   dailyDone[todayKey]=true; saveDaily();
-  if(firstDone) earnYen(10);
-  var pvOk=0; for(var p=0;p<dailyState.pv.length;p++){ if(dailyState.pvAnswers[p]===dailyState.pv[p].topic.check.correct) pvOk++; }
-  var rpct=dailyState.reviewMax?Math.round(dailyState.reviewScore/dailyState.reviewMax*100):0;
+  if(firstDone) earnYen(10);   // 本日完了でゲーム時間を加算
+  var uCount=0; for(var p=0;p<dailyState.pv.length;p++){ if(dailyState.understood[p]) uCount++; }
+  var ta = dailyState.ta || {solved:0, correct:0};
+
   var main=document.getElementById('main');
-  main.innerHTML='<div class="daily-wrap"><div class="result"><h2>本日完了！おつかれさま 🎉</h2>'+
-    '<div class="msg" style="margin-top:12px;line-height:2">① 復習 '+rpct+'%（'+dailyState.reviewScore+'/'+dailyState.reviewMax+'点）<br>② 予習 '+pvOk+'/'+dailyState.pv.length+' 先取りチェック<br><br>連続 <b>'+dailyStreak()+'</b> 日！ゲーム時間 +10分。<br>予習しておくと、授業がぐっとわかるよ。</div>'+
-    '<div class="actions" style="justify-content:center"><button class="btn primary" id="dfCal">カレンダーへ →</button></div></div></div>';
+  var html='<div class="daily-wrap"><div class="result"><h2>本日完了！おつかれさま 🎉</h2>'+
+    '<div class="msg" style="margin-top:12px;line-height:2">'+
+    '① タイムアタック <b>'+ta.solved+'問</b>（正解 '+ta.correct+'）<br>'+
+    '② 今日の復習 <b>ぜんぶ正解！</b><br>'+
+    '③ 予習 理解 <b>'+uCount+'/'+dailyState.pv.length+'</b><br><br>'+
+    '連続 <b>'+dailyStreak()+'</b> 日！ゲーム時間が増えたよ。<br>予習しておくと、授業がぐっとわかる！</div>'+
+    '<div class="actions" style="justify-content:center;margin-top:10px"><button class="btn primary" id="dfCal">カレンダーへ →</button></div></div></div>';
+  main.innerHTML=html;
   document.getElementById('dfCal').onclick=function(){ dailyState.phase='cal'; renderDailyCalendar(); };
 }
 

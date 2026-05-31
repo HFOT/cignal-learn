@@ -1,0 +1,8 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# 個人メモ・一時ファイル
+/tmp/
+*.tmp

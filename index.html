@@ -5202,14 +5202,14 @@ function renderDailyCalendar(){
     btnLabel = '▶ 先取りでやってみる';
   } else {
     menuLine = 'Day '+pDay+'：今日の1時間（'+dailyTierLabel(pDay)+'）';
-    subLine = '① 5分タイムアタック（過去問スピード）→ ② 今日の復習（全問正解で次へ）→ ③ 予習（次の単元を先取り）';
+    subLine = '① 過去の復習（5分タイムアタック・過去問）→ ② 今日の復習（全問正解で次へ）→ ③ 予習（次の単元を先取り）';
   }
   html += '<div class="daily-today"><div class="dt-date">'+todayKey+'（'+wds[today.getDay()]+'）</div>'+
     '<div class="dt-menu">'+menuLine+'</div>'+
     '<div class="dt-sub">'+subLine+'</div>'+
     (canStart
       ? '<button class="daily-done-btn" id="dailyStartBtn">'+btnLabel+'</button>'+
-        '<div class="daily-flow"><span>① 5分タイムアタック</span><i>›</i><span>② 今日の復習</span><i>›</i><span>③ 予習</span></div>'
+        '<div class="daily-flow"><span>① 過去の復習</span><i>›</i><span>② 今日の復習</span><i>›</i><span>③ 予習</span></div>'
       : '<button class="daily-done-btn completed">✓ 本日完了ずみ！</button>') +
     '</div></div>';
 
@@ -5244,7 +5244,7 @@ function renderDailyTimeAttack(){
   if(ta.endAt === 0) ta.endAt = Date.now() + TA_SECONDS*1000;
   var KANA = ['ア','イ','ウ','エ','オ','カ'];
   var html = '<div class="daily-wrap">';
-  html += '<div class="ta-bar"><div class="ta-title">① 5分タイムアタック<em>過去問スピード</em></div>'+
+  html += '<div class="ta-bar"><div class="ta-title">① 過去の復習<em>5分タイムアタック・過去問</em></div>'+
     '<div class="ta-bar-right"><span class="ta-count" id="taCount">答えた '+Object.keys(ta.answers).length+'/'+ta.pool.length+'</span>'+
     '<div class="ta-timer" id="taTimer">5:00</div></div></div>';
   html += '<div class="ta-sub" style="margin-bottom:8px">5分で できるだけ多く解こう！ わかる問題から どんどん答えてOK（まちがえても進める）。</div>';
@@ -5290,9 +5290,9 @@ function endTimeAttack(){
   (ta.pool||[]).forEach(function(item,i){ var a = ta.answers ? ta.answers[i] : undefined; if(a!==undefined){ solved++; if(a===item.q.correct) correct++; } });
   ta.solved = solved; ta.correct = correct;
   var main = document.getElementById('main');
-  main.innerHTML = '<div class="daily-wrap"><div class="result"><h2>⏱ タイムアタック終了！</h2>'+
+  main.innerHTML = '<div class="daily-wrap"><div class="result"><h2>⏱ ① 過去の復習 おわり！</h2>'+
     '<div class="score">'+solved+' 問</div>'+
-    '<div class="msg" style="line-height:2">5分で <b>'+solved+'問</b> 解いた！（正解 '+correct+'）<br>つぎは「今日の復習」。<b>全問正解</b>できたら予習に進めるよ。</div>'+
+    '<div class="msg" style="line-height:2">5分で <b>'+solved+'問</b> 解いた！（正解 '+correct+'）<br>つぎは「② 今日の復習」。<b>全問正解</b>できたら予習に進めるよ。</div>'+
     '<div class="actions" style="justify-content:center"><button class="btn primary" id="taToReview">② 今日の復習へ →</button></div></div></div>';
   document.getElementById('taToReview').onclick = function(){ dailyState.phase='review'; dailyState.reviewChecked=false; renderDailyReview(); };
 }
@@ -5430,7 +5430,7 @@ function dailyFinish(){
   var main=document.getElementById('main');
   var html='<div class="daily-wrap"><div class="result"><h2>本日完了！おつかれさま 🎉</h2>'+
     '<div class="msg" style="margin-top:12px;line-height:2">'+
-    '① タイムアタック <b>'+ta.solved+'問</b>（正解 '+ta.correct+'）<br>'+
+    '① 過去の復習（タイムアタック）<b>'+ta.solved+'問</b>（正解 '+ta.correct+'）<br>'+
     '② 今日の復習 <b>ぜんぶ正解！</b><br>'+
     '③ 予習 理解 <b>'+uCount+'/'+dailyState.pv.length+'</b><br><br>'+
     '連続 <b>'+dailyStreak()+'</b> 日！ゲーム時間が増えたよ。<br>予習しておくと、授業がぐっとわかる！</div>'+

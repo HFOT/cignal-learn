@@ -5175,11 +5175,18 @@ function buildDayItems(day){
   return items;
 }
 
-// ===== ① タイムアタック用：過去問（選択式のみ＝サクサク解ける）プール =====
+// ===== ① 過去の復習＝タイムアタック：中間～昨日までに積み上げた範囲（累積） =====
 var TA_SECONDS = 5*60; // 5分
+// 何セット目まで＝中間(set0)から日が進むほど累積で広げる
+function pastMaxSet(day){
+  if(day<=2)  return 1; // 中間範囲（基礎2セット）
+  if(day<=6)  return 2;
+  if(day<=11) return 3;
+  return 4;             // 全範囲
+}
 function buildTimeAttackPool(day){
   var pool=[];
-  var maxSet = Math.max.apply(null, dailyTierSets(day));
+  var maxSet = pastMaxSet(day); // set 0..maxSet を累積で（中間～昨日まで）
   DAILY_SUBJS.forEach(function(subj){
     (TEST_DATA[subj].sets||[]).forEach(function(s, si){
       if(!s || si>maxSet) return;
@@ -5260,7 +5267,7 @@ function renderDailyCalendar(){
     btnLabel = '▶ 先取りでやってみる';
   } else {
     menuLine = 'Day '+pDay+'：今日の1時間（'+dailyTierLabel(pDay)+'）';
-    subLine = '① 過去の復習（5分タイムアタック・過去問）→ ② 今日の復習（全問正解で次へ）→ ③ 予習（次の単元を先取り）';
+    subLine = '① 過去の復習＝中間〜昨日までを5分タイムアタック → ② 今日の復習（全問正解で次へ）→ ③ 予習（次の単元を先取り）';
   }
   html += '<div class="daily-today"><div class="dt-date">'+todayKey+'（'+wds[today.getDay()]+'）</div>'+
     '<div class="dt-menu">'+menuLine+'</div>'+
@@ -5303,10 +5310,10 @@ function renderDailyTimeAttack(){
   if(ta.endAt === 0) ta.endAt = Date.now() + TA_SECONDS*1000;
   var KANA = ['ア','イ','ウ','エ','オ','カ'];
   var html = '<div class="daily-wrap">';
-  html += '<div class="ta-bar"><div class="ta-title">① 過去の復習<em>5分タイムアタック・過去問</em></div>'+
+  html += '<div class="ta-bar"><div class="ta-title">① 過去の復習<em>中間〜昨日まで・5分タイムアタック</em></div>'+
     '<div class="ta-bar-right"><span class="ta-count" id="taCount">答えた '+Object.keys(ta.answers).length+'/'+ta.pool.length+'</span>'+
     '<div class="ta-timer" id="taTimer">5:00</div></div></div>';
-  html += '<div class="ta-sub" style="margin-bottom:8px">5分で できるだけ多く解こう！ わかる問題から どんどん答えてOK（まちがえても進める）。</div>';
+  html += '<div class="ta-sub" style="margin-bottom:8px">中間〜昨日までに習った範囲から出題。5分で できるだけ多く解こう！（まちがえても止まらず進める）</div>';
   html += '<div class="test-sheet">';
   var lastSubj = null;
   for(var i=0;i<ta.pool.length;i++){

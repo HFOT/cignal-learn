@@ -1185,6 +1185,22 @@ var SUBJECTS = {
           {q:'「I am Kana.」の疑問文は？', choices:['Am I Kana?','Are I Kana?','Do I Kana?','Is I Kana?'], a:0, expl:'be動詞を主語の前に出す。Am I Kana?'},
           {q:'「私は東京出身です。」を英語にすると？', choices:['I am from Tokyo.','I is from Tokyo.','I from Tokyo am.','Tokyo I am.'], a:0, expl:'I am from Tokyo. from = 〜出身。'}
         ]
+      },
+      {
+        name:'Lv6 can（できる）',
+        intro:'Unit2 の山。「〜できる」は can。canのうしろは動詞の原形。三人称でも形は変わらない。TEST Set 6 対応。',
+        questions:[
+          {q:'「私はピアノをひけます。」を英語にすると？', choices:['I can play the piano.','I play can the piano.','I can plays the piano.','I am play the piano.'], a:0, expl:'can + 動詞の原形。I can play ～.'},
+          {q:'Mary ___ play the piano. の空欄に入る語は？', choices:['can','is','are','does'], a:0, expl:'「ひける」は can。Mary can play ～.'},
+          {q:'can のうしろの動詞はどの形にする？', choices:['原形（そのままの形）','三人称単数の s をつける','ing 形','過去形'], a:0, expl:'can のあとは必ず動詞の原形。He can plays ✗ → He can play ◯。'},
+          {q:'He ___ cook well.（彼は上手に料理ができる）の空欄は？', choices:['can','cans','is can','do'], a:0, expl:'主語が He でも can はそのまま。cans にはしない。'},
+          {q:'「私は速く泳げません。」を英語にすると？', choices:['I can\'t swim fast.','I don\'t swim fast.','I am not swim fast.','I not can swim fast.'], a:0, expl:'否定は can\'t（＝cannot）。I can\'t swim fast.'},
+          {q:'「あなたはギターをひけますか。」を英語にすると？', choices:['Can you play the guitar?','Do you play the guitar?','Are you play the guitar?','You can play the guitar?'], a:0, expl:'can の疑問文は Can を主語の前に出す。Can you ～?'},
+          {q:'Can you swim? に Yes で答えると？', choices:['Yes, I can.','Yes, I do.','Yes, I am.','Yes, I swim.'], a:0, expl:'Can you ～? には can で答える。Yes, I can.'},
+          {q:'Can he cook? に No で答えると？', choices:['No, he can\'t.','No, he doesn\'t.','No, he isn\'t.','No, he not can.'], a:0, expl:'No, he can\'t.（＝No, he cannot.）'},
+          {q:'「私の兄はサッカー部に入っています。」を英語にすると？', choices:['My brother is on the soccer team.','My brother is in the soccer.','My brother plays soccer team.','My brother on soccer.'], a:0, expl:'部活は be on the ～ team / be in the ～ club。'},
+          {q:'「彼女はテニスが得意です。」を英語にすると？', choices:['She is good at tennis.','She is good tennis.','She can good tennis.','She likes good tennis.'], a:0, expl:'「〜が得意」は be good at ～。'}
+        ]
       }
     ]
   },
@@ -2249,6 +2265,34 @@ var TEST_DATA = {
         {text:'I am Kana. の疑問文は？', type:'choice', choices:['Am I Kana?','Are I Kana?','Do I Kana?','Is I Kana?'], correct:0, point:10},
         {text:'音声を聞いて、聞こえた英文を書きなさい。', type:'listening', audio:'How are you?', keywords:['How','are','you'], point:10},
         {text:'音声を聞いて、聞こえた英文を書きなさい。', type:'listening', audio:'Nice to meet you.', keywords:['Nice','to','meet','you'], point:10}
+      ]},
+      {name:'Set 6 can（できる）', questions:[
+        {text:'Mary ( ) play the piano. に入る語は？', type:'choice', choices:['can','is','are','does'], correct:0, point:10},
+        {text:'「私はピアノをひけます。」を英語で書きなさい。', type:'writing', keywords:['I','can','play'], point:10},
+        {text:'can のうしろの動詞はどの形にする？', type:'choice', choices:['原形（そのままの形）','三人称単数のs','ing形','過去形'], correct:0, point:10},
+        {text:'He ( ) cook well. に入る語は？（彼は上手に料理ができる）', type:'choice', choices:['can','cans','is can','do'], correct:0, point:10},
+        {text:'「私は料理ができません。」を英語にすると？', type:'choice', choices:['I can cook.','I can\'t cook.','I don\'t cook.','I am not cook.'], correct:1, point:10},
+        {text:'「あなたはギターをひけますか。」を英語で書きなさい。', type:'writing', keywords:['Can','you','play'], point:10},
+        {text:'Can you swim? に Yes で答えなさい。', type:'writing', keywords:['Yes','I','can'], point:10},
+        {text:'Can you ski? に No で答えると？', type:'choice', choices:['No, I can\'t.','No, I don\'t.','No, I am not.','No, I cannot ski well.'], correct:0, point:10},
+        {text:'「私の兄はサッカー部に入っています。」を英語で書きなさい。', type:'writing', keywords:['brother','on','soccer','team'], point:10},
+        {text:'「彼女はテニスが得意です。」を英語で書きなさい。（good at を使う）', type:'writing', keywords:['She','good','at','tennis'], point:10},
+        {text:'音声を聞いて、聞こえた英文を書きなさい。', type:'listening', audio:'I can play the piano.', keywords:['I','can','play','piano'], point:10},
+        {text:'音声を聞いて、聞こえた英文を書きなさい。', type:'listening', audio:'Can you cook?', keywords:['Can','you','cook'], point:10}
+      ]},
+      {name:'Set 7 まとめテスト（Unit1+2）', questions:[
+        {text:'This ( ) my bag. に入る語は？', type:'choice', choices:['is','are','am','be'], correct:0, point:10},
+        {text:'Is that a fox? — No, ( ) not. に入る語は？', type:'choice', choices:['it\'s','is','that','I\'m'], correct:0, point:10},
+        {text:'You want a bag. を疑問文にすると？', type:'choice', choices:['Do you want a bag?','Are you want a bag?','You want a bag?','Want you a bag?'], correct:0, point:10},
+        {text:'I like natto. を否定文にすると？', type:'choice', choices:['I don\'t like natto.','I am not like natto.','I not like natto.','I like not natto.'], correct:0, point:10},
+        {text:'「私のことをアミと呼んでください。」を英語で書きなさい。', type:'writing', keywords:['Call','me','Ami'], point:10},
+        {text:'「あなたはどうですか。」を英語で書きなさい。（あいさつのやりとり）', type:'writing', keywords:['How','about','you'], point:10},
+        {text:'並べかえ:（ I / don\'t / have / a cat / . ）私はネコを飼っていません。', type:'writing', keywords:['I','don','have','cat'], point:10},
+        {text:'並べかえ:（ you / a volleyball fan / are / too / , / ? ）あなたもバレーボールファンですか。', type:'writing', keywords:['Are','you','volleyball','fan','too'], point:10},
+        {text:'My brother ( ) a good soccer player. に入る語は？', type:'choice', choices:['is','are','am','can'], correct:0, point:10},
+        {passage:'Aki: Ellen, this is Mike. He is my brother.\nEllen: Hi, Mike. Can you play soccer?\nMike: Yes, I can. I\'m on the soccer team. I can cook well, too. I\'m in the cooking club.', text:'Mike はサッカーができますか。Yes / No で答えなさい。', type:'choice', choices:['Yes, he can.','No, he can\'t.','Yes, he is.','No, he isn\'t.'], correct:0, point:10},
+        {passage:'Aki: Ellen, this is Mike. He is my brother.\nEllen: Hi, Mike. Can you play soccer?\nMike: Yes, I can. I\'m on the soccer team. I can cook well, too. I\'m in the cooking club.', text:'Mike が入っている部活を、日本語で2つ書きなさい。', type:'choice', choices:['サッカー部と料理部（クッキング部）','サッカー部とテニス部','野球部と美術部','料理部と吹奏楽部'], correct:0, point:10},
+        {passage:'Aki: Ellen, this is Mike. He is my brother.\nEllen: Hi, Mike. Can you play soccer?\nMike: Yes, I can. I\'m on the soccer team. I can cook well, too. I\'m in the cooking club.', text:'Mike と Aki の関係は？', type:'choice', choices:['兄弟','親子','先生と生徒','友達だけ'], correct:0, point:10}
       ]}
     ]
   },
@@ -3681,6 +3725,18 @@ var SUMMARY_DATA = {
         {hint:'Is this a book? (Yes) → Yes, ___ is.', answer:'it'},
         {hint:'apple の前は a? ___?', answer:'an'}
       ], audio:['This is a pen.','That is my dog.','Yes, it is.','No, it isn\'t.','This is an apple.']},
+      {title:'can（〜できる）', points:[
+        '「〜できる」は <span class="key">can</span> ＋ 動詞の<span class="key">原形</span>（I can swim. / He can play soccer.）',
+        '主語が三人称でも <span class="key">can は変わらない</span>（He can play ◯ / He cans ✗）',
+        '否定: <span class="key">can\'t（＝cannot）</span>（I can\'t swim.）',
+        '疑問: <span class="key">Can</span> you ～? → Yes, I can. / No, I can\'t.',
+        '部活: be <span class="key">on the</span> ～ team / be <span class="key">in the</span> ～ club ／ 得意: be <span class="key">good at</span> ～'
+      ], practice:[
+        {hint:'私はピアノをひけます。→ I ___ play the piano.', answer:'can'},
+        {hint:'彼は泳げません。→ He ___ swim. (1語)', answer:'can\'t'},
+        {hint:'あなたは料理できますか。→ ___ you cook?', answer:'Can'},
+        {hint:'テニスが得意です。→ I am good ___ tennis.', answer:'at'}
+      ], audio:['I can play the piano.','He can swim fast.','I can\'t cook.','Can you play soccer?','Yes, I can.','She is good at tennis.']},
       {title:'あいさつ表現', points:[
         '朝=Good morning / 昼=Good afternoon / 夕方〜夜=Good evening',
         '初対面: <span class="key">Nice to meet you.</span>',
@@ -4208,7 +4264,17 @@ var CARD_DATA = {
         {front:'apple の前は a? an?', back:'an（母音で始まるから）', cat:'a/an'},
         {front:'「あれは私の犬です」を英語で', back:'That is my dog.', cat:'This/That'},
         {front:'It is の短縮形は？', back:'It\'s', cat:'短縮形'},
-        {front:'Monday は何曜日？', back:'月曜日', cat:'曜日'}
+        {front:'Monday は何曜日？', back:'月曜日', cat:'曜日'},
+        {front:'「私はピアノをひけます」を英語で', back:'I can play the piano.', cat:'can'},
+        {front:'can のうしろの動詞の形は？', back:'原形（そのままの形）。He can play ◯', cat:'can'},
+        {front:'「私は泳げません」を英語で', back:'I can\'t swim.（can\'t＝cannot）', cat:'can'},
+        {front:'「あなたは料理できますか」を英語で', back:'Can you cook?', cat:'can'},
+        {front:'Can you swim? (Yes)', back:'Yes, I can.', cat:'can'},
+        {front:'「私のことをアミと呼んでください」を英語で', back:'Call me Ami.', cat:'連語'},
+        {front:'「あなたはどうですか」を英語で', back:'How about you?', cat:'連語'},
+        {front:'「すみません（呼びかけ）」を英語で', back:'Excuse me.', cat:'連語'},
+        {front:'「〜が得意だ」を表す英語は？', back:'be good at ～', cat:'連語'},
+        {front:'「サッカー部に入っている」を英語で', back:'be on the soccer team', cat:'部活'}
       ]},
       {key:'vocab', name:'単語', audioFront:true, cards:[
         // ★最重要：あいさつ・基本表現
@@ -4996,10 +5062,12 @@ var DAILY_WEIGHTS = {en:5, math:6, jp:6, sci:5, soc:5};
 // ② 今日の復習だけに使う「単元」リスト（任意選択。選ばなければ おまかせ＝全範囲）
 var DAILY_UNITS = {
   en: [
-    {id:'be',   name:'be動詞', kw:['am','is','are','be動詞']},
-    {id:'verb', name:'一般動詞', kw:['like','play','have','study','一般動詞','Do you','don\'t']},
-    {id:'pron', name:'代名詞', kw:['me','him','her','them','us','代名詞','目的格']},
-    {id:'wh',   name:'疑問詞', kw:['What','Who','Where','When','Which','How']}
+    {id:'be',       name:'be動詞', kw:['am','is','are','be動詞']},
+    {id:'thisthat', name:'this/that/it', kw:['This','That','this','that','冠詞']},
+    {id:'can',      name:'can（できる）', kw:['can','Can','cannot']},
+    {id:'club',     name:'三人称・部活・得意', kw:['brother','sister','team','club','good at','on the','in the']},
+    {id:'aisatsu',  name:'あいさつ・連語', kw:['Call me','How about','Nice to meet','welcome','Excuse','morning']},
+    {id:'wh',       name:'疑問詞', kw:['What','Who','Where','When','Which']}
   ],
   math: [
     {id:'seisu',  name:'正負の数', kw:['正の数','負の数','絶対値','計算しなさい','×','÷','加法','減法']},
@@ -5159,7 +5227,7 @@ function dailyTierSets(day){
   if(day<=5) return [0,1];
   if(day<=12) return [1,2,3];
   if(day<=20) return [2,3,4];
-  return [0,1,2,3,4];
+  return [0,1,2,3,4,5,6];
 }
 // その日の5教科ミックス問題を作る
 function buildDayItems(day){
@@ -5182,7 +5250,7 @@ function pastMaxSet(day){
   if(day<=2)  return 1; // 中間範囲（基礎2セット）
   if(day<=6)  return 2;
   if(day<=11) return 3;
-  return 4;             // 全範囲
+  return 6;             // 全範囲（英語の追加セットも含む。不足セットは自動スキップ）
 }
 function buildTimeAttackPool(day){
   var pool=[];

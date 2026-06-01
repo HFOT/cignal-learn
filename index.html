@@ -136,6 +136,9 @@ button{font-family:inherit;color:inherit}
 .daily-flow span{background:var(--paper-2);border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-weight:600}
 .daily-flow i{color:var(--border-h);font-style:normal;font-size:13px}
 /* ① タイムアタック */
+.ta-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 2px 8px;margin-bottom:2px;border-bottom:1px solid var(--border)}
+.ta-bar-right{display:flex;align-items:center;gap:12px}
+.ta-count{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;white-space:nowrap}
 .ta-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
 .ta-title{font-size:18px;font-weight:700}
 .ta-title em{font-style:normal;color:var(--accent);margin-left:6px;font-size:12px}
@@ -2014,7 +2017,36 @@ var FURIGANA = {
   '絶対値':'ぜったいち','数直線':'すうちょくせん','加法':'かほう','減法':'げんぽう','乗法':'じょうほう','除法':'じょほう',
   '累乗':'るいじょう','指数':'しすう','分配法則':'ぶんぱいほうそく','交換法則':'こうかんほうそく','結合法則':'けつごうほうそく',
   '逆数':'ぎゃくすう','分数':'ぶんすう','分子':'ぶんし','分母':'ぶんぼ','約分':'やくぶん','整数':'せいすう','自然数':'しぜんすう',
-  '符号':'ふごう','正の数':'せいのかず','負の数':'ふのかず','計算':'けいさん','展開':'てんかい','偶数':'ぐうすう','奇数':'きすう'
+  '符号':'ふごう','正の数':'せいのかず','負の数':'ふのかず','計算':'けいさん','展開':'てんかい','偶数':'ぐうすう','奇数':'きすう',
+  '文字式':'もじしき','文字':'もじ','数量':'すうりょう','代入':'だいにゅう','式の値':'しきのあたい','係数':'けいすう','項':'こう','方程式':'ほうていしき',
+  // 理科（追加）
+  '物質':'ぶっしつ','有機物':'ゆうきぶつ','無機物':'むきぶつ','金属':'きんぞく','非金属':'ひきんぞく','性質':'せいしつ','状態変化':'じょうたいへんか','状態':'じょうたい','変化':'へんか',
+  '体積':'たいせき','質量':'しつりょう','固体':'こたい','液体':'えきたい','気体':'きたい','水蒸気':'すいじょうき','蒸発':'じょうはつ','沸騰':'ふっとう','融点':'ゆうてん','沸点':'ふってん',
+  '二酸化炭素':'にさんかたんそ','酸素':'さんそ','炭素':'たんそ','砂糖':'さとう','食塩':'しょくえん','磁石':'じしゃく','電気':'でんき','金属光沢':'きんぞくこうたく','密度':'みつど',
+  '鉄':'てつ','銅':'どう','光':'ひかり','熱':'ねつ',
+  // 社会（追加）
+  '世界':'せかい','国名':'こくめい','首都':'しゅと','国旗':'こっき','面積':'めんせき','位置':'いち','島国':'しまぐに','地球':'ちきゅう','回転':'かいてん','時刻':'じこく','場所':'ばしょ',
+  '東':'ひがし','西':'にし','南':'みなみ','北':'きた','北西':'ほくせい','北東':'ほくとう','南東':'なんとう','南西':'なんせい','山脈':'さんみゃく','大陸性':'たいりくせい',
+  // 数学（読み補助・追加）
+  '数':'かず','値':'あたい','式':'しき','例':'れい','和':'わ','差':'さ','積':'せき','商':'しょう',
+  // 国語の文法用語（std側でも拾う・読み問題の答えではない語）
+  '品詞':'ひんし','名詞':'めいし','動詞':'どうし','形容詞':'けいようし','形容動詞':'けいようどうし','副詞':'ふくし','助詞':'じょし','助動詞':'じょどうし','連体詞':'れんたいし','感動詞':'かんどうし',
+  '説明文':'せつめいぶん','話題':'わだい','筆者':'ひっしゃ','主題':'しゅだい','組み立て':'くみたて','存在':'そんざい','動作':'どうさ',
+  // 英語の文法用語
+  '一般動詞':'いっぱんどうし','目的格':'もくてきかく','代名詞':'だいめいし','否定':'ひてい','疑問':'ぎもん','否定文':'ひていぶん','疑問文':'ぎもんぶん','主格':'しゅかく','所有格':'しょゆうかく','過去形':'かこけい',
+  // 学習・UI共通
+  '問題':'もんだい','答え':'こたえ','正解':'せいかい','不正解':'ふせいかい','解説':'かいせつ','重要':'じゅうよう','重要文':'じゅうようぶん','次':'つぎ','前':'まえ','後':'あと',
+  '先生':'せんせい','学校':'がっこう','勉強':'べんきょう','漢字':'かんじ','読書':'どくしょ','音楽':'おんがく','美術':'びじゅつ','体育':'たいいく','技術':'ぎじゅつ','家庭':'かてい',
+  '理科':'りか','社会':'しゃかい','数学':'すうがく','英語':'えいご','国語':'こくご','試験':'しけん','中間':'ちゅうかん','期末':'きまつ','学年末':'がくねんまつ','復習':'ふくしゅう','予習':'よしゅう',
+  '学習':'がくしゅう','単元':'たんげん','基礎':'きそ','標準':'ひょうじゅん','応用':'おうよう','総合':'そうごう','全範囲':'ぜんはんい','理解':'りかい','注意':'ちゅうい','順番':'じゅんばん','本日':'ほんじつ','連続':'れんぞく','合計':'ごうけい','時間':'じかん','今日':'きょう','明日':'あした',
+  // よく出る熟語（正しい読みで広くカバー）
+  '中心':'ちゅうしん','中央':'ちゅうおう','最初':'さいしょ','最後':'さいご','名前':'なまえ','部分':'ぶぶん','場合':'ばあい','自分':'じぶん','全部':'ぜんぶ','半分':'はんぶん','本当':'ほんとう','普通':'ふつう','関係':'かんけい','結果':'けっか','理由':'りゆう','大切':'たいせつ','一番':'いちばん','反対':'はんたい','賛成':'さんせい','意味':'いみ','言葉':'ことば','数字':'すうじ','記号':'きごう',
+  '図形':'ずけい','直線':'ちょくせん','曲線':'きょくせん','線分':'せんぶん','角度':'かくど','小数':'しょうすう','単位':'たんい','長方形':'ちょうほうけい','正方形':'せいほうけい','三角形':'さんかくけい','円周':'えんしゅう','直径':'ちょっけい','半径':'はんけい','種類':'しゅるい','以上':'いじょう','以下':'いか','未満':'みまん','以外':'いがい',
+  '内容':'ないよう','表現':'ひょうげん','意見':'いけん','確認':'かくにん','必要':'ひつよう','使用':'しよう','利用':'りよう','共通':'きょうつう','内側':'うちがわ','外側':'そとがわ','両方':'りょうほう','以内':'いない',
+  '実験':'じっけん','物体':'ぶったい','温度':'おんど','気温':'きおん','加熱':'かねつ','水溶液':'すいようえき','溶液':'ようえき','原子':'げんし','元素':'げんそ','記録':'きろく',
+  '地図':'ちず','地形':'ちけい','産業':'さんぎょう','農業':'のうぎょう','工業':'こうぎょう','貿易':'ぼうえき','輸出':'ゆしゅつ','輸入':'ゆにゅう','文化':'ぶんか','宗教':'しゅうきょう','言語':'げんご','民族':'みんぞく','地域':'ちいき','国境':'こっきょう','領土':'りょうど','人々':'ひとびと','国々':'くにぐに',
+  '発音':'はつおん','文法':'ぶんぽう','単語':'たんご','会話':'かいわ','例文':'れいぶん','和訳':'わやく','過去':'かこ','現在':'げんざい','未来':'みらい','複数':'ふくすう','単数':'たんすう','英単語':'えいたんご',
+  '直後':'ちょくご','直前':'ちょくぜん','最も':'もっとも','次の':'つぎの','作る':'つくる','使う':'つかう','調べる':'しらべる','答える':'こたえる','正しい':'ただしい'
 };
 var FURIGANA_RE = (function(){
   var keys = Object.keys(FURIGANA).sort(function(a,b){ return b.length - a.length; });
@@ -2036,13 +2068,55 @@ var FURIGANA_JP_RE = (function(){
   return new RegExp('(' + keys.join('|') + ')', 'g');
 })();
 
-var _rubyMode = 'std'; // 'std'(理社数) | 'jp'(国語の用語のみ) | 'off'
+var _rubyMode = 'std'; // 'std'(理社数+一般) | 'jp'(国語の用語のみ) | 'off'
+// 単漢字の読みフォールバック（複合語辞書で拾えなかった漢字に広く振る）
+var KANJI_YOMI = {
+  '一':'いち','二':'に','三':'さん','四':'よん','五':'ご','六':'ろく','七':'なな','八':'はち','九':'きゅう','十':'じゅう','百':'ひゃく','千':'せん','万':'まん','億':'おく',
+  '円':'えん','年':'とし','月':'つき','日':'ひ','時':'じ','分':'ふん','秒':'びょう','週':'しゅう','半':'はん','回':'かい','度':'ど','番':'ばん','第':'だい','何':'なに','個':'こ','本':'ほん','点':'てん',
+  '朝':'あさ','昼':'ひる','夜':'よる','夕':'ゆう','今':'いま','毎':'まい','春':'はる','夏':'なつ','秋':'あき','冬':'ふゆ',
+  '山':'やま','川':'かわ','海':'うみ','空':'そら','雨':'あめ','雪':'ゆき','風':'かぜ','火':'ひ','水':'みず','木':'き','土':'つち','石':'いし','花':'はな','草':'くさ','林':'はやし','森':'もり','田':'た','畑':'はたけ','星':'ほし','天':'てん','地':'ち','池':'いけ','岩':'いわ','谷':'たに','島':'しま','波':'なみ','氷':'こおり','湖':'みずうみ','雲':'くも',
+  '目':'め','耳':'みみ','口':'くち','手':'て','足':'あし','体':'からだ','頭':'あたま','顔':'かお','心':'こころ','力':'ちから','声':'こえ','歯':'は','毛':'け','血':'ち','骨':'ほね',
+  '人':'ひと','父':'ちち','母':'はは','子':'こ','男':'おとこ','女':'おんな','兄':'あに','弟':'おとうと','姉':'あね','妹':'いもうと','友':'とも','名':'な','皆':'みな',
+  '上':'うえ','下':'した','左':'ひだり','右':'みぎ','中':'なか','外':'そと','内':'うち','前':'まえ','後':'あと','横':'よこ','間':'あいだ','東':'ひがし','西':'にし','南':'みなみ','北':'きた','方':'ほう','側':'がわ',
+  '大':'おお','小':'ちい','高':'たか','安':'やす','新':'あたら','古':'ふる','多':'おお','少':'すく','長':'なが','短':'みじか','早':'はや','強':'つよ','弱':'よわ','重':'おも','軽':'かる','太':'ふと','細':'ほそ','明':'あか','暗':'くら','広':'ひろ','深':'ふか','近':'ちか','遠':'とお','同':'おな','次':'つぎ','正':'ただ','悪':'わる',
+  '学':'がく','校':'こう','先':'せん','生':'せい','字':'じ','文':'ぶん','紙':'かみ','絵':'え','図':'ず','表':'あらわ','線':'せん','形':'かたち','色':'いろ','音':'おと','言':'こと','話':'はなし','物':'もの','事':'こと','所':'ところ','道':'みち','家':'いえ','店':'みせ','駅':'えき','町':'まち','村':'むら','市':'し','国':'くに','県':'けん','都':'と','京':'きょう','区':'く','部':'ぶ',
+  '食':'た','飲':'の','見':'み','聞':'き','読':'よ','書':'か','行':'い','来':'く','出':'で','入':'はい','立':'た','休':'やす','歩':'ある','走':'はし','思':'おも','知':'し','作':'つく','使':'つか','始':'はじ','終':'お','答':'こた','教':'おし','習':'なら','覚':'おぼ','持':'も','待':'ま','取':'と','買':'か','売':'う','会':'あ','合':'あ','切':'き',
+  '王':'おう','茶':'ちゃ','米':'こめ','麦':'むぎ','肉':'にく','魚':'さかな','卵':'たまご','油':'あぶら','糸':'いと','綿':'わた','銀':'ぎん','玉':'たま','球':'たま','箱':'はこ','机':'つくえ','窓':'まど','戸':'と','門':'もん','橋':'はし',
+  '式':'しき','差':'さ','積':'せき','商':'しょう','倍':'ばい','約':'やく','割':'わり','余':'あま','確':'たし',
+  '通':'とお','変':'か','選':'えら','進':'すす','決':'き','残':'のこ','続':'つづ','反':'はん','対':'たい','意':'い','味':'あじ','用':'よう','要':'よう','量':'りょう','別':'べつ','関':'かん','化':'か','速':'はや','配':'くば','調':'しら','感':'かん','表':'あらわ','現':'あらわ','他':'ほか','全':'ぜん'
+};
+var COMPOUND_MAXLEN = (function(){ var mx=1; for(var k in FURIGANA){ if(k.length>mx) mx=k.length; } return mx; })();
+function isKanjiChar(ch){ var c=ch.charCodeAt(0); return (c>=0x4E00 && c<=0x9FFF) || (c>=0x3400 && c<=0x4DBF); }
+// std用：複合語辞書（正しい読み）→ 単漢字フォールバック の順でルビを振る
+function furiganaStd(s){
+  var out='', i=0, n=s.length;
+  while(i<n){
+    var ch=s[i];
+    if(ch==='<'){ var gt=s.indexOf('>',i); if(gt===-1){ out+=s.slice(i); break; } out+=s.slice(i,gt+1); i=gt+1; continue; } // タグはそのまま
+    if(ch==='&'){ var sc=s.indexOf(';',i); if(sc!==-1 && sc-i<=8){ out+=s.slice(i,sc+1); i=sc+1; continue; } } // HTMLエンティティはそのまま
+    if(isKanjiChar(ch)){
+      // 1) 複合語辞書（長い順）＝必ず正しい読み
+      var matched=false;
+      for(var L=Math.min(COMPOUND_MAXLEN, n-i); L>=2; L--){ var sub=s.substr(i,L); if(FURIGANA[sub]){ out+='<ruby>'+sub+'<rt>'+FURIGANA[sub]+'</rt></ruby>'; i+=L; matched=true; break; } }
+      if(matched) continue;
+      // 2) 単漢字フォールバックは「前後がかな等で孤立した漢字」だけに適用（未知の熟語を誤読しない）
+      var yomi = FURIGANA[ch] || KANJI_YOMI[ch];
+      if(yomi){
+        var prevK = (i>0) && isKanjiChar(s[i-1]);
+        var nextK = (i+1<n) && isKanjiChar(s[i+1]);
+        if(!prevK && !nextK){ out+='<ruby>'+ch+'<rt>'+yomi+'</rt></ruby>'; i++; continue; }
+      }
+    }
+    out+=ch; i++;
+  }
+  return out;
+}
 function furigana(s){
   if(_rubyMode === 'off') return s;
   if(_rubyMode === 'jp'){
     return s.replace(FURIGANA_JP_RE, function(m){ return '<ruby>' + m + '<rt>' + FURIGANA_JP[m] + '</rt></ruby>'; });
   }
-  return s.replace(FURIGANA_RE, function(m){ return '<ruby>' + m + '<rt>' + FURIGANA[m] + '</rt></ruby>'; });
+  return furiganaStd(s);
 }
 
 // 文中の「分子/分母」を縦並びの分数に＋用語にふりがな（先にHTMLエスケープ）
@@ -5154,30 +5228,50 @@ function renderDailyCalendar(){
     dailyState.pv = buildDayPreview(pDay);
     dailyState.pvAnswers = {};
     dailyState.understood = {};
-    dailyState.ta = { pool: buildTimeAttackPool(pDay), idx:0, solved:0, correct:0, endAt:0, timer:null };
+    dailyState.ta = { pool: buildTimeAttackPool(pDay), answers:{}, solved:0, correct:0, endAt:0, timer:null };
     dailyState.phase = 'ta';
     renderDailyTimeAttack();
   };
 }
 
 var SUBJ_NAME = {en:'英語', math:'数学', jp:'国語', sci:'理科', soc:'社会'};
-// ===== ① 5分タイムアタック（過去問スピード） =====
+// ===== ① 5分タイムアタック（過去問スピード・問題一覧形式） =====
 function renderDailyTimeAttack(){
   var main = document.getElementById('main');
   var ta = dailyState.ta;
   if(!ta || !ta.pool.length){ endTimeAttack(); return; }
+  if(!ta.answers) ta.answers = {};
   if(ta.endAt === 0) ta.endAt = Date.now() + TA_SECONDS*1000;
-  var html = '<div class="daily-wrap"><div class="ta-head">'+
-    '<div class="ta-title">① 5分タイムアタック<em>過去問スピード</em></div>'+
-    '<div class="ta-timer" id="taTimer">5:00</div></div>';
-  html += '<div class="ta-sub">どんどん答えて、5分でどこまで進めるかチャレンジ！（まちがえても止まらず次へ）</div>';
-  html += '<div class="ta-progress"><span id="taSolved">解いた 0問</span> ・ <span id="taCorrect">正解 0</span></div>';
-  html += '<div class="ta-card" id="taCard"></div>';
-  html += '<div class="actions" style="justify-content:center;margin-top:10px"><button class="btn" id="taQuit">やめて復習へ →</button></div>';
-  html += '</div>';
+  var KANA = ['ア','イ','ウ','エ','オ','カ'];
+  var html = '<div class="daily-wrap">';
+  html += '<div class="ta-bar"><div class="ta-title">① 5分タイムアタック<em>過去問スピード</em></div>'+
+    '<div class="ta-bar-right"><span class="ta-count" id="taCount">答えた '+Object.keys(ta.answers).length+'/'+ta.pool.length+'</span>'+
+    '<div class="ta-timer" id="taTimer">5:00</div></div></div>';
+  html += '<div class="ta-sub" style="margin-bottom:8px">5分で できるだけ多く解こう！ わかる問題から どんどん答えてOK（まちがえても進める）。</div>';
+  html += '<div class="test-sheet">';
+  var lastSubj = null;
+  for(var i=0;i<ta.pool.length;i++){
+    var item = ta.pool[i], q = item.q;
+    if(item.subj !== lastSubj){ html += '<div class="exam-daimon-head" style="margin:14px 0 8px">'+SUBJ_NAME[item.subj]+'</div>'; lastSubj = item.subj; }
+    _rubyMode = (item.subj==='jp') ? 'jp' : 'std';
+    html += '<div class="test-row"><div class="test-q"><span class="num">'+(i+1)+'</span><div style="flex:1;min-width:0">'+fracText(q.text)+'</div></div>';
+    html += '<div class="test-a"><div class="choice-row">';
+    for(var c=0;c<q.choices.length;c++){ var sel=(ta.answers[i]===c)?' sel':''; html += '<button class="choice-pill'+sel+'" data-tac="'+i+'" data-c="'+c+'"><span class="kana">'+KANA[c]+'</span>'+fracText(q.choices[c])+'</button>'; }
+    html += '</div></div></div>';
+  }
+  _rubyMode = 'std';
+  html += '</div><div class="actions" style="justify-content:center;margin-top:14px"><button class="btn primary" id="taFinish">採点して復習へ →</button></div></div>';
   main.innerHTML = html;
-  document.getElementById('taQuit').onclick = function(){ endTimeAttack(); };
-  taShowQuestion();
+  main.querySelectorAll('.choice-pill[data-tac]').forEach(function(b){
+    b.onclick = function(){
+      var qi = parseInt(b.dataset.tac,10);
+      ta.answers[qi] = parseInt(b.dataset.c,10);
+      var box = b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){ p.classList.remove('sel'); });
+      b.classList.add('sel');
+      var cnt = document.getElementById('taCount'); if(cnt) cnt.textContent = '答えた '+Object.keys(ta.answers).length+'/'+ta.pool.length;
+    };
+  });
+  document.getElementById('taFinish').onclick = function(){ endTimeAttack(); };
   if(ta.timer) clearInterval(ta.timer);
   ta.timer = setInterval(function(){
     var tEl = document.getElementById('taTimer');
@@ -5189,40 +5283,16 @@ function renderDailyTimeAttack(){
     tEl.classList.toggle('urgent', sec<=30);
   }, 250);
 }
-function taShowQuestion(){
-  var ta = dailyState.ta, KANA=['ア','イ','ウ','エ','オ','カ'];
-  var card = document.getElementById('taCard'); if(!card) return;
-  var item = ta.pool[ta.idx % ta.pool.length], q = item.q;
-  _rubyMode = (item.subj==='jp') ? 'jp' : 'std';
-  var h = '<div class="ta-subj">'+SUBJ_NAME[item.subj]+'</div>';
-  h += '<div class="ta-q">'+fracText(q.text)+'</div>';
-  h += '<div class="choice-row ta-choices">';
-  for(var c=0;c<q.choices.length;c++){ h += '<button class="choice-pill" data-tac="'+c+'"><span class="kana">'+KANA[c]+'</span>'+fracText(q.choices[c])+'</button>'; }
-  h += '</div><div class="ta-feedback" id="taFb"></div>';
-  _rubyMode = 'std';
-  card.innerHTML = h;
-  card.querySelectorAll('.choice-pill[data-tac]').forEach(function(b){
-    b.onclick = function(){
-      if(card.dataset.locked) return; card.dataset.locked = '1';
-      var c = parseInt(b.dataset.tac,10), ok = (c === q.correct);
-      ta.solved++; if(ok) ta.correct++;
-      card.querySelectorAll('.choice-pill').forEach(function(p){ p.disabled = true; });
-      b.classList.add(ok ? 'ta-ok' : 'ta-ng');
-      if(!ok){ var cor = card.querySelectorAll('.choice-pill')[q.correct]; if(cor) cor.classList.add('ta-ok'); }
-      var fb = document.getElementById('taFb'); if(fb){ fb.textContent = ok ? '○ 正解！' : '× 正解は '+KANA[q.correct]; fb.className = 'ta-feedback '+(ok?'ok':'ng'); }
-      var sv = document.getElementById('taSolved'); if(sv) sv.textContent = '解いた '+ta.solved+'問';
-      var cr = document.getElementById('taCorrect'); if(cr) cr.textContent = '正解 '+ta.correct;
-      setTimeout(function(){ if(dailyState.phase!=='ta') return; ta.idx++; var cd=document.getElementById('taCard'); if(cd) cd.removeAttribute('data-locked'); taShowQuestion(); }, 650);
-    };
-  });
-}
 function endTimeAttack(){
-  var ta = dailyState.ta || {solved:0, correct:0};
+  var ta = dailyState.ta || {pool:[], answers:{}};
   if(ta.timer){ clearInterval(ta.timer); ta.timer = null; }
+  var solved=0, correct=0;
+  (ta.pool||[]).forEach(function(item,i){ var a = ta.answers ? ta.answers[i] : undefined; if(a!==undefined){ solved++; if(a===item.q.correct) correct++; } });
+  ta.solved = solved; ta.correct = correct;
   var main = document.getElementById('main');
   main.innerHTML = '<div class="daily-wrap"><div class="result"><h2>⏱ タイムアタック終了！</h2>'+
-    '<div class="score">'+ta.solved+' 問</div>'+
-    '<div class="msg" style="line-height:2">5分で <b>'+ta.solved+'問</b> 解いた！（正解 '+ta.correct+'）<br>つぎは「今日の復習」。<b>全問正解</b>できたら予習に進めるよ。</div>'+
+    '<div class="score">'+solved+' 問</div>'+
+    '<div class="msg" style="line-height:2">5分で <b>'+solved+'問</b> 解いた！（正解 '+correct+'）<br>つぎは「今日の復習」。<b>全問正解</b>できたら予習に進めるよ。</div>'+
     '<div class="actions" style="justify-content:center"><button class="btn primary" id="taToReview">② 今日の復習へ →</button></div></div></div>';
   document.getElementById('taToReview').onclick = function(){ dailyState.phase='review'; dailyState.reviewChecked=false; renderDailyReview(); };
 }

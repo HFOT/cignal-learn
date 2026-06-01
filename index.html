@@ -192,6 +192,18 @@ button{font-family:inherit;color:inherit}
 .chant-play:hover{filter:brightness(1.1)}
 .chant-play.stop{background:var(--ng)}
 .chant-hint{font-size:11px;color:var(--muted);margin-top:10px}
+/* 1個ずつ再生カード（最小ペア＋日本語） */
+.chant-rows{display:flex;flex-direction:column;gap:9px;margin-bottom:6px;text-align:left}
+.chant-row{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:12px;background:var(--paper-2);border:1px solid var(--border);cursor:pointer;transition:transform .15s,background .15s,box-shadow .15s}
+.chant-row:hover{border-color:var(--accent)}
+.chant-row.active{background:linear-gradient(90deg,rgba(124,92,255,.22),rgba(76,194,255,.12));border-color:var(--accent);transform:scale(1.03);box-shadow:0 6px 18px rgba(124,92,255,.35)}
+.chant-row-play{flex:0 0 auto;width:38px;height:38px;border-radius:50%;border:none;background:var(--accent);color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:filter .15s}
+.chant-row-play:hover{filter:brightness(1.12)}
+.chant-row.active .chant-row-play{animation:crPulse .5s infinite alternate}
+@keyframes crPulse{from{transform:scale(1)}to{transform:scale(1.12)}}
+.chant-row-text{flex:1;min-width:0}
+.cr-en{font-size:16px;font-weight:800;letter-spacing:.01em}
+.cr-ja{font-size:12px;color:var(--muted);margin-top:2px}
 .cal-wd{text-align:center;font-size:11px;color:var(--muted);padding:4px 0;font-weight:600}
 .cal-wd.sun{color:var(--ng)} .cal-wd.sat{color:var(--accent)}
 .cal-cell{
@@ -4148,9 +4160,9 @@ function summaryRenderMain(){
   for(var i=0; i<data.sections.length; i++){
     var sec = data.sections[i];
     html += '<div class="summary-section">';
+    var _chHas = RHYTHM_DATA[summarySubj] && RHYTHM_DATA[summarySubj][sec.title];
     html += '<div class="summary-section-title"><span class="num">'+(i+1)+'</span>'+furigana(sec.title)+
-      ((RHYTHM_DATA[summarySubj] && RHYTHM_DATA[summarySubj][sec.title]) ? '<button class="chant-btn" data-chant="'+escapeHtml(sec.title)+'">🎵 リズムで覚える</button>' : '')+
-      '</div>';
+      (_chHas ? '<button class="chant-btn" data-chant="'+escapeHtml(sec.title)+'">🎵 リズムで覚える</button>' : '')+'</div>';
     if(sec.table){
       html += '<table class="summary-table"><tr>';
       for(var h=0; h<sec.table.headers.length; h++){
@@ -4265,110 +4277,104 @@ function speakEnglish(text, btn){
   window.speechSynthesis.speak(utter);
 }
 
-// ============ 🎵 リズムで覚える（チャント） ============
-// 要点のセクションタイトルをキーに、PPAP風の短いチャント
+// ============ 🎵 リズムで覚える（最小ペアを1個ずつ・日本語つき） ============
+// 似ているけど意味がちがう文を、1個ずつ タップ再生。melody があればABCのうたで歌う
+// ABCのうた前半「ドドソソララソ」＝7音。7音節の文がぴったり乗る
+var ABC_MELODY = [523.25,523.25,783.99,783.99,880.00,880.00,783.99];
 var RHYTHM_DATA = {
   en: {
-    'be動詞の使い分け': { lines:[
-      {t:'I am！（アイ アム）', say:'I am'},
-      {t:'You are！（ユー アー）', say:'You are'},
-      {t:'He is, She is, It is！', say:'He is, she is, it is'},
-      {t:'みんなで We are, They are！', say:'We are, they are'},
-      {t:'I に am、You に are、', say:''},
-      {t:'のこりは is か are！', say:''},
-      {t:'not を つけたら ひていぶん！', say:'I am not'},
-      {t:'まえに 出したら ぎもんぶん！', say:'Are you happy?'}
-    ]},
-    'This / That の使い分け': { lines:[
-      {t:'近くは This！（ジス）', say:'This is a pen'},
-      {t:'遠くは That！（ザット）', say:'That is a pen'},
-      {t:'答えは It！ Yes, it is！', say:'Yes, it is'},
-      {t:'ちがえば No, it isn\'t！', say:'No, it isn\'t'},
-      {t:'母音の まえは a じゃない、an！', say:'an apple'}
-    ]},
-    'can（〜できる）': { lines:[
-      {t:'I can play！（アイ キャン プレイ）', say:'I can play'},
-      {t:'You can swim！（ユー キャン スイム）', say:'You can swim'},
-      {t:'can の あとは げんけい だよ！', say:''},
-      {t:'He can cook！ s は つけない！', say:'He can cook'},
-      {t:'できない ときは can\'t！', say:'I can\'t cook'},
-      {t:'Can you～？ — Yes, I can！', say:'Can you cook? Yes, I can'}
-    ]},
-    'あいさつ表現': { lines:[
-      {t:'Good morning！（グッ モーニン）', say:'Good morning'},
-      {t:'Nice to meet you！', say:'Nice to meet you'},
-      {t:'How are you？ — I\'m fine！', say:'How are you? I\'m fine, thank you'},
-      {t:'Thank you！ — You\'re welcome！', say:'Thank you. You\'re welcome'},
-      {t:'またね See you！ Goodbye！', say:'See you. Goodbye'}
-    ]}
+    'be動詞の使い分け': { items:[
+      {en:'I am a student.', ja:'わたしは生徒です。'},
+      {en:'You are a student.', ja:'あなたは生徒です。'},
+      {en:'He is a student.', ja:'かれは生徒です。'},
+      {en:'We are students.', ja:'わたしたちは生徒です。'},
+      {en:'I am not a student.', ja:'わたしは生徒では ありません。'},
+      {en:'Are you a student?', ja:'あなたは生徒ですか？'}
+    ] },
+    'This / That の使い分け': { items:[
+      {en:'This is a pen.', ja:'これは ペンです。'},
+      {en:'That is a pen.', ja:'あれは ペンです。'},
+      {en:'It is a pen.', ja:'それは ペンです。'},
+      {en:'This is not a pen.', ja:'これは ペンでは ありません。'},
+      {en:'Is this a pen?', ja:'これは ペンですか？'}
+    ] },
+    'can（〜できる）': { melody:ABC_MELODY, hint:'ぜんぶ ABCのうたの メロディで 歌えるよ！（7音）', items:[
+      {en:'I can play the piano.', ja:'わたしは ピアノを ひけます。'},
+      {en:'We can play the piano.', ja:'わたしたちは ピアノを ひけます。'},
+      {en:'He can play the piano.', ja:'かれは ピアノを ひけます。'},
+      {en:'She can play the piano.', ja:'かのじょは ピアノを ひけます。'},
+      {en:'I can\'t play the piano.', ja:'わたしは ピアノを ひけません。'},
+      {en:'Can you play the piano?', ja:'あなたは ピアノを ひけますか？'}
+    ] },
+    'あいさつ表現': { items:[
+      {en:'Good morning.', ja:'おはよう。'},
+      {en:'Nice to meet you.', ja:'はじめまして。'},
+      {en:'How are you?', ja:'元気ですか？'},
+      {en:'I\'m fine, thank you.', ja:'元気です、ありがとう。'},
+      {en:'Thank you.', ja:'ありがとう。'},
+      {en:'You\'re welcome.', ja:'どういたしまして。'}
+    ] }
   }
 };
-var _chant = { ac:null, beatTimer:null, beat:0, line:0, playing:false, lines:[] };
-function _chantSound(ac, t, kind){
-  var o=ac.createOscillator(), g=ac.createGain();
-  if(kind==='kick'){ o.frequency.setValueAtTime(160,t); o.frequency.exponentialRampToValueAtTime(50,t+0.12); g.gain.setValueAtTime(0.5,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.18); o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.2); }
-  else { o.type='square'; o.frequency.value=1100; g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.05); o.connect(g).connect(ac.destination); o.start(t); o.stop(t+0.06); }
+var _chant = { ac:null, melody:null, items:[] };
+// メロディを「歌うように」鳴らす（やわらかい音色＋レガート＋軽いビブラート）
+function _chantMelody(ac, freqs){
+  if(!ac) return;
+  var t=ac.currentTime+0.05;
+  for(var i=0;i<freqs.length;i++){
+    var d=(i===freqs.length-1)?0.95:0.5;
+    var o=ac.createOscillator(), o2=ac.createOscillator(), g=ac.createGain(), vib=ac.createOscillator(), vg=ac.createGain();
+    o.type='sine'; o2.type='triangle'; o.frequency.setValueAtTime(freqs[i],t); o2.frequency.setValueAtTime(freqs[i],t);
+    vib.frequency.setValueAtTime(5.5,t); vg.gain.setValueAtTime(freqs[i]*0.006,t); vib.connect(vg); vg.connect(o.frequency); vg.connect(o2.frequency);
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.22,t+0.05); g.gain.setValueAtTime(0.20,t+d-0.12); g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+    o.connect(g); o2.connect(g); g.connect(ac.destination);
+    o.start(t); o2.start(t); vib.start(t); o.stop(t+d); o2.stop(t+d); vib.stop(t+d);
+    t += d*0.96; // ちょっと重ねてレガート
+  }
 }
-function _chantSpeak(say){
+function _chantSpeak(say, rate){
   if(!say || !window.speechSynthesis) return;
   try{ window.speechSynthesis.cancel(); }catch(e){}
-  var u=new SpeechSynthesisUtterance(say); u.lang='en-US'; u.rate=1.0; u.pitch=1.05;
+  var u=new SpeechSynthesisUtterance(say); u.lang='en-US'; u.rate=rate||0.95; u.pitch=1.05;
   var vs=window.speechSynthesis.getVoices();
-  for(var i=0;i<vs.length;i++){ if(vs[i].lang.indexOf('en')===0){ u.voice=vs[i]; break; } }
+  for(var i=0;i<vs.length;i++){ if(vs[i].lang.indexOf('en')===0 && vs[i].name.indexOf('Female')!==-1){ u.voice=vs[i]; break; } if(vs[i].lang.indexOf('en')===0 && !u.voice) u.voice=vs[i]; }
   window.speechSynthesis.speak(u);
 }
 function openChantPlayer(subj, title){
   var chant = RHYTHM_DATA[subj] && RHYTHM_DATA[subj][title];
   if(!chant) return;
-  _chant.lines = chant.lines;
+  _chant.items = chant.items; _chant.melody = chant.melody || null;
   var ov = document.createElement('div');
   ov.className = 'chant-overlay'; ov.id = 'chantOverlay';
-  var lh = '';
-  for(var i=0;i<chant.lines.length;i++){ lh += '<div class="chant-line" data-i="'+i+'">'+furigana(escapeHtml(chant.lines[i].t))+'</div>'; }
+  var rows = '';
+  for(var i=0;i<chant.items.length;i++){
+    var it = chant.items[i];
+    rows += '<div class="chant-row" data-i="'+i+'"><button class="chant-row-play" data-i="'+i+'">'+(_chant.melody?'🎵':'▶')+'</button>'+
+      '<div class="chant-row-text"><div class="cr-en">'+escapeHtml(it.en)+'</div><div class="cr-ja">'+furigana(escapeHtml(it.ja))+'</div></div></div>';
+  }
+  var sub = _chant.melody ? 'ABCのうたで 1つずつ 歌おう' : '1つずつ きいて まねしよう';
+  var hint = chant.hint || 'にている けど 意味が ちがうよ。聞きくらべよう！';
   ov.innerHTML = '<div class="chant-card"><button class="chant-close" id="chantClose">✕</button>'+
-    '<div class="chant-title">🎵 '+furigana(escapeHtml(title))+'<span>リズムで覚えよう</span></div>'+
-    '<div class="chant-lines" id="chantLines">'+lh+'</div>'+
-    '<div class="chant-ctrl"><button class="chant-play" id="chantPlay">▶ さいせい</button><button class="chant-play stop" id="chantStop" style="display:none">■ ストップ</button></div>'+
-    '<div class="chant-hint">リズムに のって こえに 出してみよう！</div></div>';
+    '<div class="chant-title">🎵 '+furigana(escapeHtml(title))+'<span>'+sub+'</span></div>'+
+    '<div class="chant-rows" id="chantRows">'+rows+'</div>'+
+    '<div class="chant-hint">'+hint+'</div></div>';
   document.body.appendChild(ov);
   document.getElementById('chantClose').onclick = closeChantPlayer;
   ov.onclick = function(e){ if(e.target===ov) closeChantPlayer(); };
-  document.getElementById('chantPlay').onclick = startChant;
-  document.getElementById('chantStop').onclick = stopChant;
+  ov.querySelectorAll('.chant-row').forEach(function(row){
+    row.onclick = function(){ playChantOne(parseInt(row.dataset.i,10)); };
+  });
 }
-function startChant(){
-  if(_chant.playing) return;
-  _chant.playing = true; _chant.beat = 0; _chant.line = 0;
+function playChantOne(i){
+  var it = _chant.items[i]; if(!it) return;
   try{ _chant.ac = _chant.ac || new (window.AudioContext||window.webkitAudioContext)(); if(_chant.ac.state==='suspended') _chant.ac.resume(); }catch(e){ _chant.ac=null; }
-  var pb=document.getElementById('chantPlay'), sb=document.getElementById('chantStop');
-  if(pb) pb.style.display='none'; if(sb) sb.style.display='';
-  var beatMs = 600; // 100 BPM
-  function advanceLine(){
-    var lines = document.querySelectorAll('#chantLines .chant-line');
-    lines.forEach(function(el){ el.classList.remove('active'); });
-    var idx = _chant.line % _chant.lines.length;
-    var el = lines[idx]; if(el){ el.classList.add('active'); el.scrollIntoView({block:'center'}); }
-    _chantSpeak(_chant.lines[idx].say);
-    _chant.line++;
-  }
-  advanceLine();
-  _chant.beatTimer = setInterval(function(){
-    if(!_chant.playing){ return; }
-    if(_chant.ac){ var t=_chant.ac.currentTime+0.02; _chantSound(_chant.ac, t, (_chant.beat%2===0)?'kick':'hat'); }
-    _chant.beat++;
-    if(_chant.beat % 2 === 0){ advanceLine(); }
-  }, beatMs);
-}
-function stopChant(){
-  _chant.playing = false;
-  if(_chant.beatTimer){ clearInterval(_chant.beatTimer); _chant.beatTimer=null; }
-  try{ window.speechSynthesis.cancel(); }catch(e){}
-  var pb=document.getElementById('chantPlay'), sb=document.getElementById('chantStop');
-  if(pb) pb.style.display=''; if(sb) sb.style.display='none';
-  document.querySelectorAll('#chantLines .chant-line').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('#chantRows .chant-row').forEach(function(el){ el.classList.remove('active'); });
+  var row = document.querySelector('#chantRows .chant-row[data-i="'+i+'"]'); if(row) row.classList.add('active');
+  if(_chant.melody && _chant.ac){ _chantMelody(_chant.ac, _chant.melody); _chantSpeak(it.en, 0.9); }
+  else { _chantSpeak(it.en, 0.95); }
 }
 function closeChantPlayer(){
-  stopChant();
+  try{ window.speechSynthesis.cancel(); }catch(e){}
   var ov=document.getElementById('chantOverlay'); if(ov) ov.remove();
 }
 

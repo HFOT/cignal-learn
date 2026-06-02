@@ -5968,18 +5968,22 @@ function buildFinisherPool(){
   });
   return pool;
 }
+function _finOrder(n){ var o=[]; for(var k=0;k<n;k++) o.push(k); return _finShuffle(o); }
 function startFinisher(){
-  finisherState={ pool:buildFinisherPool(), idx:0, correct:0, picked:null, bySubj:{}, wrong:[], rewarded:false };
+  finisherState={ pool:buildFinisherPool(), idx:0, correct:0, picked:null, bySubj:{}, wrong:[], rewarded:false, order:null, firstTry:true };
   trainState.mode='finisher'; renderFinisher();
 }
 function renderFinisher(){
   var main=document.getElementById('main'); var fs=finisherState;
   if(fs.idx>=fs.pool.length){ renderFinisherResult(); return; }
   var cur=fs.pool[fs.idx], it=cur.it, subj=cur.subj;
+  if(!fs.order || fs.order.length!==it.choices.length) fs.order=_finOrder(it.choices.length);
+  var order=fs.order, correctPos=order.indexOf(it.correct);
   _rubyMode=(subj==='jp')?'jp':'std';
   var KANA=['ア','イ','ウ','エ','オ','カ'];
   var subjName=(TRAIN_DATA[subj]&&TRAIN_DATA[subj].name)||(SUBJECTS[subj]&&SUBJECTS[subj].name)||subj;
   var answered=(fs.picked!=null);
+  var ok = answered && (fs.picked===correctPos);
   var prompt=it.ja||it.prompt;
   var pct=Math.round(fs.idx/fs.pool.length*100);
   var html='<div class="train-wrap">';
@@ -5988,36 +5992,40 @@ function renderFinisher(){
   html+='<div class="fin-subj">'+escapeHtml(subjName)+(cur.cat?' ・ '+escapeHtml(cur.cat):'')+(it.ja?' ・ 日本語→英語':'')+'</div>';
   html+='<div class="train-prompt">'+(it.ja?furigana(escapeHtml(prompt)):fracText(prompt))+'</div>';
   html+='<div class="train-choices">';
-  for(var c=0;c<it.choices.length;c++){
+  for(var pos=0;pos<order.length;pos++){
+    var origIdx=order[pos];
     var cls='tc';
-    if(answered){ if(c===it.correct) cls+=' correct'; else if(fs.picked===c) cls+=' wrong'; }
-    var chtxt=it.ja?escapeHtml(it.choices[c]):fracText(it.choices[c]);
-    html+='<button class="'+cls+'" data-fc="'+c+'"'+(answered?' disabled':'')+'><span class="kana">'+KANA[c]+'</span>'+chtxt+'</button>';
+    if(answered){ if(pos===correctPos) cls+=' correct'; else if(fs.picked===pos) cls+=' wrong'; }
+    var chtxt=it.ja?escapeHtml(it.choices[origIdx]):fracText(it.choices[origIdx]);
+    html+='<button class="'+cls+'" data-fc="'+pos+'"'+(answered?' disabled':'')+'><span class="kana">'+KANA[pos]+'</span>'+chtxt+'</button>';
   }
   html+='</div>';
   if(answered){
-    var ok=(fs.picked===it.correct);
-    html+='<div class="train-expl show">'+(ok?'⭕ 正解！':'❌ 正解は '+KANA[it.correct])+(it.expl?'<br>📘 '+furigana(escapeHtml(it.expl)):'')+'</div>';
-    if(!ok) html+='<div class="train-next"><button id="finNext">つぎへ →</button></div>';
+    html+='<div class="train-expl show">'+(ok?'⭕ 正解！つぎへ進むよ':'❌ ちがう。正解は '+KANA[correctPos])+(it.expl?'<br>📘 '+furigana(escapeHtml(it.expl)):'')+'</div>';
+    if(!ok) html+='<div class="train-next"><button id="finRetryQ">🔁 もう一度（正解するまで進めない・位置がかわる）</button></div>';
   }
   html+='</div></div>';
   main.innerHTML=html; _rubyMode='std';
   if(!answered){
     main.querySelectorAll('.tc[data-fc]').forEach(function(b){ b.onclick=function(){
       if(fs.picked!=null) return;
-      fs.picked=parseInt(b.dataset.fc,10);
-      var ok=(fs.picked===it.correct);
-      fs.bySubj[subj]=fs.bySubj[subj]||{c:0,t:0}; fs.bySubj[subj].t++;
-      if(ok){ fs.correct++; fs.bySubj[subj].c++; }
-      else { fs.wrong.push({subj:subj, cat:cur.cat, it:it}); }
+      var pos=parseInt(b.dataset.fc,10);
+      fs.picked=pos;
+      var good=(pos===correctPos);
+      if(fs.firstTry){ // 採点は最初の1回だけ（やり直しても点は増えない＝苦手扱い）
+        fs.bySubj[subj]=fs.bySubj[subj]||{c:0,t:0}; fs.bySubj[subj].t++;
+        if(good){ fs.correct++; fs.bySubj[subj].c++; } else { fs.wrong.push({subj:subj, cat:cur.cat, it:it}); }
+        fs.firstTry=false;
+      }
       renderFinisher();
-      if(ok){ setTimeout(function(){ if(trainState.mode==='finisher' && finisherState===fs && fs.picked!=null){ finNext(); } }, 700); }
+      if(good){ setTimeout(function(){ if(trainState.mode==='finisher' && finisherState===fs && fs.picked!=null){ finNext(); } }, 700); }
+      // 不正解は自動で進まない → 「もう一度」で位置をかえて再出題
     }; });
-  } else {
-    var fn=document.getElementById('finNext'); if(fn) fn.onclick=finNext;
+  } else if(!ok){
+    var rb=document.getElementById('finRetryQ'); if(rb) rb.onclick=function(){ fs.picked=null; fs.order=_finOrder(it.choices.length); renderFinisher(); };
   }
 }
-function finNext(){ finisherState.idx++; finisherState.picked=null; renderFinisher(); }
+function finNext(){ var fs=finisherState; fs.idx++; fs.picked=null; fs.order=null; fs.firstTry=true; renderFinisher(); }
 function renderFinisherResult(){
   var main=document.getElementById('main'); var fs=finisherState;
   var total=fs.pool.length, pct=total?Math.round(fs.correct/total*100):0;

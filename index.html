@@ -204,6 +204,42 @@ button{font-family:inherit;color:inherit}
 .chant-row-text{flex:1;min-width:0}
 .cr-en{font-size:16px;font-weight:800;letter-spacing:.01em}
 .cr-ja{font-size:12px;color:var(--muted);margin-top:2px}
+/* 🔥 5科目集中トレーニング */
+.mode-train{background:linear-gradient(135deg,#ff6b3d,#ff3d77)!important;color:#fff!important;border:1px solid transparent!important}
+.train-wrap{max-width:680px;margin:0 auto;padding:6px 4px 28px}
+.train-subjtabs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
+.train-subjtab{padding:7px 17px;border-radius:20px;border:1px solid var(--border);background:var(--paper-2);color:var(--muted);font-weight:700;cursor:pointer;font-size:13px;transition:all .12s}
+.train-subjtab:hover{border-color:var(--accent)}
+.train-subjtab.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.train-cats{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:14px}
+.train-cat{padding:5px 13px;border-radius:14px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-size:12px;cursor:pointer;transition:all .12s}
+.train-cat:hover{border-color:var(--accent)}
+.train-cat.on{background:rgba(68,104,255,.18);border-color:var(--accent);color:var(--accent);font-weight:700}
+.train-card{background:var(--paper);border:1px solid var(--border-h);border-radius:16px;padding:20px 22px;box-shadow:0 3px 14px var(--shadow)}
+.train-progress{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:10px}
+.train-qlabel{font-size:12px;color:var(--accent);font-weight:700;margin-bottom:6px}
+.train-prompt{font-size:23px;font-weight:800;line-height:1.55;margin-bottom:18px}
+.train-choices{display:flex;flex-direction:column;gap:9px}
+.train-choices .tc{padding:12px 15px;border-radius:10px;border:1px solid var(--border);background:var(--paper-2);color:var(--ink);font-size:15px;cursor:pointer;text-align:left;transition:all .12s}
+.train-choices .tc:hover{border-color:var(--accent)}
+.train-choices .tc .kana{font-weight:700;margin-right:9px;color:var(--muted)}
+.train-choices .tc.correct{background:rgba(62,209,132,.2);border-color:var(--ok);color:var(--ok);font-weight:800}
+.train-choices .tc.wrong{background:rgba(232,76,76,.18);border-color:var(--ng);color:var(--ng)}
+.train-choices .tc.elim{opacity:.32;text-decoration:line-through;pointer-events:none}
+.train-choices .tc:disabled{cursor:default}
+.train-help{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.train-help button{padding:6px 13px;border-radius:16px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;transition:all .12s}
+.train-help .hint:hover{color:var(--warn);border-color:var(--warn)}
+.train-help .special:hover{color:var(--accent);border-color:var(--accent)}
+.train-help .ans:hover{color:var(--ok);border-color:var(--ok)}
+.train-hintbox{margin-top:10px;font-size:13px;border-radius:8px;padding:9px 12px}
+.train-hintbox.hint{background:rgba(240,185,11,.1);color:var(--warn);border:1px solid var(--warn)}
+.train-hintbox.special{background:rgba(124,92,255,.1);color:var(--accent);border:1px solid var(--accent)}
+.train-expl{margin-top:10px;font-size:13px;line-height:1.75;background:var(--paper-2);border-left:3px solid var(--ok);border-radius:8px;padding:10px 13px;display:none}
+.train-expl.show{display:block}
+.train-next{margin-top:16px;text-align:center}
+.train-next button{padding:11px 32px;border-radius:24px;border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:800;cursor:pointer;transition:filter .15s}
+.train-next button:hover{filter:brightness(1.1)}
 .cal-wd{text-align:center;font-size:11px;color:var(--muted);padding:4px 0;font-weight:600}
 .cal-wd.sun{color:var(--ng)} .cal-wd.sat{color:var(--accent)}
 .cal-cell{
@@ -1058,6 +1094,7 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
     <button class="mode-btn" data-mode="summary">要点✓</button>
     <button class="mode-btn" data-mode="cards">暗記</button>
     <button class="mode-btn" data-mode="mock">模試</button>
+    <button class="mode-btn mode-train" data-mode="train">🔥 5科目集中</button>
   </div>
 
   <div class="study-guide" id="studyGuide"></div>
@@ -2675,6 +2712,11 @@ function switchMode(mode){
     eyebrow.textContent = '総合模試 / Jr.High 1 — 1単元まとめ';
     title.innerHTML = '総合まとめ模試<em>50分 × 5パターン</em>';
     mockRender();
+  } else if(mode === 'train'){
+    hdrRight.innerHTML = '<div class="hdr-stat"><b id="trainDone">0</b><span>こなした</span></div>';
+    eyebrow.textContent = '5科目集中トレーニング / テスト直前';
+    title.innerHTML = '集中トレーニング<em>選ぶだけ・日本語と英語を連動</em>';
+    renderTrain();
   }
   // 勉強順ナビが有効なら現在ステップを同期
   if(guide.active) renderGuide();
@@ -5726,6 +5768,125 @@ function dailyFinish(){
     '<div class="actions" style="justify-content:center;margin-top:10px"><button class="btn primary" id="dfCal">カレンダーへ →</button></div></div></div>';
   main.innerHTML=html;
   document.getElementById('dfCal').onclick=function(){ dailyState.phase='cal'; renderDailyCalendar(); };
+}
+
+// ============ 🔥 5科目集中トレーニング ============
+var TRAIN_SUBJS = ['en','math','jp','sci','soc'];
+var trainState = { subj:'en', cat:0, idx:0, picked:null, revealed:false, elim:[], done:0, hintShown:false };
+// 英語＝日本語→英語の連動（手作り）。ヒント/スペシャルヒント/説明つき
+var TRAIN_DATA = {
+  en: { name:'英語', cats:[
+    { name:'be動詞（〜です）', items:[
+      {ja:'私は生徒です。', choices:['I am a student.','You are a student.','He is a student.','I am student.'], correct:0, hint:'「私は」＝I、be動詞は am。', special:'a を忘れずに（I ___ a student）。', expl:'I am a student. I のbe動詞は am。数えられる名詞には a をつける。'},
+      {ja:'あなたは先生です。', choices:['You are a teacher.','I am a teacher.','You is a teacher.','You are teacher.'], correct:0, hint:'「あなたは」＝You、be動詞は are。', special:'You の be動詞は are。', expl:'You are a teacher. You のbe動詞は are。'},
+      {ja:'彼は私の友達です。', choices:['He is my friend.','He are my friend.','He am my friend.','His my friend.'], correct:0, hint:'「彼は」＝He、be動詞は is。', special:'He / She / It は is。', expl:'He is my friend. 三人称単数(He)のbe動詞は is。my＝私の。'},
+      {ja:'私たちは生徒です。', choices:['We are students.','We is students.','We am students.','We are student.'], correct:0, hint:'「私たちは」＝We（複数）。', special:'複数なので are ＋ students。', expl:'We are students. 複数(We)のbe動詞は are。生徒が複数なので students。'},
+      {ja:'私は東京出身です。', choices:['I am from Tokyo.','I from Tokyo.','I am Tokyo.','From Tokyo I am.'], correct:0, hint:'「〜出身」＝from 〜。', special:'be動詞 am ＋ from。', expl:'I am from Tokyo. from＝〜出身。'}
+    ]},
+    { name:'this / that / it', items:[
+      {ja:'これはペンです。', choices:['This is a pen.','That is a pen.','It is pen.','This are a pen.'], correct:0, hint:'近くのものは This。', special:'This is a 〜。', expl:'This is a pen. 近くのもの1つは This is a 〜。'},
+      {ja:'あれは私のかばんです。', choices:['That is my bag.','This is my bag.','It is my bag.','That are my bag.'], correct:0, hint:'遠くのものは That。', special:'近くThis／遠くThat。', expl:'That is my bag. 遠くのものは That。'},
+      {ja:'これはりんごです。', choices:['This is an apple.','This is a apple.','This is apple.','That is a apple.'], correct:0, hint:'apple は母音で始まる。', special:'母音の前は a ではなく an。', expl:'This is an apple. apple は母音(a)で始まるので an。'},
+      {ja:'これは何ですか。', choices:['What is this?','What this is?','Is this what?','What are this?'], correct:0, hint:'「何」＝What を先頭に。', special:'What ＋ is ＋ this?', expl:'What is this? 疑問詞 What を先頭に、be動詞 is を主語の前に。'},
+      {ja:'あれはあなたのペンですか。', choices:['Is that your pen?','That is your pen?','Are that your pen?','Is your pen that?'], correct:0, hint:'be動詞 Is を先頭に。', special:'Is that 〜? の語順。', expl:'Is that your pen? 疑問文は be動詞を主語の前に出す。'}
+    ]},
+    { name:'can（〜できる）', items:[
+      {ja:'私はピアノをひけます。', choices:['I can play the piano.','I play can the piano.','I can plays the piano.','I am play the piano.'], correct:0, hint:'can ＋ 動詞の原形。', special:'can play（s をつけない）。', expl:'I can play the piano. can のあとは動詞の原形。'},
+      {ja:'彼は速く泳げます。', choices:['He can swim fast.','He cans swim fast.','He can swims fast.','He is swim fast.'], correct:0, hint:'can は He でも形は同じ。', special:'He can swim（cans ✗）。', expl:'He can swim fast. canは三人称でも変化しない。動詞は原形。'},
+      {ja:'私は料理ができません。', choices:['I can\'t cook.','I don\'t cook.','I am not cook.','I not can cook.'], correct:0, hint:'否定は can\'t。', special:'can\'t ＝ cannot。', expl:'I can\'t cook. canの否定は can\'t（cannot）。'},
+      {ja:'あなたはギターをひけますか。', choices:['Can you play the guitar?','Do you play the guitar?','Are you play the guitar?','You can play the guitar?'], correct:0, hint:'疑問は Can を先頭に。', special:'Can you 〜?', expl:'Can you play the guitar? canの疑問文は Can を主語の前に。'},
+      {ja:'私はテニスが得意です。', choices:['I am good at tennis.','I am good tennis.','I can good tennis.','I like good tennis.'], correct:0, hint:'「〜が得意」＝good at。', special:'be good at 〜。', expl:'I am good at tennis. 「得意」は be good at 〜。'},
+      {ja:'私の兄はサッカー部に入っています。', choices:['My brother is on the soccer team.','My brother in the soccer.','My brother plays soccer team.','My brother on soccer.'], correct:0, hint:'部活は on the 〜 team。', special:'be on the 〜 team。', expl:'My brother is on the soccer team. 「〜部に入っている」は be on the 〜 team。'}
+    ]},
+    { name:'否定・疑問', items:[
+      {ja:'私は幸せではありません。', choices:['I am not happy.','I not am happy.','I am happy not.','I do not happy.'], correct:0, hint:'be動詞のあとに not。', special:'am ＋ not。', expl:'I am not happy. be動詞の否定は後ろに not。'},
+      {ja:'あなたは生徒ですか。', choices:['Are you a student?','You are a student?','Do you a student?','Is you a student?'], correct:0, hint:'be動詞 Are を先頭に。', special:'Are you 〜?', expl:'Are you a student? 疑問文は be動詞を主語の前に。'},
+      {ja:'あなたは犬が好きですか。', choices:['Do you like dogs?','Are you like dogs?','You like dogs?','Like you dogs?'], correct:0, hint:'一般動詞の疑問は Do。', special:'Do you like 〜?', expl:'Do you like dogs? 一般動詞(like)の疑問文は Do you 〜?'},
+      {ja:'私は納豆が好きではありません。', choices:['I don\'t like natto.','I am not like natto.','I not like natto.','I like not natto.'], correct:0, hint:'一般動詞の否定は don\'t。', special:'don\'t ＋ 動詞。', expl:'I don\'t like natto. 一般動詞(like)の否定は don\'t。'},
+      {ja:'あなたは生徒ですか。— いいえ、ちがいます。', choices:['No, I am not.','No, you aren\'t.','No, I don\'t.','No, he isn\'t.'], correct:0, hint:'Are you 〜? には I で答える。', special:'No, I am not.', expl:'No, I am not. Are you 〜? の No応答は I am not.'}
+    ]},
+    { name:'あいさつ・連語', items:[
+      {ja:'はじめまして。', choices:['Nice to meet you.','See you.','Thank you.','You are welcome.'], correct:0, hint:'初対面のあいさつ。', special:'Nice to meet you.', expl:'Nice to meet you. 初めて会ったときのあいさつ。'},
+      {ja:'どういたしまして。', choices:['You\'re welcome.','Thank you.','I\'m sorry.','Excuse me.'], correct:0, hint:'Thank you への返事。', special:'You\'re welcome.', expl:'You\'re welcome. Thank you への返事。'},
+      {ja:'私のことをアミと呼んでください。', choices:['Call me Ami.','Call Ami me.','My name Ami.','I am call Ami.'], correct:0, hint:'Call ＋ me ＋ 名前。', special:'Call me 〜.', expl:'Call me Ami. 「〜と呼んでください」は Call me 〜.'},
+      {ja:'あなたはどうですか。', choices:['How about you?','How you about?','What about you are?','How are about you?'], correct:0, hint:'聞き返す表現。', special:'How about you?', expl:'How about you? 「あなたはどう？」と聞き返す表現。'},
+      {ja:'元気ですか。', choices:['How are you?','What are you?','Who are you?','Where are you?'], correct:0, hint:'How are 〜?', special:'How are you?', expl:'How are you? 「元気ですか」。答えは I\'m fine, thank you.'}
+    ]}
+  ]}
+};
+// 他科目は LEARN(SUBJECTS) のレベルから自動構築（解説つき）
+function trainGetCats(subj){
+  if(TRAIN_DATA[subj]) return TRAIN_DATA[subj].cats;
+  var lv = (SUBJECTS[subj] && SUBJECTS[subj].levels) || [];
+  return lv.map(function(level){
+    return { name: level.name, items: (level.questions||[]).filter(function(q){ return q.choices; }).map(function(q){
+      return { prompt:q.q, choices:q.choices, correct:q.a, expl:q.expl||'' };
+    }) };
+  });
+}
+function trainHintText(it){
+  if(it.hint) return it.hint;
+  if(it.expl){ var m=String(it.expl).split(/[。\n]/)[0]; if(m && m.length>=3) return m+'。'; }
+  return '選択肢をよく見て、正しい形を選ぼう。';
+}
+function trainBindTabs(main){
+  main.querySelectorAll('.train-subjtab[data-tsubj]').forEach(function(b){ b.onclick=function(){ trainState.subj=b.dataset.tsubj; trainState.cat=0; trainResetItem(); renderTrain(); }; });
+  main.querySelectorAll('.train-cat[data-tcat]').forEach(function(b){ b.onclick=function(){ trainState.cat=parseInt(b.dataset.tcat,10); trainResetItem(); renderTrain(); }; });
+}
+function trainResetItem(){ trainState.idx=0; trainState.picked=null; trainState.revealed=false; trainState.elim=[]; trainState.hintShown=false; }
+function trainNext(){
+  var cats=trainGetCats(trainState.subj); var cat=cats[trainState.cat]||{items:[]};
+  trainState.idx=(trainState.idx+1)%Math.max(1,cat.items.length);
+  trainState.picked=null; trainState.revealed=false; trainState.elim=[]; trainState.hintShown=false;
+  renderTrain();
+}
+function renderTrain(){
+  var main=document.getElementById('main');
+  _rubyMode = (trainState.subj==='jp')?'jp':'std';
+  var cats=trainGetCats(trainState.subj);
+  if(trainState.cat>=cats.length) trainState.cat=0;
+  var cat=cats[trainState.cat]||{items:[]};
+  if(trainState.idx>=cat.items.length) trainState.idx=0;
+  var it=cat.items[trainState.idx];
+  var KANA=['ア','イ','ウ','エ','オ','カ'];
+  var html='<div class="train-wrap">';
+  html+='<div class="train-subjtabs">';
+  TRAIN_SUBJS.forEach(function(s){ var nm=(TRAIN_DATA[s]&&TRAIN_DATA[s].name)||(SUBJECTS[s]&&SUBJECTS[s].name)||s; html+='<button class="train-subjtab'+(s===trainState.subj?' on':'')+'" data-tsubj="'+s+'">'+nm+'</button>'; });
+  html+='</div>';
+  html+='<div class="train-cats">';
+  cats.forEach(function(c,ci){ html+='<button class="train-cat'+(ci===trainState.cat?' on':'')+'" data-tcat="'+ci+'">'+furigana(escapeHtml(c.name))+'</button>'; });
+  html+='</div>';
+  if(!it){ html+='<div class="train-card">この項目は準備中です。</div></div>'; main.innerHTML=html; _rubyMode='std'; trainBindTabs(main); return; }
+  var answered=(trainState.picked!=null||trainState.revealed);
+  var prompt=it.ja||it.prompt;
+  var qlabel=it.ja?'次の日本語を 英語に すると？':'正しい答えを えらぼう';
+  html+='<div class="train-card">';
+  html+='<div class="train-progress">'+(trainState.idx+1)+' / '+cat.items.length+'　'+escapeHtml(cat.name)+'</div>';
+  html+='<div class="train-qlabel">'+qlabel+'</div>';
+  html+='<div class="train-prompt">'+(it.ja?furigana(escapeHtml(prompt)):fracText(prompt))+'</div>';
+  html+='<div class="train-choices">';
+  for(var c=0;c<it.choices.length;c++){
+    var cls='tc';
+    if(trainState.elim.indexOf(c)>=0) cls+=' elim';
+    if(answered){ if(c===it.correct) cls+=' correct'; else if(trainState.picked===c) cls+=' wrong'; }
+    var chtxt=it.ja?escapeHtml(it.choices[c]):fracText(it.choices[c]);
+    html+='<button class="'+cls+'" data-tc="'+c+'"'+(answered?' disabled':'')+'><span class="kana">'+KANA[c]+'</span>'+chtxt+'</button>';
+  }
+  html+='</div>';
+  html+='<div class="train-help"><button class="hint" id="tHint">💡 ヒント</button><button class="special" id="tSpecial">⭐ スペシャルヒント</button><button class="ans" id="tAns">👀 答えを見る</button></div>';
+  html+='<div class="train-hintbox hint" id="tHintBox" style="display:'+(trainState.hintShown?'block':'none')+'">'+furigana(escapeHtml(trainHintText(it)))+'</div>';
+  html+='<div class="train-hintbox special" id="tSpecialBox" style="display:'+(trainState.elim.length?'block':'none')+'">まちがいを 2つ 消したよ。のこりから えらぼう！</div>';
+  html+='<div class="train-expl'+(answered?' show':'')+'" id="tExpl">📘 '+furigana(escapeHtml(it.expl||''))+'</div>';
+  html+='<div class="train-next"><button id="tNext">つぎへ →</button></div>';
+  html+='</div></div>';
+  main.innerHTML=html;
+  _rubyMode='std';
+  trainBindTabs(main);
+  main.querySelectorAll('.tc[data-tc]').forEach(function(b){ b.onclick=function(){ if(answered) return; trainState.picked=parseInt(b.dataset.tc,10); if(trainState.picked===it.correct){ trainState.done++; var d=document.getElementById('trainDone'); if(d) d.textContent=trainState.done; } renderTrain(); }; });
+  document.getElementById('tHint').onclick=function(){ trainState.hintShown=!trainState.hintShown; document.getElementById('tHintBox').style.display=trainState.hintShown?'block':'none'; };
+  document.getElementById('tSpecial').onclick=function(){ var wrongs=[]; for(var c=0;c<it.choices.length;c++){ if(c!==it.correct) wrongs.push(c); } trainState.elim=wrongs.slice(0,2); renderTrain(); };
+  document.getElementById('tAns').onclick=function(){ trainState.revealed=true; renderTrain(); };
+  document.getElementById('tNext').onclick=function(){ trainNext(); };
 }
 
 // ============ Init ============

@@ -1373,7 +1373,13 @@ var SUBJECTS = {
           {q:'(+10) + (-15) = ?', choices:['+25','-25','+5','-5'], a:3, expl:'絶対値の差 15-10=5、大きい方は -15 → -5。'},
           {q:'(-3) + (+8) + (-2) = ?', choices:['+3','-3','+13','-13'], a:0, expl:'順に計算: -3+8=+5、+5+(-2)=+3。'},
           {q:'(+7) + (-7) = ?', choices:['+14','-14','0','+7'], a:2, expl:'反対の数を足すと必ず 0 になる。'},
-          {q:'(-9) + (+4) = ?', choices:['+5','-5','+13','-13'], a:1, expl:'絶対値の差 9-4=5、大きい方は -9 → -5。'}
+          {q:'(-9) + (+4) = ?', choices:['+5','-5','+13','-13'], a:1, expl:'絶対値の差 9-4=5、大きい方は -9 → -5。'},
+          {q:'(+6) + (+8) = ?', choices:['+14','-14','+2','-2'], a:0, expl:'同符号→足してそのまま符号。6+8=14→+14。'},
+          {q:'(-7) + (-5) = ?', choices:['-12','+12','-2','+2'], a:0, expl:'マイナス同士→足してマイナス。-12。'},
+          {q:'(+9) + (-12) = ?', choices:['+3','-3','+21','-21'], a:1, expl:'差12-9=3、大きい方-12→-3。'},
+          {q:'(-8) + (+8) = ?', choices:['+16','-16','0','+8'], a:2, expl:'反対の数→0。'},
+          {q:'(+15) + (-6) = ?', choices:['+9','-9','+21','-21'], a:0, expl:'差15-6=9、大きい方+15→+9。'},
+          {q:'(-10) + (+3) + (-1) = ?', choices:['-8','+8','-14','+14'], a:0, expl:'-10+3=-7、-7+(-1)=-8。'}
         ]
       },
       {
@@ -1389,7 +1395,13 @@ var SUBJECTS = {
           {q:'(+8) - (+3) + (-2) を計算すると？', choices:['+3','-3','+7','+13'], a:0, expl:'+8-3=+5、+5+(-2)=+3。'},
           {q:'a から b を引く式として正しいのは？', choices:['a + b','b - a','a - b','-a-b'], a:2, expl:'「a から b を引く」= a - b。'},
           {q:'(-6) - (-6) = ?', choices:['+12','-12','0','+6'], a:2, expl:'-6 を引く = +6 を足す → (-6)+(+6) = 0。'},
-          {q:'(+3) - (-8) = ?', choices:['+11','-11','+5','-5'], a:0, expl:'-8 を引く = +8 を足す → (+3)+(+8) = +11。'}
+          {q:'(+3) - (-8) = ?', choices:['+11','-11','+5','-5'], a:0, expl:'-8 を引く = +8 を足す → (+3)+(+8) = +11。'},
+          {q:'(+9) - (+4) = ?', choices:['+5','-5','+13','-13'], a:0, expl:'(+9)+(-4)=+5。'},
+          {q:'(-7) - (+2) = ?', choices:['-9','+9','-5','+5'], a:0, expl:'(-7)+(-2)=-9。'},
+          {q:'(+2) - (-6) = ?', choices:['+8','-8','-4','+4'], a:0, expl:'-6を引く=+6を足す→(+2)+(+6)=+8。'},
+          {q:'(-4) - (-9) = ?', choices:['+5','-5','-13','+13'], a:0, expl:'-9を引く=+9を足す→(-4)+(+9)=+5。'},
+          {q:'(+1) - (+7) = ?', choices:['-6','+6','-8','+8'], a:0, expl:'(+1)+(-7)=-6。'},
+          {q:'(-5) - (-5) = ?', choices:['0','-10','+10','-5'], a:0, expl:'-5を引く=+5を足す→0。'}
         ]
       },
       {
@@ -1405,7 +1417,13 @@ var SUBJECTS = {
           {q:'(-15) ÷ (-5) = ?', choices:['+3','-3','+10','-20'], a:0, expl:'マイナス÷マイナス = プラス。15÷5=3 → +3。'},
           {q:'負の数を 3 つかけたとき、答えの符号は？', choices:['必ず +','必ず -','どちらもありうる','0 になる'], a:1, expl:'マイナスが奇数個なら -、偶数個なら +。3 個 → -。', search:'正負の数 乗法 符号 ルール'},
           {q:'(-2)² = ?', choices:['+4','-4','+2','-2'], a:0, expl:'(-2)² = (-2)×(-2) = +4。マイナスが偶数個 → +。'},
-          {q:'(-2)³ = ?', choices:['+8','-8','+6','-6'], a:1, expl:'(-2)³ = (-2)×(-2)×(-2) = -8。マイナスが奇数個 → -。'}
+          {q:'(-2)³ = ?', choices:['+8','-8','+6','-6'], a:1, expl:'(-2)³ = (-2)×(-2)×(-2) = -8。マイナスが奇数個 → -。'},
+          {q:'(+6) × (-3) = ?', choices:['-18','+18','-9','+9'], a:0, expl:'違う符号→-。6×3=18→-18。'},
+          {q:'(-5) × (-4) = ?', choices:['+20','-20','+9','-9'], a:0, expl:'同符号→+。5×4=20→+20。'},
+          {q:'(-20) ÷ (+4) = ?', choices:['-5','+5','-16','+16'], a:0, expl:'違う符号→-。20÷4=5→-5。'},
+          {q:'(-18) ÷ (-6) = ?', choices:['+3','-3','+12','-12'], a:0, expl:'同符号→+。18÷6=3→+3。'},
+          {q:'(+7) × (-1) = ?', choices:['-7','+7','-1','+1'], a:0, expl:'×(-1)は符号が反対に。+7→-7。'},
+          {q:'(-3) × (+2) × (-1) = ?', choices:['+6','-6','+5','-5'], a:0, expl:'マイナスが2個(偶数)→+。3×2×1=6→+6。'}
         ]
       },
       {
@@ -1459,7 +1477,14 @@ var SUBJECTS = {
           {q:'「努力」の読み方は？', choices:['とりょく','どりょく','どうりょく','つとめりき'], a:1},
           {q:'「街」の読み方は？', choices:['みち','まち','がい','とおり'], a:1, expl:'「まち」と読む。「街角 (まちかど)」「街路 (がいろ)」と熟語によって読み方が変わる。'},
           {q:'「結果」の読み方は？', choices:['けっか','けつか','むすぶか','けっこう'], a:0, expl:'結果 = 最終的にどうなったかということ。'},
-          {q:'「複雑」の読み方は？', choices:['ふくぞう','ふくざつ','ふうさつ','ふくさつ'], a:1, expl:'複雑 = いろいろなものが入り混じって込み入っていること。'}
+          {q:'「複雑」の読み方は？', choices:['ふくぞう','ふくざつ','ふうさつ','ふくさつ'], a:1, expl:'複雑 = いろいろなものが入り混じって込み入っていること。'},
+          {q:'「故郷」の読み方は？', choices:['こきょう','ふるさと','こごう','こうきょう'], a:0, expl:'故郷 = 生まれ育った土地。「ふるさと」とも読む。'},
+          {q:'「境遇」の読み方は？', choices:['きょうぐう','けいぐう','きょうぐ','さかいぐう'], a:0, expl:'境遇 = その人の置かれている立場や状況。'},
+          {q:'「一斉」の読み方は？', choices:['いっせい','いっさい','ひとせい','いちせい'], a:0, expl:'一斉 = みんないっしょに。'},
+          {q:'「政策」の読み方は？', choices:['せいさく','せいさ','しょうさく','せいざく'], a:0, expl:'政策 = 政治のうえでの方針。'},
+          {q:'「資料」の読み方は？', choices:['しりょう','しざい','じりょう','しりょ'], a:0, expl:'資料 = 調べるもとになる材料。'},
+          {q:'「推測」の読み方は？', choices:['すいそく','すいしき','ついそく','すいぞく'], a:0, expl:'推測 = おしはかって考えること。'},
+          {q:'「健康」の読み方は？', choices:['けんこう','けんこ','けんごう','きんこう'], a:0, expl:'健康 = 体や心の調子がよいこと。'}
         ]
       },
       {
@@ -1475,7 +1500,14 @@ var SUBJECTS = {
           {q:'「ぎもん」を漢字で書くと？', choices:['疑問','義問','議問','技問'], a:0},
           {q:'「しんけん」を漢字で書くと？', choices:['新権','真剣','真検','心懸'], a:1, expl:'真剣 = まじめに本気で取り組むこと。'},
           {q:'「けっか」を漢字で書くと？', choices:['結果','決果','結課','結化'], a:0},
-          {q:'「かいてん」を漢字で書くと？', choices:['回転','回点','改転','開展'], a:0}
+          {q:'「かいてん」を漢字で書くと？', choices:['回転','回点','改転','開展'], a:0},
+          {q:'「こきょう」を漢字で書くと？', choices:['故郷','古郷','故京','個郷'], a:0, expl:'故郷 = 生まれ育った土地。'},
+          {q:'「しりょう」を漢字で書くと？', choices:['資料','史料','資量','志料'], a:0, expl:'資料 = 調べるもとになる材料。'},
+          {q:'「せいさく」を漢字で書くと？（政治の方針）', choices:['政策','製作','制作','政作'], a:0, expl:'政策。「製作・制作」は物を作る意味で別。'},
+          {q:'「すいそく」を漢字で書くと？', choices:['推測','推則','水測','推側'], a:0, expl:'推測 = おしはかること。'},
+          {q:'「けんこう」を漢字で書くと？', choices:['健康','建康','健好','験康'], a:0, expl:'健康。'},
+          {q:'「いっせい」を漢字で書くと？（みんないっしょに）', choices:['一斉','一世','一勢','一精'], a:0, expl:'一斉。「一世」は時代の意味で別。'},
+          {q:'「ぎもん」を漢字で書くと？', choices:['疑問','義問','議問','技問'], a:0, expl:'疑問。'}
         ]
       },
       {
@@ -1586,7 +1618,12 @@ var SUBJECTS = {
           {q:'受粉のあと、子房は何に変化しますか。', choices:['花びら','種子','果実 (実)','根'], a:2, expl:'子房 → 果実、胚珠 → 種子になる。', search:'受粉 子房 果実 胚珠 種子'},
           {q:'受粉のあと、胚珠は何に変化しますか。', choices:['花びら','種子','果実','茎'], a:1, expl:'胚珠 → 種子に。覚え方: 「子房は実、胚珠は種」。'},
           {q:'花の外側にあって、つぼみを守るのは？', choices:['花びら','がく','おしべ','めしべ'], a:1, expl:'がくは花の一番外側。'},
-          {q:'花の外側から順に正しいのは？', choices:['がく→花びら→おしべ→めしべ','めしべ→おしべ→花びら→がく','花びら→がく→おしべ→めしべ','おしべ→めしべ→がく→花びら'], a:0, expl:'外→内: がく→花びら→おしべ→めしべ。'}
+          {q:'花の外側から順に正しいのは？', choices:['がく→花びら→おしべ→めしべ','めしべ→おしべ→花びら→がく','花びら→がく→おしべ→めしべ','おしべ→めしべ→がく→花びら'], a:0, expl:'外→内: がく→花びら→おしべ→めしべ。'},
+          {q:'めしべの先のねばねばした部分を何といいますか。', choices:['柱頭','子房','やく','胚珠'], a:0, expl:'柱頭(ちゅうとう)＝めしべの先。花粉がつく。'},
+          {q:'「子房は◯、胚珠は種子」◯に入るのは？', choices:['果実','花びら','がく','茎'], a:0, expl:'受粉後、子房→果実、胚珠→種子。'},
+          {q:'花粉がめしべにつくことを何という？', choices:['受粉','発芽','蒸散','光合成'], a:0, expl:'受粉。そのあと受精して種子ができる。'},
+          {q:'おしべの先の、花粉が入っている部分は？', choices:['やく','柱頭','子房','がく'], a:0, expl:'やく＝おしべの先で花粉ができる。'},
+          {q:'つぼみを外側で守るのは？', choices:['がく','花びら','おしべ','めしべ'], a:0, expl:'がくは一番外側でつぼみを守る。'}
         ]
       },
       {
@@ -1656,7 +1693,12 @@ var SUBJECTS = {
           {q:'南極大陸の特徴として正しいのは？', choices:['人がたくさん住んでいる','一年中ほとんど雪と氷','熱帯雨林が広がる','砂漠だらけ'], a:1, expl:'南極大陸は厚い氷におおわれていて、国はなく研究者だけがいる。'},
           {q:'地球の表面のうち、海の割合はおよそ何 % ですか。', choices:['30%','50%','70%','90%'], a:2, expl:'海:陸 = 約 7:3。海のほうがずっと広い。', search:'地球 海と陸 割合'},
           {q:'赤道が通る大陸は？', choices:['ユーラシア','南極','アフリカ','オーストラリア'], a:2, expl:'アフリカ大陸と南アメリカ大陸を赤道が通る。'},
-          {q:'人が定住していない大陸は？', choices:['オーストラリア','南極','アフリカ','南アメリカ'], a:1, expl:'南極大陸には国がなく、研究者のみ。'}
+          {q:'人が定住していない大陸は？', choices:['オーストラリア','南極','アフリカ','南アメリカ'], a:1, expl:'南極大陸には国がなく、研究者のみ。'},
+          {q:'二番目に大きい大陸は？', choices:['アフリカ大陸','北アメリカ大陸','南極大陸','オーストラリア大陸'], a:0, expl:'1位ユーラシア、2位アフリカ。'},
+          {q:'日本のまわりにある、世界最大の海洋は？', choices:['太平洋','大西洋','インド洋','北極海'], a:0, expl:'日本の東は太平洋。世界最大の海。'},
+          {q:'六大陸に「ふくまれない」のは？', choices:['ユーラシア大陸','アフリカ大陸','グリーンランド','南極大陸'], a:2, expl:'グリーンランドは大陸ではなく世界最大の島。'},
+          {q:'海と陸の面積の割合はおよそ？', choices:['海7：陸3','海3：陸7','海5：陸5','海9：陸1'], a:0, expl:'海のほうが広く、約7：3。'},
+          {q:'赤道より北を何という？', choices:['北半球','南半球','東半球','西半球'], a:0, expl:'赤道の北＝北半球、南＝南半球。'}
         ]
       },
       {
@@ -1686,7 +1728,13 @@ var SUBJECTS = {
           {q:'西経 75 度のニューヨークと日本 (東経 135 度) の経度の差は？', choices:['60 度','135 度','180 度','210 度'], a:3, expl:'135 + 75 = 210 度 → 14 時間の時差。'},
           {q:'日本が 12 月 31 日午後 6 時のとき、ニューヨーク (-14 時間) はいつですか。', choices:['12 月 31 日 午前 4 時','12 月 30 日 午後 4 時','1 月 1 日 午前 8 時','1 月 1 日 午前 4 時'], a:0, expl:'18 時 - 14 時間 = 4 時 (同じ日付の朝)。'},
           {q:'緯度0度の線（赤道）の基準は？', choices:['イギリス','日本','地球を南北に二分する線','太平洋'], a:2, expl:'赤道は地球を南北半球に分ける基準線。'},
-          {q:'経度0度の基準はどこの国？', choices:['日本','アメリカ','フランス','イギリス'], a:3, expl:'イギリスのグリニッジ天文台が経度0度の基準。'}
+          {q:'経度0度の基準はどこの国？', choices:['日本','アメリカ','フランス','イギリス'], a:3, expl:'イギリスのグリニッジ天文台が経度0度の基準。'},
+          {q:'経度が30度ちがう2地点の時差は？', choices:['1時間','2時間','30分','3時間'], a:1, expl:'30÷15＝2時間。'},
+          {q:'経度が45度ちがうと時差は？', choices:['2時間','3時間','45分','1時間'], a:1, expl:'45÷15＝3時間。'},
+          {q:'地球は何時間で1回転する？', choices:['12時間','24時間','15時間','48時間'], a:1, expl:'24時間で1回転（360度）。'},
+          {q:'時差を求める計算は？', choices:['経度の差÷15','経度の差×15','経度の差÷24','経度の差＋15'], a:0, expl:'経度の差÷15度＝時差(時間)。'},
+          {q:'日本より西の国では、時刻は日本より？', choices:['進んでいる','遅れている','同じ','日付が進む'], a:1, expl:'東ほど進み、西ほど遅れる。'},
+          {q:'経度差が90度の2地点の時差は？', choices:['4時間','6時間','9時間','3時間'], a:1, expl:'90÷15＝6時間。'}
         ]
       },
       {
@@ -5935,14 +5983,36 @@ var TRAIN_DATA = {
       {ja:'あなたは先生です。', choices:['You are a teacher.','I am a teacher.','You is a teacher.','You are teacher.'], correct:0, hint:'「あなたは」＝You、be動詞は are。', special:'You の be動詞は are。', expl:'You are a teacher. You のbe動詞は are。'},
       {ja:'彼は私の友達です。', choices:['He is my friend.','He are my friend.','He am my friend.','His my friend.'], correct:0, hint:'「彼は」＝He、be動詞は is。', special:'He / She / It は is。', expl:'He is my friend. 三人称単数(He)のbe動詞は is。my＝私の。'},
       {ja:'私たちは生徒です。', choices:['We are students.','We is students.','We am students.','We are student.'], correct:0, hint:'「私たちは」＝We（複数）。', special:'複数なので are ＋ students。', expl:'We are students. 複数(We)のbe動詞は are。生徒が複数なので students。'},
-      {ja:'私は東京出身です。', choices:['I am from Tokyo.','I from Tokyo.','I am Tokyo.','From Tokyo I am.'], correct:0, hint:'「〜出身」＝from 〜。', special:'be動詞 am ＋ from。', expl:'I am from Tokyo. from＝〜出身。'}
+      {ja:'私は東京出身です。', choices:['I am from Tokyo.','I from Tokyo.','I am Tokyo.','From Tokyo I am.'], correct:0, hint:'「〜出身」＝from 〜。', special:'be動詞 am ＋ from。', expl:'I am from Tokyo. from＝〜出身。'},
+      {ja:'私は田中です。', choices:['I am Tanaka.','I are Tanaka.','I is Tanaka.','My Tanaka.'], correct:0, hint:'I のbe動詞は am。', special:'名のるときも I am 〜。', expl:'I am Tanaka. 名前を名のるとき。'},
+      {ja:'彼女は私の母です。', choices:['She is my mother.','She are my mother.','She am my mother.','Her is my mother.'], correct:0, hint:'She のbe動詞は is。', special:'my＝私の。', expl:'She is my mother. 三人称単数 She は is。'},
+      {ja:'これは私のかさです。', choices:['This is my umbrella.','This are my umbrella.','This my umbrella.','It is my umbrella.'], correct:0, hint:'This のbe動詞は is。', special:'This is my 〜。', expl:'This is my umbrella.'},
+      {ja:'私たちは友達です。', choices:['We are friends.','We is friends.','We am friends.','We are friend.'], correct:0, hint:'We は複数→are。', special:'複数→friends（s）。', expl:'We are friends. 複数なので are ＋ friends。'},
+      {ja:'彼は親切です。', choices:['He is kind.','He are kind.','He kind is.','He am kind.'], correct:0, hint:'He のbe動詞は is。', special:'He is ＋ 形容詞。', expl:'He is kind. 様子の語の前も is。'},
+      {ja:'あなたは中学生です。', choices:['You are a junior high school student.','You is a student.','You am a student.','You are student.'], correct:0, hint:'You は are。', special:'a を忘れずに。', expl:'You are a junior high school student.'},
+      {ja:'それは新しいです。', choices:['It is new.','It are new.','It new is.','Its new.'], correct:0, hint:'It のbe動詞は is。', special:'It is ＋ 形容詞。', expl:'It is new.'},
+      {ja:'私の名前はケンです。', choices:['My name is Ken.','My name are Ken.','I name is Ken.','My name Ken.'], correct:0, hint:'name は単数→is。', special:'My name is 〜。', expl:'My name is Ken.'},
+      {ja:'彼らは先生です。', choices:['They are teachers.','They is teachers.','They am teachers.','They are teacher.'], correct:0, hint:'They は複数→are。', special:'複数→teachers。', expl:'They are teachers.'},
+      {ja:'私は12歳です。', choices:['I am twelve.','I am twelve years.','I twelve.','I have twelve.'], correct:0, hint:'年齢は I am ＋ 数。', special:'I am twelve (years old).', expl:'I am twelve. 年齢は be動詞で表す。'},
+      {ja:'これはペンではありません。', choices:['This is not a pen.','This not a pen.','This isn\'t pen.','This do not a pen.'], correct:0, hint:'be動詞のあとに not。', special:'is not＝isn\'t。', expl:'This is not a pen. 否定は be動詞＋not。'},
+      {ja:'彼は私の弟です。', choices:['He is my brother.','He are my brother.','His my brother.','He am my brother.'], correct:0, hint:'He は is。', special:'my brother＝私の弟。', expl:'He is my brother.'}
     ]},
     { name:'this / that / it', items:[
       {ja:'これはペンです。', choices:['This is a pen.','That is a pen.','It is pen.','This are a pen.'], correct:0, hint:'近くのものは This。', special:'This is a 〜。', expl:'This is a pen. 近くのもの1つは This is a 〜。'},
       {ja:'あれは私のかばんです。', choices:['That is my bag.','This is my bag.','It is my bag.','That are my bag.'], correct:0, hint:'遠くのものは That。', special:'近くThis／遠くThat。', expl:'That is my bag. 遠くのものは That。'},
       {ja:'これはりんごです。', choices:['This is an apple.','This is a apple.','This is apple.','That is a apple.'], correct:0, hint:'apple は母音で始まる。', special:'母音の前は a ではなく an。', expl:'This is an apple. apple は母音(a)で始まるので an。'},
       {ja:'これは何ですか。', choices:['What is this?','What this is?','Is this what?','What are this?'], correct:0, hint:'「何」＝What を先頭に。', special:'What ＋ is ＋ this?', expl:'What is this? 疑問詞 What を先頭に、be動詞 is を主語の前に。'},
-      {ja:'あれはあなたのペンですか。', choices:['Is that your pen?','That is your pen?','Are that your pen?','Is your pen that?'], correct:0, hint:'be動詞 Is を先頭に。', special:'Is that 〜? の語順。', expl:'Is that your pen? 疑問文は be動詞を主語の前に出す。'}
+      {ja:'あれはあなたのペンですか。', choices:['Is that your pen?','That is your pen?','Are that your pen?','Is your pen that?'], correct:0, hint:'be動詞 Is を先頭に。', special:'Is that 〜? の語順。', expl:'Is that your pen? 疑問文は be動詞を主語の前に出す。'},
+      {ja:'これは卵です。', choices:['This is an egg.','This is a egg.','This is egg.','That is an egg.'], correct:0, hint:'egg は母音で始まる。', special:'母音の前は an。', expl:'This is an egg. egg は母音(e)→an。'},
+      {ja:'あれは学校です。', choices:['That is a school.','This is a school.','It is school.','That are a school.'], correct:0, hint:'遠くは That。', special:'That is a 〜。', expl:'That is a school.'},
+      {ja:'これは何ですか。— それは机です。', choices:['It is a desk.','This is a desk.','That is desk.','It are a desk.'], correct:0, hint:'What is this? の答えは It。', special:'It is a 〜。', expl:'It is a desk. this/that は it で受ける。'},
+      {ja:'これはあなたのかばんですか。', choices:['Is this your bag?','This your bag?','Are this your bag?','Is your bag this?'], correct:0, hint:'Is を先頭に。', special:'Is this 〜?', expl:'Is this your bag?'},
+      {ja:'これはりんごですか。— はい、そうです。', choices:['Yes, it is.','Yes, this is.','Yes, I am.','Yes, apple is.'], correct:0, hint:'this で聞かれたら it で答える。', special:'Yes, it is.', expl:'Yes, it is. this/that の答えは it。'},
+      {ja:'あれは鳥です。', choices:['That is a bird.','That are a bird.','That is bird.','This is a bird.'], correct:0, hint:'遠くは That。', special:'a bird。', expl:'That is a bird.'},
+      {ja:'これはオレンジです。', choices:['This is an orange.','This is a orange.','This is orange.','That is a orange.'], correct:0, hint:'orange は母音で始まる。', special:'母音の前は an。', expl:'This is an orange. orange は母音(o)→an。'},
+      {ja:'それは私の自転車です。', choices:['It is my bike.','It are my bike.','This my bike.','It is bike.'], correct:0, hint:'それ＝It。', special:'It is my 〜。', expl:'It is my bike.'},
+      {ja:'これは時計です。', choices:['This is a clock.','This is clock.','This are a clock.','It is clock.'], correct:0, hint:'近くは This。', special:'a clock。', expl:'This is a clock.'},
+      {ja:'あれは病院ではありません。', choices:['That is not a hospital.','That not a hospital.','That isn\'t hospital.','That do not a hospital.'], correct:0, hint:'be動詞のあとに not。', special:'That is not 〜。', expl:'That is not a hospital.'}
     ]},
     { name:'can（〜できる）', items:[
       {ja:'私はピアノをひけます。', choices:['I can play the piano.','I play can the piano.','I can plays the piano.','I am play the piano.'], correct:0, hint:'can ＋ 動詞の原形。', special:'can play（s をつけない）。', expl:'I can play the piano. can のあとは動詞の原形。'},
@@ -5950,21 +6020,49 @@ var TRAIN_DATA = {
       {ja:'私は料理ができません。', choices:['I can\'t cook.','I don\'t cook.','I am not cook.','I not can cook.'], correct:0, hint:'否定は can\'t。', special:'can\'t ＝ cannot。', expl:'I can\'t cook. canの否定は can\'t（cannot）。'},
       {ja:'あなたはギターをひけますか。', choices:['Can you play the guitar?','Do you play the guitar?','Are you play the guitar?','You can play the guitar?'], correct:0, hint:'疑問は Can を先頭に。', special:'Can you 〜?', expl:'Can you play the guitar? canの疑問文は Can を主語の前に。'},
       {ja:'私はテニスが得意です。', choices:['I am good at tennis.','I am good tennis.','I can good tennis.','I like good tennis.'], correct:0, hint:'「〜が得意」＝good at。', special:'be good at 〜。', expl:'I am good at tennis. 「得意」は be good at 〜。'},
-      {ja:'私の兄はサッカー部に入っています。', choices:['My brother is on the soccer team.','My brother in the soccer.','My brother plays soccer team.','My brother on soccer.'], correct:0, hint:'部活は on the 〜 team。', special:'be on the 〜 team。', expl:'My brother is on the soccer team. 「〜部に入っている」は be on the 〜 team。'}
+      {ja:'私の兄はサッカー部に入っています。', choices:['My brother is on the soccer team.','My brother in the soccer.','My brother plays soccer team.','My brother on soccer.'], correct:0, hint:'部活は on the 〜 team。', special:'be on the 〜 team。', expl:'My brother is on the soccer team. 「〜部に入っている」は be on the 〜 team。'},
+      {ja:'私は英語を話せます。', choices:['I can speak English.','I speak can English.','I can speaks English.','I am speak English.'], correct:0, hint:'can ＋ 原形。', special:'can speak。', expl:'I can speak English.'},
+      {ja:'彼女は上手に歌えます。', choices:['She can sing well.','She cans sing well.','She can sings well.','She is sing well.'], correct:0, hint:'三人称でも can はそのまま。', special:'She can sing。', expl:'She can sing well. canは形が変わらない、動詞は原形。'},
+      {ja:'私は速く走れません。', choices:['I can\'t run fast.','I don\'t run fast.','I am not run fast.','I not can run fast.'], correct:0, hint:'否定は can\'t。', special:'can\'t＝cannot。', expl:'I can\'t run fast.'},
+      {ja:'あなたは泳げますか。', choices:['Can you swim?','Do you swim?','Are you swim?','You can swim?'], correct:0, hint:'疑問は Can を先頭に。', special:'Can you 〜?', expl:'Can you swim?'},
+      {ja:'あなたは料理ができますか。— はい、できます。', choices:['Yes, I can.','Yes, I do.','Yes, I am.','Yes, I cook.'], correct:0, hint:'Can you 〜? には can で答える。', special:'Yes, I can.', expl:'Yes, I can. canの疑問には can で答える。'},
+      {ja:'彼はギターをひけますか。— いいえ、ひけません。', choices:['No, he can\'t.','No, he doesn\'t.','No, he isn\'t.','No, he not can.'], correct:0, hint:'No, 主語 can\'t。', special:'No, he can\'t.', expl:'No, he can\'t.'},
+      {ja:'私は数学が得意です。', choices:['I am good at math.','I am good math.','I can good math.','I like good math.'], correct:0, hint:'得意＝good at。', special:'be good at 〜。', expl:'I am good at math.'},
+      {ja:'私はテニス部に入っています。', choices:['I am on the tennis team.','I am in the tennis.','I play tennis team.','I on tennis.'], correct:0, hint:'部活は on the 〜 team。', special:'be on the 〜 team。', expl:'I am on the tennis team.'},
+      {ja:'彼女は美術部に入っています。', choices:['She is in the art club.','She is on the art.','She plays art club.','She in art.'], correct:0, hint:'部は in the 〜 club。', special:'be in the 〜 club。', expl:'She is in the art club. クラブは in the 〜 club。'},
+      {ja:'私は自転車に乗れます。', choices:['I can ride a bike.','I can rides a bike.','I ride can a bike.','I am ride a bike.'], correct:0, hint:'can ＋ 原形。', special:'can ride。', expl:'I can ride a bike.'}
     ]},
     { name:'否定・疑問', items:[
       {ja:'私は幸せではありません。', choices:['I am not happy.','I not am happy.','I am happy not.','I do not happy.'], correct:0, hint:'be動詞のあとに not。', special:'am ＋ not。', expl:'I am not happy. be動詞の否定は後ろに not。'},
       {ja:'あなたは生徒ですか。', choices:['Are you a student?','You are a student?','Do you a student?','Is you a student?'], correct:0, hint:'be動詞 Are を先頭に。', special:'Are you 〜?', expl:'Are you a student? 疑問文は be動詞を主語の前に。'},
       {ja:'あなたは犬が好きですか。', choices:['Do you like dogs?','Are you like dogs?','You like dogs?','Like you dogs?'], correct:0, hint:'一般動詞の疑問は Do。', special:'Do you like 〜?', expl:'Do you like dogs? 一般動詞(like)の疑問文は Do you 〜?'},
       {ja:'私は納豆が好きではありません。', choices:['I don\'t like natto.','I am not like natto.','I not like natto.','I like not natto.'], correct:0, hint:'一般動詞の否定は don\'t。', special:'don\'t ＋ 動詞。', expl:'I don\'t like natto. 一般動詞(like)の否定は don\'t。'},
-      {ja:'あなたは生徒ですか。— いいえ、ちがいます。', choices:['No, I am not.','No, you aren\'t.','No, I don\'t.','No, he isn\'t.'], correct:0, hint:'Are you 〜? には I で答える。', special:'No, I am not.', expl:'No, I am not. Are you 〜? の No応答は I am not.'}
+      {ja:'あなたは生徒ですか。— いいえ、ちがいます。', choices:['No, I am not.','No, you aren\'t.','No, I don\'t.','No, he isn\'t.'], correct:0, hint:'Are you 〜? には I で答える。', special:'No, I am not.', expl:'No, I am not. Are you 〜? の No応答は I am not.'},
+      {ja:'彼は医者ではありません。', choices:['He is not a doctor.','He not a doctor.','He doesn\'t a doctor.','He is not doctor.'], correct:0, hint:'be動詞のあとに not。', special:'is not＝isn\'t。', expl:'He is not a doctor.'},
+      {ja:'あなたは音楽が好きですか。', choices:['Do you like music?','Are you like music?','You like music?','Like you music?'], correct:0, hint:'一般動詞の疑問は Do。', special:'Do you like 〜?', expl:'Do you like music?'},
+      {ja:'私は野球をしません。', choices:['I don\'t play baseball.','I am not play baseball.','I not play baseball.','I play not baseball.'], correct:0, hint:'一般動詞の否定は don\'t。', special:'don\'t ＋ 動詞。', expl:'I don\'t play baseball.'},
+      {ja:'これはあなたの本ですか。— いいえ、ちがいます。', choices:['No, it isn\'t.','No, this isn\'t.','No, I\'m not.','No, book isn\'t.'], correct:0, hint:'this の答えは it。', special:'No, it isn\'t.', expl:'No, it isn\'t. this/that の答えは it。'},
+      {ja:'彼は犬が好きですか。', choices:['Does he like dogs?','Do he like dogs?','Is he like dogs?','He likes dogs?'], correct:0, hint:'三人称の疑問は Does。', special:'Does he 〜?', expl:'Does he like dogs? 三人称単数(he)の疑問は Does。'},
+      {ja:'私はその映画が好きではありません。', choices:['I don\'t like the movie.','I am not like the movie.','I not like the movie.','I like not the movie.'], correct:0, hint:'don\'t ＋ 動詞。', special:'don\'t like。', expl:'I don\'t like the movie.'},
+      {ja:'あなたは犬を飼っていますか。', choices:['Do you have a dog?','Are you have a dog?','You have a dog?','Have you a dog?'], correct:0, hint:'have の疑問は Do you。', special:'Do you have 〜?', expl:'Do you have a dog?'},
+      {ja:'これは難しくありません。', choices:['This is not difficult.','This not difficult.','This doesn\'t difficult.','This is not a difficult.'], correct:0, hint:'be動詞＋not。', special:'is not difficult。', expl:'This is not difficult.'}
     ]},
     { name:'あいさつ・連語', items:[
       {ja:'はじめまして。', choices:['Nice to meet you.','See you.','Thank you.','You are welcome.'], correct:0, hint:'初対面のあいさつ。', special:'Nice to meet you.', expl:'Nice to meet you. 初めて会ったときのあいさつ。'},
       {ja:'どういたしまして。', choices:['You\'re welcome.','Thank you.','I\'m sorry.','Excuse me.'], correct:0, hint:'Thank you への返事。', special:'You\'re welcome.', expl:'You\'re welcome. Thank you への返事。'},
       {ja:'私のことをアミと呼んでください。', choices:['Call me Ami.','Call Ami me.','My name Ami.','I am call Ami.'], correct:0, hint:'Call ＋ me ＋ 名前。', special:'Call me 〜.', expl:'Call me Ami. 「〜と呼んでください」は Call me 〜.'},
       {ja:'あなたはどうですか。', choices:['How about you?','How you about?','What about you are?','How are about you?'], correct:0, hint:'聞き返す表現。', special:'How about you?', expl:'How about you? 「あなたはどう？」と聞き返す表現。'},
-      {ja:'元気ですか。', choices:['How are you?','What are you?','Who are you?','Where are you?'], correct:0, hint:'How are 〜?', special:'How are you?', expl:'How are you? 「元気ですか」。答えは I\'m fine, thank you.'}
+      {ja:'元気ですか。', choices:['How are you?','What are you?','Who are you?','Where are you?'], correct:0, hint:'How are 〜?', special:'How are you?', expl:'How are you? 「元気ですか」。答えは I\'m fine, thank you.'},
+      {ja:'おはよう。', choices:['Good morning.','Good night.','Good evening.','Good afternoon.'], correct:0, hint:'朝のあいさつ。', special:'Good morning.', expl:'Good morning. 朝のあいさつ。'},
+      {ja:'こんばんは。', choices:['Good evening.','Good morning.','Good night.','Good afternoon.'], correct:0, hint:'夕方〜夜のあいさつ。', special:'Good evening.', expl:'Good evening.'},
+      {ja:'さようなら。', choices:['Goodbye.','Hello.','Thank you.','See you.'], correct:0, hint:'別れのあいさつ。', special:'Goodbye。', expl:'Goodbye. カジュアルは See you.'},
+      {ja:'ありがとう。', choices:['Thank you.','You\'re welcome.','I\'m sorry.','Excuse me.'], correct:0, hint:'感謝の言葉。', special:'Thank you.', expl:'Thank you.'},
+      {ja:'ごめんなさい。', choices:['I\'m sorry.','Thank you.','Excuse me.','You\'re welcome.'], correct:0, hint:'あやまる言葉。', special:'I\'m sorry.', expl:'I\'m sorry.'},
+      {ja:'すみません（呼びかけ）。', choices:['Excuse me.','I\'m sorry.','Thank you.','Good morning.'], correct:0, hint:'呼びかけ・人に声をかける。', special:'Excuse me.', expl:'Excuse me. 呼びかけや道を通るとき。'},
+      {ja:'またね。', choices:['See you.','Goodbye.','Hello.','Nice to meet you.'], correct:0, hint:'カジュアルな別れ。', special:'See you.', expl:'See you.'},
+      {ja:'お元気ですか。— 元気です、ありがとう。', choices:['I\'m fine, thank you.','You\'re welcome.','See you.','Good night.'], correct:0, hint:'How are you? の答え。', special:'I\'m fine, thank you.', expl:'I\'m fine, thank you.'},
+      {ja:'あなたのお名前は何ですか。', choices:['What is your name?','How is your name?','Who is your name?','Where is your name?'], correct:0, hint:'名前を聞く＝What。', special:'What is your name?', expl:'What is your name?'},
+      {ja:'お会いできてうれしいです。', choices:['Nice to meet you.','See you later.','Thank you very much.','You are welcome.'], correct:0, hint:'初対面のあいさつ。', special:'Nice to meet you.', expl:'Nice to meet you.'}
     ]}
   ]}
 };

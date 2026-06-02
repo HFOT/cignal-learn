@@ -264,6 +264,13 @@ button{font-family:inherit;color:inherit}
 .wk-chip{padding:6px 13px;border-radius:16px;border:1px solid var(--border);background:var(--paper-2);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;transition:all .12s}
 .wk-chip:hover{border-color:#ff6b3d}
 .wk-chip.on{background:linear-gradient(135deg,#ff6b3d,#ff3d77);border-color:transparent;color:#fff}
+/* ⚡ このまま行こうぜ！＝実力解放テスト */
+.mode-release{background:linear-gradient(135deg,#ffb300,#ff7043)!important;color:#1b1b1b!important;border:1px solid transparent!important;font-weight:800!important}
+.exam-submit{padding:12px 30px;border-radius:6px;border:none;background:#1b1b1b;color:#fcfbf6;font-size:15px;font-weight:800;cursor:pointer;transition:background .15s}
+.exam-submit:hover{background:#000}
+.exam-paper .choice-pill.gr-correct{background:#e3f4e6!important;border-color:#2e7d32!important;color:#1b5e20!important;font-weight:700}
+.exam-paper .choice-pill.gr-wrong{background:#fce4e6!important;border-color:#c62828!important;color:#b71c1c!important}
+.exam-mk{font-size:12px;margin-top:6px;font-weight:700}
 .cal-wd{text-align:center;font-size:11px;color:var(--muted);padding:4px 0;font-weight:600}
 .cal-wd.sun{color:var(--ng)} .cal-wd.sat{color:var(--accent)}
 .cal-cell{
@@ -1119,6 +1126,7 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
     <button class="mode-btn" data-mode="cards">暗記</button>
     <button class="mode-btn" data-mode="mock">模試</button>
     <button class="mode-btn mode-train" data-mode="train">🔥 これでいくぞ！</button>
+    <button class="mode-btn mode-release" data-mode="release">⚡ このまま行こうぜ！</button>
   </div>
 
   <div class="study-guide" id="studyGuide"></div>
@@ -2742,6 +2750,11 @@ function switchMode(mode){
     title.innerHTML = 'これでいくぞ！<em>5科目集中・選ぶだけ</em>';
     trainState.mode = 'train';
     renderTrain();
+  } else if(mode === 'release'){
+    hdrRight.innerHTML = '<div class="hdr-stat"><b id="relScore">―</b><span>得点</span></div>';
+    eyebrow.textContent = '5科目 実力解放テスト / 本番形式';
+    title.innerHTML = 'このまま行こうぜ！<em>5科目・実力解放テスト</em>';
+    if(!releaseState.items.length) startRelease(); else renderRelease();
   }
   // 勉強順ナビが有効なら現在ステップを同期
   if(guide.active) renderGuide();
@@ -6001,10 +6014,12 @@ function renderFinisherResult(){
     '<div class="fin-rrows">'+rows+'</div>'+
     '<div class="fin-msg">'+msg+'</div>'+
     (nWrong ? '<div class="train-next"><button id="finWeak" style="background:linear-gradient(135deg,#ff6b3d,#ff3d77)">💪 弱点克服へ（できなかった '+nWrong+' 問）</button></div>' : '<div class="fin-msg" style="color:var(--ok);margin-top:8px">⭐ 全問正解！弱点なし！</div>')+
+    '<div class="train-next" style="margin-top:10px"><button id="finRelease" style="background:linear-gradient(135deg,#ffb300,#ff7043);color:#1b1b1b">⚡ このまま行こうぜ！（実力解放テスト）</button></div>'+
     '<div class="train-help" style="justify-content:center;margin-top:14px"><button class="special" id="finRetry">💥 もう一回</button><button class="ans" id="finBack">← もどる</button></div>'+
     '</div></div>';
   main.innerHTML=html;
   var fw=document.getElementById('finWeak'); if(fw) fw.onclick=function(){ startWeak(fs.wrong); };
+  document.getElementById('finRelease').onclick=function(){ switchMode('release'); };
   document.getElementById('finRetry').onclick=startFinisher;
   document.getElementById('finBack').onclick=function(){ trainState.mode='train'; renderTrain(); };
 }
@@ -6076,6 +6091,80 @@ function renderWeak(){
   document.getElementById('tSpecial').onclick=function(){ var wrongs=[]; for(var c=0;c<it.choices.length;c++){ if(c!==it.correct) wrongs.push(c); } trainState.elim=wrongs.slice(0,2); renderWeak(); };
   document.getElementById('tAns').onclick=function(){ trainState.revealed=true; renderWeak(); };
   document.getElementById('tNext').onclick=weakNext;
+}
+
+// ===== ⚡ このまま行こうぜ！＝5科目 実力解放テスト（本番用紙形式・選択式）=====
+var releaseState = { items:[], answers:{}, graded:false, score:0, correct:0, rewarded:false };
+function buildReleaseTest(){
+  var items=[];
+  TRAIN_SUBJS.forEach(function(subj){
+    var all=[];
+    trainBaseCats(subj).forEach(function(c){ (c.items||[]).forEach(function(it){ all.push(it); }); });
+    _finShuffle(all).slice(0,4).forEach(function(it){ items.push({subj:subj, it:it}); }); // 各科目4問＝計20問
+  });
+  return items;
+}
+function startRelease(){
+  releaseState={ items:buildReleaseTest(), answers:{}, graded:false, score:0, correct:0, rewarded:false };
+  renderRelease();
+}
+function gradeRelease(){
+  var rs=releaseState, correct=0;
+  rs.items.forEach(function(item,i){ if(rs.answers[i]===item.it.correct) correct++; });
+  rs.correct=correct; rs.score=rs.items.length?Math.round(correct/rs.items.length*100):0; rs.graded=true;
+  if(!rs.rewarded){ rs.rewarded=true; earnYen(Math.max(1,Math.round(correct/2))); }
+  var sc=document.getElementById('relScore'); if(sc) sc.textContent=rs.score;
+  renderRelease();
+  try{ document.querySelector('.main').scrollTop=0; }catch(e){}
+}
+function renderRelease(){
+  var main=document.getElementById('main'); var rs=releaseState;
+  var KANA=['ア','イ','ウ','エ','オ','カ'];
+  var html='<div class="exam-paper">';
+  var scoreV = rs.graded ? rs.score : ('／100');
+  html+='<div class="exam-head"><div><div class="exam-title">5科目 実力解放テスト</div><div class="exam-sub">中1 1学期 中間範囲 ・ 全'+rs.items.length+'問 ・ 記号で答えなさい</div></div>'+
+    '<div class="exam-score"><span class="lbl">得点</span><span class="v">'+scoreV+'</span></div></div>';
+  html+='<div class="exam-name"><div class="field">名前 <span class="line nameline"></span></div><div class="field">組 <span class="line"></span></div></div>';
+  var lastSubj=null, qno=0, daimon=0;
+  rs.items.forEach(function(item,i){
+    if(item.subj!==lastSubj){
+      if(lastSubj!==null) html+='</div>';
+      daimon++;
+      var nm=(TRAIN_DATA[item.subj]&&TRAIN_DATA[item.subj].name)||(SUBJECTS[item.subj]&&SUBJECTS[item.subj].name)||item.subj;
+      html+='<div class="exam-daimon"><div class="exam-daimon-head"><span>大問 '+daimon+'　'+escapeHtml(nm)+'</span><span class="haiten">各5点</span></div>';
+      lastSubj=item.subj;
+    }
+    qno++;
+    var it=item.it;
+    _rubyMode=(item.subj==='jp')?'jp':'std';
+    var ptext = it.ja ? (furigana(escapeHtml(it.ja))+' <span style="color:#888;font-size:12px">（英語で？）</span>') : fracText(it.prompt);
+    html+='<div class="exam-q"><div class="exam-qno">('+qno+')</div><div class="exam-qbody"><div class="exam-qtext">'+ptext+'</div><div class="choice-row">';
+    for(var c=0;c<it.choices.length;c++){
+      var cls='choice-pill'+((rs.answers[i]===c)?' sel':'');
+      if(rs.graded){ if(c===it.correct) cls+=' gr-correct'; else if(rs.answers[i]===c) cls+=' gr-wrong'; }
+      var chtxt=it.ja?escapeHtml(it.choices[c]):fracText(it.choices[c]);
+      html+='<button class="'+cls+'" data-rq="'+i+'" data-c="'+c+'"'+(rs.graded?' disabled':'')+'>'+KANA[c]+'. '+chtxt+'</button>';
+    }
+    html+='</div>';
+    if(rs.graded){ var ok=(rs.answers[i]===it.correct); html+='<div class="exam-mk" style="color:'+(ok?'#2e7d32':'#c62828')+'">'+(ok?'○ 正解':'× 正解は '+KANA[it.correct])+(it.expl?'　/　'+escapeHtml(it.expl):'')+'</div>'; }
+    html+='</div></div>';
+  });
+  _rubyMode='std';
+  if(lastSubj!==null) html+='</div>';
+  if(!rs.graded){
+    html+='<div style="text-align:center;margin-top:22px"><button class="exam-submit" id="relGrade">⚡ 採点する（実力解放！）</button></div>';
+  } else {
+    html+='<div style="text-align:center;margin-top:22px"><div style="font-size:18px;font-weight:800;margin-bottom:12px">得点 '+rs.score+' 点（正解 '+rs.correct+' / '+rs.items.length+'）</div>'+
+      '<button class="exam-submit" id="relRetry">🔁 もう一回（新しい問題で）</button></div>';
+  }
+  html+='</div>';
+  main.innerHTML=html; _rubyMode='std';
+  if(!rs.graded){
+    main.querySelectorAll('.choice-pill[data-rq]').forEach(function(b){ b.onclick=function(){ var qi=parseInt(b.dataset.rq,10); rs.answers[qi]=parseInt(b.dataset.c,10); var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){ p.classList.remove('sel'); }); b.classList.add('sel'); }; });
+    document.getElementById('relGrade').onclick=gradeRelease;
+  } else {
+    document.getElementById('relRetry').onclick=startRelease;
+  }
 }
 
 // ============ Init ============

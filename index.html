@@ -6127,12 +6127,18 @@ function renderWeak(){
 var releaseState = { pattern:0, items:[], answers:{}, graded:false, score:0, correct:0, rewarded:false };
 var RELEASE_PATTERNS = 10;
 function buildReleaseTest(pattern){
-  var items=[];
+  var items=[], qi=0;
   TRAIN_SUBJS.forEach(function(subj,si){
     var all=[];
     trainBaseCats(subj).forEach(function(c){ (c.items||[]).forEach(function(it){ all.push(it); }); });
     // パターンごとにシード固定（同じパターンは毎回同じ問題、別パターンは別の問題）
-    mockSeededShuffle(all, pattern*13 + si + 1).slice(0,4).forEach(function(it){ items.push({subj:subj, it:it}); });
+    mockSeededShuffle(all, pattern*13 + si + 1).slice(0,4).forEach(function(it){
+      // 選択肢の表示順もシャッフル（正解が先頭に固定されないように・パターンごとに再現性あり）
+      var idx=[]; for(var k=0;k<it.choices.length;k++) idx.push(k);
+      var order=mockSeededShuffle(idx, pattern*131 + qi*7 + 17);
+      qi++;
+      items.push({subj:subj, it:it, order:order});
+    });
   });
   return items;
 }
@@ -6151,7 +6157,7 @@ function renderReleasePatternBar(){
 }
 function gradeRelease(){
   var rs=releaseState, correct=0;
-  rs.items.forEach(function(item,i){ if(rs.answers[i]===item.it.correct) correct++; });
+  rs.items.forEach(function(item,i){ var order=item.order||[]; var cp=order.indexOf(item.it.correct); if(rs.answers[i]===cp) correct++; });
   rs.correct=correct; rs.score=rs.items.length?Math.round(correct/rs.items.length*100):0; rs.graded=true;
   if(!rs.rewarded){ rs.rewarded=true; earnYen(Math.max(1,Math.round(correct/2))); }
   var sc=document.getElementById('relScore'); if(sc) sc.textContent=rs.score;
@@ -6179,15 +6185,18 @@ function renderRelease(){
     var it=item.it;
     _rubyMode=(item.subj==='jp')?'jp':'std';
     var ptext = it.ja ? (furigana(escapeHtml(it.ja))+' <span style="color:#888;font-size:12px">（英語で？）</span>') : fracText(it.prompt);
+    var order=item.order||(function(){var a=[];for(var k=0;k<it.choices.length;k++)a.push(k);return a;})();
+    var correctPos=order.indexOf(it.correct);
     html+='<div class="exam-q"><div class="exam-qno">('+qno+')</div><div class="exam-qbody"><div class="exam-qtext">'+ptext+'</div><div class="choice-row">';
-    for(var c=0;c<it.choices.length;c++){
-      var cls='choice-pill'+((rs.answers[i]===c)?' sel':'');
-      if(rs.graded){ if(c===it.correct) cls+=' gr-correct'; else if(rs.answers[i]===c) cls+=' gr-wrong'; }
-      var chtxt=it.ja?escapeHtml(it.choices[c]):fracText(it.choices[c]);
-      html+='<button class="'+cls+'" data-rq="'+i+'" data-c="'+c+'"'+(rs.graded?' disabled':'')+'>'+KANA[c]+'. '+chtxt+'</button>';
+    for(var pos=0;pos<order.length;pos++){
+      var origIdx=order[pos];
+      var cls='choice-pill'+((rs.answers[i]===pos)?' sel':'');
+      if(rs.graded){ if(pos===correctPos) cls+=' gr-correct'; else if(rs.answers[i]===pos) cls+=' gr-wrong'; }
+      var chtxt=it.ja?escapeHtml(it.choices[origIdx]):fracText(it.choices[origIdx]);
+      html+='<button class="'+cls+'" data-rq="'+i+'" data-c="'+pos+'"'+(rs.graded?' disabled':'')+'>'+KANA[pos]+'. '+chtxt+'</button>';
     }
     html+='</div>';
-    if(rs.graded){ var ok=(rs.answers[i]===it.correct); html+='<div class="exam-mk" style="color:'+(ok?'#2e7d32':'#c62828')+'">'+(ok?'○ 正解':'× 正解は '+KANA[it.correct])+(it.expl?'　/　'+escapeHtml(it.expl):'')+'</div>'; }
+    if(rs.graded){ var ok=(rs.answers[i]===correctPos); html+='<div class="exam-mk" style="color:'+(ok?'#2e7d32':'#c62828')+'">'+(ok?'○ 正解':'× 正解は '+KANA[correctPos])+(it.expl?'　/　'+escapeHtml(it.expl):'')+'</div>'; }
     html+='</div></div>';
   });
   _rubyMode='std';

@@ -1094,7 +1094,7 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
     <button class="mode-btn" data-mode="summary">要点✓</button>
     <button class="mode-btn" data-mode="cards">暗記</button>
     <button class="mode-btn" data-mode="mock">模試</button>
-    <button class="mode-btn mode-train" data-mode="train">🔥 5科目集中</button>
+    <button class="mode-btn mode-train" data-mode="train">🔥 これでいくぞ！</button>
   </div>
 
   <div class="study-guide" id="studyGuide"></div>
@@ -2714,8 +2714,8 @@ function switchMode(mode){
     mockRender();
   } else if(mode === 'train'){
     hdrRight.innerHTML = '<div class="hdr-stat"><b id="trainDone">0</b><span>こなした</span></div>';
-    eyebrow.textContent = '5科目集中トレーニング / テスト直前';
-    title.innerHTML = '集中トレーニング<em>選ぶだけ・日本語と英語を連動</em>';
+    eyebrow.textContent = '5科目集中 / テスト直前 — これでいくぞ！';
+    title.innerHTML = 'これでいくぞ！<em>5科目集中・選ぶだけ</em>';
     renderTrain();
   }
   // 勉強順ナビが有効なら現在ステップを同期

@@ -6373,6 +6373,92 @@ function renderWeak(){
 // ===== ⚡ このまま行こうぜ！＝5科目 実力解放テスト（本番用紙形式・選択式）=====
 var releaseState = { pattern:0, mode:'full', fix:{}, items:[], answers:{}, graded:false, score:0, correct:0, rewarded:false };
 var RELEASE_PATTERNS = 10;
+// ===== 同レベルの別問題を自動生成（実力解放テスト用の大量プール）=====
+function _genRng(seed){ var s=((seed%2147483647)+2147483647)%2147483647||1; return function(){ s=s*16807%2147483647; return (s-1)/2147483646; }; }
+function _shuf4(arr, rng){ arr=arr.slice(0,6); for(var i=arr.length-1;i>0;i--){ var j=Math.floor(rng()*(i+1)); var t=arr[i];arr[i]=arr[j];arr[j]=t; } return arr; }
+function _sg(n){ return (n<0?'-'+(-n):'+'+n); }
+function _par(n){ return '('+_sg(n)+')'; }
+function genMath(){
+  var out=[], rng=_genRng(20260601);
+  function ri(a,b){ return a+Math.floor(rng()*(b-a+1)); }
+  function push(q, correct, wrongs, cat, expl){
+    var set=[correct]; wrongs.forEach(function(w){ if(set.indexOf(w)<0 && set.length<4) set.push(w); });
+    var d=1; while(set.length<4){ [correct+d,correct-d].forEach(function(w){ if(set.indexOf(w)<0&&set.length<4) set.push(w); }); d++; }
+    set=_shuf4(set,rng);
+    out.push({it:{prompt:q, choices:set.map(function(n){return _sg(n);}), correct:set.indexOf(correct), expl:expl||''}, cat:cat});
+  }
+  var i,a,b,ans;
+  for(i=0;i<55;i++){ a=ri(-15,15); b=ri(-15,15); ans=a+b; push(_par(a)+' + '+_par(b)+' = ?', ans, [a-b,-(a+b),Math.abs(a)+Math.abs(b)], '正負の数の加法','同符号は絶対値を足す、異符号は差。'); }
+  for(i=0;i<55;i++){ a=ri(-15,15); b=ri(-15,15); ans=a-b; push(_par(a)+' - '+_par(b)+' = ?', ans, [a+b,-(a-b),b-a], '正負の数の減法','引く数の符号を変えて足す。'); }
+  for(i=0;i<44;i++){ a=ri(-12,12)||2; b=ri(-12,12)||2; ans=a*b; push(_par(a)+' × '+_par(b)+' = ?', ans, [-ans,a+b,Math.abs(a*b)], '正負の数の乗法','同符号→+、異符号→-。'); }
+  for(i=0;i<36;i++){ b=ri(2,12)*(rng()<.5?-1:1); var qq=ri(2,12)*(rng()<.5?-1:1); a=b*qq; ans=a/b; push(_par(a)+' ÷ '+_par(b)+' = ?', ans, [-ans,a-b,Math.abs(ans)+1], '正負の数の除法','同符号→+、異符号→-。'); }
+  var bs=[-5,-4,-3,-2,2,3,4,5,6]; for(i=0;i<22;i++){ var ba=bs[i%bs.length]; var ex=2+(i%2); ans=Math.round(Math.pow(ba,ex)); push('('+_sg(ba)+')'+(ex===2?'²':'³')+' = ?', ans, [-ans,Math.abs(ba)*ex,Math.round(Math.pow(-ba,ex))], '累乗','マイナスが偶数個→+、奇数個→-。'); }
+  for(i=0;i<26;i++){ a=ri(-25,25); ans=Math.abs(a); push('('+_sg(a)+') の絶対値は？', ans, [a,-ans,ans+1], '絶対値','絶対値＝符号を取った値。'); }
+  return out;
+}
+function genEnglish(){
+  var out=[], rng=_genRng(20260602);
+  var subs=[{j:'私は',e:'I',be:'am'},{j:'あなたは',e:'You',be:'are'},{j:'彼は',e:'He',be:'is'},{j:'彼女は',e:'She',be:'is'},{j:'私たちは',e:'We',be:'are'},{j:'彼らは',e:'They',be:'are'}];
+  var nouns=[{j:'生徒',e:'a student',pl:'students'},{j:'先生',e:'a teacher',pl:'teachers'},{j:'友達',e:'a friend',pl:'friends'},{j:'医者',e:'a doctor',pl:'doctors'},{j:'歌手',e:'a singer',pl:'singers'},{j:'テニス選手',e:'a tennis player',pl:'tennis players'},{j:'看護師',e:'a nurse',pl:'nurses'},{j:'サッカー選手',e:'a soccer player',pl:'soccer players'},{j:'ピアニスト',e:'a pianist',pl:'pianists'},{j:'画家',e:'an artist',pl:'artists'}];
+  function push(ja, correct, wrongs, cat){ var ch=_shuf4([correct].concat(wrongs.filter(function(w){return w!==correct;})), rng); out.push({it:{ja:ja, choices:ch, correct:ch.indexOf(correct), expl:''}, cat:cat}); }
+  subs.forEach(function(s){ nouns.forEach(function(n){
+    var pl=(s.e==='We'||s.e==='They'); var obj=pl?n.pl:n.e;
+    var correct=s.e+' '+s.be+' '+obj+'.';
+    push(s.j+n.j+'です。', correct, [s.e+' '+(s.be==='is'?'are':'is')+' '+obj+'.', s.e+' '+s.be+' '+(pl?n.e:n.pl)+'.', s.e+' '+(s.be==='am'?'is':'am')+' '+obj+'.'], 'be動詞');
+  }); });
+  var verbs=[{j:'泳げます',e:'swim'},{j:'速く走れます',e:'run fast'},{j:'歌えます',e:'sing'},{j:'料理ができます',e:'cook'},{j:'ピアノをひけます',e:'play the piano'},{j:'英語を話せます',e:'speak English'},{j:'自転車に乗れます',e:'ride a bike'},{j:'スキーができます',e:'ski'},{j:'踊れます',e:'dance'},{j:'バスケができます',e:'play basketball'},{j:'絵をかけます',e:'draw'},{j:'ギターをひけます',e:'play the guitar'}];
+  subs.slice(0,4).forEach(function(s){ verbs.forEach(function(v){
+    var correct=s.e+' can '+v.e+'.';
+    push(s.j+v.j+'。', correct, [s.e+' can '+v.e+'s.', s.e+' '+s.be+' '+v.e+'.', s.e+' '+v.e+' can.'], 'can');
+  }); });
+  var things=[{j:'ペン',e:'a pen'},{j:'本',e:'a book'},{j:'犬',e:'a dog'},{j:'時計',e:'a clock'},{j:'りんご',e:'an apple'},{j:'卵',e:'an egg'},{j:'消しゴム',e:'an eraser'},{j:'かばん',e:'a bag'},{j:'ノート',e:'a notebook'},{j:'帽子',e:'a cap'},{j:'ボール',e:'a ball'},{j:'オレンジ',e:'an orange'},{j:'いす',e:'a chair'},{j:'カメラ',e:'a camera'}];
+  things.forEach(function(t){
+    push('これは'+t.j+'です。', 'This is '+t.e+'.', ['That is '+t.e+'.','This are '+t.e+'.','It is '+t.e.replace(/^an? /,'')+'.'], 'this/that/it');
+    push('あれは'+t.j+'です。', 'That is '+t.e+'.', ['This is '+t.e+'.','That are '+t.e+'.','It is '+t.e+'.'], 'this/that/it');
+  });
+  nouns.forEach(function(n){
+    push('あなたは'+n.j+'ですか。', 'Are you '+n.e+'?', ['You are '+n.e+'?','Do you '+n.e+'?','Is you '+n.e+'?'], '否定・疑問');
+    push('私は'+n.j+'ではありません。', 'I am not '+n.e+'.', ['I not am '+n.e+'.','I do not '+n.e+'.','I am '+n.e+' not.'], '否定・疑問');
+  });
+  // 一般動詞（〜が好き / 持っている）
+  var likes=[{j:'音楽',e:'music'},{j:'犬',e:'dogs'},{j:'サッカー',e:'soccer'},{j:'数学',e:'math'},{j:'りんご',e:'apples'},{j:'本',e:'books'},{j:'ねこ',e:'cats'},{j:'テニス',e:'tennis'},{j:'英語',e:'English'},{j:'理科',e:'science'},{j:'バナナ',e:'bananas'},{j:'魚',e:'fish'},{j:'野球',e:'baseball'},{j:'映画',e:'movies'}];
+  likes.forEach(function(t){
+    push('私は'+t.j+'が好きです。', 'I like '+t.e+'.', ['I am like '+t.e+'.','I likes '+t.e+'.','Like I '+t.e+'.'], '否定・疑問');
+    push('彼は'+t.j+'が好きです。', 'He likes '+t.e+'.', ['He like '+t.e+'.','He is like '+t.e+'.','He do like '+t.e+'.'], '否定・疑問');
+    push('あなたは'+t.j+'が好きですか。', 'Do you like '+t.e+'?', ['Are you like '+t.e+'?','You like '+t.e+'?','Is you like '+t.e+'?'], '否定・疑問');
+  });
+  // this/that の疑問・応答
+  things.forEach(function(t){
+    push('これは'+t.j+'ですか。', 'Is this '+t.e+'?', ['This is '+t.e+'?','Are this '+t.e+'?','Do this '+t.e+'?'], 'this/that/it');
+  });
+  // can の疑問（あなたは〜できますか）
+  verbs.forEach(function(v){
+    push('あなたは'+v.j.replace('ます','ますか')+'。', 'Can you '+v.e+'?', ['Do you '+v.e+'?','Are you '+v.e+'?','You can '+v.e+'?'], 'can');
+  });
+  return out;
+}
+function genQuestions(subj){ if(subj==='math') return genMath(); if(subj==='en') return genEnglish(); return []; }
+// 実力解放テスト用プール（手作り＝約1割 ＋ 自動生成＝残り）。科目ごとキャッシュ
+var _relPoolCache={};
+function releasePool(subj){
+  if(_relPoolCache[subj]) return _relPoolCache[subj];
+  var curated=[]; trainBaseCats(subj).forEach(function(c){ (c.items||[]).forEach(function(it){ curated.push({it:it, cat:c.name}); }); });
+  var gen=genQuestions(subj);
+  var raw;
+  if(gen.length){
+    // 手作り（これでいくぞ/必殺の内容）は約1割、残り9割は自動生成の類似別問題
+    var nCur=Math.max(2, Math.round(gen.length/9));
+    var curPick=mockSeededShuffle(curated, 555).slice(0, nCur);
+    raw = curPick.concat(gen);
+  } else {
+    raw = curated;
+  }
+  // テキストで重複除去（同じ問題が2回出ないように）
+  var seen={}, pool=[];
+  raw.forEach(function(x){ var k=(x.it.ja||x.it.prompt); if(k && !seen[k]){ seen[k]=1; pool.push(x); } });
+  _relPoolCache[subj]=pool;
+  return pool;
+}
 function buildReleaseTest(pattern){
   var items=[], qi=0;
   function pushItem(subj, group, it){
@@ -6382,25 +6468,22 @@ function buildReleaseTest(pattern){
   }
   var subjs=scopeSubjs();
   if(subjs.length===1){
-    // 1科目: プールを固定順にシャッフル → パターンごとに重複しない取り分（被りゼロ）。大問＝項目
+    // 1科目: 大量プール（手作り＋自動生成）を固定順シャッフル → 各パターン重複なし（20問）。大問＝項目
     var subj=subjs[0]; var cats=trainBaseCats(subj);
     var catIdx={}; cats.forEach(function(c,ci){ catIdx[c.name]=ci; });
-    var all=[]; cats.forEach(function(c){ (c.items||[]).forEach(function(it){ all.push({it:it, cat:c.name}); }); });
-    var shuffled=mockSeededShuffle(all, 7777); // パターンに依存しない固定順
+    var shuffled=mockSeededShuffle(releasePool(subj), 7777);
     var size=Math.min(20, Math.max(5, Math.floor(shuffled.length/RELEASE_PATTERNS)));
     var start=pattern*size, slice=[];
     for(var i=0;i<size;i++){ slice.push(shuffled[(start+i)%shuffled.length]); }
-    slice.sort(function(a,b){ return (catIdx[a.cat]||0)-(catIdx[b.cat]||0); }); // 大問＝項目順
+    slice.sort(function(a,b){ return (catIdx[a.cat]==null?99:catIdx[a.cat])-(catIdx[b.cat]==null?99:catIdx[b.cat]); });
     slice.forEach(function(s){ pushItem(subj, s.cat, s.it); });
   } else {
-    // 総合: 科目ごとに固定順シャッフル → 各パターン4問（被りゼロ）。大問＝科目
+    // 総合: 科目ごとに大量プールを固定順シャッフル → 各パターン4問（被りゼロ）。大問＝科目
     subjs.forEach(function(subj,si){
-      var all=[];
-      trainBaseCats(subj).forEach(function(c){ (c.items||[]).forEach(function(it){ all.push(it); }); });
       var snm=(TRAIN_DATA[subj]&&TRAIN_DATA[subj].name)||(SUBJECTS[subj]&&SUBJECTS[subj].name)||subj;
-      var shuffled=mockSeededShuffle(all, 8800+si);
+      var shuffled=mockSeededShuffle(releasePool(subj), 8800+si);
       var per=4, start=pattern*per;
-      for(var i=0;i<per;i++){ pushItem(subj, snm, shuffled[(start+i)%shuffled.length]); }
+      for(var i=0;i<per;i++){ var s=shuffled[(start+i)%shuffled.length]; pushItem(subj, snm, s.it); }
     });
   }
   return items;

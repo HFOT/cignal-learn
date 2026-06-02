@@ -2760,8 +2760,10 @@ function switchMode(mode){
   } else if(mode === 'release'){
     hdrRight.innerHTML = '<div class="hdr-stat"><b id="relScore">―</b><span>得点</span></div>';
     eyebrow.textContent = '5科目 実力解放テスト / 本番形式';
-    title.innerHTML = 'このまま行こうぜ！<em>5科目・実力解放テスト</em>';
-    if(!releaseState.items.length) startRelease(); else renderRelease();
+    title.innerHTML = 'このまま行こうぜ！<em>5科目・実力解放テスト（10パターン）</em>';
+    setBar.style.display = '';
+    renderReleasePatternBar();
+    if(!releaseState.items.length) startRelease(releaseState.pattern); else renderRelease();
   }
   // 勉強順ナビが有効なら現在ステップを同期
   if(guide.active) renderGuide();
@@ -6122,19 +6124,30 @@ function renderWeak(){
 }
 
 // ===== ⚡ このまま行こうぜ！＝5科目 実力解放テスト（本番用紙形式・選択式）=====
-var releaseState = { items:[], answers:{}, graded:false, score:0, correct:0, rewarded:false };
-function buildReleaseTest(){
+var releaseState = { pattern:0, items:[], answers:{}, graded:false, score:0, correct:0, rewarded:false };
+var RELEASE_PATTERNS = 10;
+function buildReleaseTest(pattern){
   var items=[];
-  TRAIN_SUBJS.forEach(function(subj){
+  TRAIN_SUBJS.forEach(function(subj,si){
     var all=[];
     trainBaseCats(subj).forEach(function(c){ (c.items||[]).forEach(function(it){ all.push(it); }); });
-    _finShuffle(all).slice(0,4).forEach(function(it){ items.push({subj:subj, it:it}); }); // 各科目4問＝計20問
+    // パターンごとにシード固定（同じパターンは毎回同じ問題、別パターンは別の問題）
+    mockSeededShuffle(all, pattern*13 + si + 1).slice(0,4).forEach(function(it){ items.push({subj:subj, it:it}); });
   });
   return items;
 }
-function startRelease(){
-  releaseState={ items:buildReleaseTest(), answers:{}, graded:false, score:0, correct:0, rewarded:false };
+function startRelease(pattern){
+  if(pattern==null) pattern = releaseState.pattern||0;
+  releaseState={ pattern:pattern, items:buildReleaseTest(pattern), answers:{}, graded:false, score:0, correct:0, rewarded:false };
+  var sc=document.getElementById('relScore'); if(sc) sc.textContent='―';
   renderRelease();
+}
+function renderReleasePatternBar(){
+  var el=document.getElementById('testSetBar'); if(!el) return;
+  var html='<span class="lv-label">実力解放</span>';
+  for(var i=0;i<RELEASE_PATTERNS;i++){ html+='<button class="test-set-btn'+(i===releaseState.pattern?' active':'')+'" data-rp="'+i+'">パターン'+(i+1)+'<br><small>20問</small></button>'; }
+  el.innerHTML=html;
+  el.querySelectorAll('.test-set-btn[data-rp]').forEach(function(b){ b.onclick=function(){ startRelease(parseInt(b.dataset.rp,10)); renderReleasePatternBar(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }; });
 }
 function gradeRelease(){
   var rs=releaseState, correct=0;
@@ -6150,7 +6163,7 @@ function renderRelease(){
   var KANA=['ア','イ','ウ','エ','オ','カ'];
   var html='<div class="exam-paper">';
   var scoreV = rs.graded ? rs.score : ('／100');
-  html+='<div class="exam-head"><div><div class="exam-title">5科目 実力解放テスト</div><div class="exam-sub">中1 1学期 中間範囲 ・ 全'+rs.items.length+'問 ・ 記号で答えなさい</div></div>'+
+  html+='<div class="exam-head"><div><div class="exam-title">5科目 実力解放テスト　パターン'+((rs.pattern||0)+1)+'</div><div class="exam-sub">中1 1学期 中間範囲 ・ 全'+rs.items.length+'問 ・ 記号で答えなさい</div></div>'+
     '<div class="exam-score"><span class="lbl">得点</span><span class="v">'+scoreV+'</span></div></div>';
   html+='<div class="exam-name"><div class="field">名前 <span class="line nameline"></span></div><div class="field">組 <span class="line"></span></div></div>';
   var lastSubj=null, qno=0, daimon=0;
@@ -6183,7 +6196,7 @@ function renderRelease(){
     html+='<div style="text-align:center;margin-top:22px"><button class="exam-submit" id="relGrade">⚡ 採点する（実力解放！）</button></div>';
   } else {
     html+='<div style="text-align:center;margin-top:22px"><div style="font-size:18px;font-weight:800;margin-bottom:12px">得点 '+rs.score+' 点（正解 '+rs.correct+' / '+rs.items.length+'）</div>'+
-      '<button class="exam-submit" id="relRetry">🔁 もう一回（新しい問題で）</button></div>';
+      '<button class="exam-submit" id="relRetry">🔁 もう一回（同じパターン）</button><div style="font-size:12px;color:#666;margin-top:8px">上の「パターン」で別のテストに挑戦できるよ</div></div>';
   }
   html+='</div>';
   main.innerHTML=html; _rubyMode='std';
@@ -6191,7 +6204,7 @@ function renderRelease(){
     main.querySelectorAll('.choice-pill[data-rq]').forEach(function(b){ b.onclick=function(){ var qi=parseInt(b.dataset.rq,10); rs.answers[qi]=parseInt(b.dataset.c,10); var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){ p.classList.remove('sel'); }); b.classList.add('sel'); }; });
     document.getElementById('relGrade').onclick=gradeRelease;
   } else {
-    document.getElementById('relRetry').onclick=startRelease;
+    document.getElementById('relRetry').onclick=function(){ startRelease(releaseState.pattern); };
   }
 }
 

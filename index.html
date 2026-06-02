@@ -267,6 +267,18 @@ button{font-family:inherit;color:inherit}
 .wk-chip.on{background:linear-gradient(135deg,#ff6b3d,#ff3d77);border-color:transparent;color:#fff}
 /* ⚡ このまま行こうぜ！＝実力解放テスト */
 .mode-release{background:linear-gradient(135deg,#ffb300,#ff7043)!important;color:#1b1b1b!important;border:1px solid transparent!important;font-weight:800!important}
+/* 🎯 中間集中モード（3分類だけ表示） */
+.focus-toggle-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--accent);background:transparent;color:var(--accent);font-size:13px;font-weight:800;cursor:pointer;margin-right:8px;transition:all .15s}
+.focus-toggle-btn:hover{background:var(--accent);color:#fff}
+#root.focus-mode .focus-toggle-btn{background:linear-gradient(135deg,#ff3d77,#ff6b3d);color:#fff;border-color:transparent}
+#root.focus-mode #subjTabs{display:none}
+#root.focus-mode #guideStart{display:none}
+#root.focus-mode #studyGuide{display:none}
+#root.focus-mode .mode-btn[data-mode="learn"],
+#root.focus-mode .mode-btn[data-mode="test"],
+#root.focus-mode .mode-btn[data-mode="summary"],
+#root.focus-mode .mode-btn[data-mode="cards"],
+#root.focus-mode .mode-btn[data-mode="mock"]{display:none}
 .exam-submit{padding:12px 30px;border-radius:6px;border:none;background:#1b1b1b;color:#fcfbf6;font-size:15px;font-weight:800;cursor:pointer;transition:background .15s}
 .exam-submit:hover{background:#000}
 .exam-paper .choice-pill.gr-correct{background:#e3f4e6!important;border-color:#2e7d32!important;color:#1b5e20!important;font-weight:700}
@@ -1125,6 +1137,7 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
     </div>
   </div>
   <div class="mode-toggle" id="modeToggle">
+    <button class="focus-toggle-btn" id="focusToggle" onclick="toggleFocus()">🎯 中間集中</button>
     <button class="guide-start-btn" id="guideStart">📋 今日の勉強順</button>
     <button class="mode-btn active" data-mode="learn">LEARN</button>
     <button class="mode-btn" data-mode="test">TEST</button>
@@ -2778,6 +2791,24 @@ document.getElementById('modeToggle').addEventListener('click', function(e){
   var btn = e.target.closest('.mode-btn');
   if(btn) switchMode(btn.dataset.mode);
 });
+
+// 🎯 中間集中モード: 3分類（これでいくぞ／必殺／このまま行こうぜ）だけ表示
+function toggleFocus(){
+  var root=document.getElementById('root');
+  var on=root.classList.toggle('focus-mode');
+  try{ localStorage.setItem('cignal_focus', on?'1':'0'); }catch(e){}
+  var btn=document.getElementById('focusToggle'); if(btn) btn.textContent = on ? '↩ もどす' : '🎯 中間集中';
+  if(on && ['train','finisher','release'].indexOf(currentMode)<0) switchMode('train');
+}
+function loadFocus(){
+  try{
+    if(localStorage.getItem('cignal_focus')==='1'){
+      document.getElementById('root').classList.add('focus-mode');
+      var btn=document.getElementById('focusToggle'); if(btn) btn.textContent='↩ もどす';
+      if(['train','finisher','release'].indexOf(currentMode)<0) switchMode('train');
+    }
+  }catch(e){}
+}
 
 // ============ 今日の勉強順ナビ ============
 var GUIDE_ORDER = [
@@ -6265,6 +6296,7 @@ shuffleTrainChoices();
 hwInit();
 renderRoadmap();
 render();
+loadFocus();
 </script>
 </body>
 </html>

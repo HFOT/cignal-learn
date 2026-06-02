@@ -272,6 +272,11 @@ button{font-family:inherit;color:inherit}
 .exam-paper .choice-pill.gr-correct{background:#e3f4e6!important;border-color:#2e7d32!important;color:#1b5e20!important;font-weight:700}
 .exam-paper .choice-pill.gr-wrong{background:#fce4e6!important;border-color:#c62828!important;color:#b71c1c!important}
 .exam-mk{font-size:12px;margin-top:6px;font-weight:700}
+.rel-modes{display:flex;gap:10px;justify-content:center;max-width:780px;margin:0 auto 12px}
+.rel-mode{padding:10px 20px;border-radius:10px;border:1px solid var(--border);background:var(--paper-2);color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;transition:all .12s}
+.rel-mode:hover{border-color:var(--accent)}
+.rel-mode.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.rel-mode.on.fix{background:linear-gradient(135deg,#2e9e54,#1e7d40)}
 .cal-wd{text-align:center;font-size:11px;color:var(--muted);padding:4px 0;font-weight:600}
 .cal-wd.sun{color:var(--ng)} .cal-wd.sat{color:var(--accent)}
 .cal-cell{
@@ -6124,7 +6129,7 @@ function renderWeak(){
 }
 
 // ===== ⚡ このまま行こうぜ！＝5科目 実力解放テスト（本番用紙形式・選択式）=====
-var releaseState = { pattern:0, items:[], answers:{}, graded:false, score:0, correct:0, rewarded:false };
+var releaseState = { pattern:0, mode:'full', fix:{}, items:[], answers:{}, graded:false, score:0, correct:0, rewarded:false };
 var RELEASE_PATTERNS = 10;
 function buildReleaseTest(pattern){
   var items=[], qi=0;
@@ -6144,9 +6149,14 @@ function buildReleaseTest(pattern){
 }
 function startRelease(pattern){
   if(pattern==null) pattern = releaseState.pattern||0;
-  releaseState={ pattern:pattern, items:buildReleaseTest(pattern), answers:{}, graded:false, score:0, correct:0, rewarded:false };
+  var mode = releaseState.mode||'full';
+  releaseState={ pattern:pattern, mode:mode, fix:{}, items:buildReleaseTest(pattern), answers:{}, graded:false, score:0, correct:0, rewarded:false };
   var sc=document.getElementById('relScore'); if(sc) sc.textContent='―';
   renderRelease();
+}
+function setReleaseMode(m){
+  releaseState.mode=m; releaseState.answers={}; releaseState.fix={}; releaseState.graded=false; releaseState.score=0; releaseState.correct=0; releaseState.rewarded=false;
+  renderRelease(); try{ document.querySelector('.main').scrollTop=0; }catch(e){}
 }
 function renderReleasePatternBar(){
   var el=document.getElementById('testSetBar'); if(!el) return;
@@ -6167,9 +6177,13 @@ function gradeRelease(){
 function renderRelease(){
   var main=document.getElementById('main'); var rs=releaseState;
   var KANA=['ア','イ','ウ','エ','オ','カ'];
-  var html='<div class="exam-paper">';
-  var scoreV = rs.graded ? rs.score : ('／100');
-  html+='<div class="exam-head"><div><div class="exam-title">5科目 実力解放テスト　パターン'+((rs.pattern||0)+1)+'</div><div class="exam-sub">中1 1学期 中間範囲 ・ 全'+rs.items.length+'問 ・ 記号で答えなさい</div></div>'+
+  var fix=(rs.mode==='fix');
+  var solvedCount=0; if(fix){ rs.items.forEach(function(_,i){ if(rs.fix[i]&&rs.fix[i].solved) solvedCount++; }); }
+  var html='';
+  html+='<div class="rel-modes"><button class="rel-mode'+(!fix?' on':'')+'" data-rmode="full">📝 完全テスト</button><button class="rel-mode'+(fix?' on fix':'')+'" data-rmode="fix">✏️ 違うぞモード（直して100点）</button></div>';
+  html+='<div class="exam-paper">';
+  var scoreV = fix ? (solvedCount*5) : (rs.graded ? rs.score : '／100');
+  html+='<div class="exam-head"><div><div class="exam-title">5科目 実力解放テスト　パターン'+((rs.pattern||0)+1)+'</div><div class="exam-sub">中1 1学期 中間範囲 ・ 全'+rs.items.length+'問 ・ '+(fix?'まちがえたらヒントを見て直そう（直して100点）':'記号で答えなさい')+'</div></div>'+
     '<div class="exam-score"><span class="lbl">得点</span><span class="v">'+scoreV+'</span></div></div>';
   html+='<div class="exam-name"><div class="field">名前 <span class="line nameline"></span></div><div class="field">組 <span class="line"></span></div></div>';
   var lastSubj=null, qno=0, daimon=0;
@@ -6187,21 +6201,35 @@ function renderRelease(){
     var ptext = it.ja ? (furigana(escapeHtml(it.ja))+' <span style="color:#888;font-size:12px">（英語で？）</span>') : fracText(it.prompt);
     var order=item.order||(function(){var a=[];for(var k=0;k<it.choices.length;k++)a.push(k);return a;})();
     var correctPos=order.indexOf(it.correct);
+    var fst=rs.fix[i]||{}; var solved=(fix&&fst.solved);
+    var disabled = fix ? solved : rs.graded;
     html+='<div class="exam-q"><div class="exam-qno">('+qno+')</div><div class="exam-qbody"><div class="exam-qtext">'+ptext+'</div><div class="choice-row">';
     for(var pos=0;pos<order.length;pos++){
       var origIdx=order[pos];
-      var cls='choice-pill'+((rs.answers[i]===pos)?' sel':'');
-      if(rs.graded){ if(pos===correctPos) cls+=' gr-correct'; else if(rs.answers[i]===pos) cls+=' gr-wrong'; }
+      var cls='choice-pill';
+      if(!fix){ if(rs.answers[i]===pos) cls+=' sel'; if(rs.graded){ if(pos===correctPos) cls+=' gr-correct'; else if(rs.answers[i]===pos) cls+=' gr-wrong'; } }
+      else { if(solved && pos===correctPos) cls+=' gr-correct'; else if(!solved && fst.lastWrong===pos) cls+=' gr-wrong'; }
       var chtxt=it.ja?escapeHtml(it.choices[origIdx]):fracText(it.choices[origIdx]);
-      html+='<button class="'+cls+'" data-rq="'+i+'" data-c="'+pos+'"'+(rs.graded?' disabled':'')+'>'+KANA[pos]+'. '+chtxt+'</button>';
+      html+='<button class="'+cls+'" data-rq="'+i+'" data-c="'+pos+'"'+(disabled?' disabled':'')+'>'+KANA[pos]+'. '+chtxt+'</button>';
     }
     html+='</div>';
-    if(rs.graded){ var ok=(rs.answers[i]===correctPos); html+='<div class="exam-mk" style="color:'+(ok?'#2e7d32':'#c62828')+'">'+(ok?'○ 正解':'× 正解は '+KANA[correctPos])+(it.expl?'　/　'+escapeHtml(it.expl):'')+'</div>'; }
+    if(!fix && rs.graded){ var ok=(rs.answers[i]===correctPos); html+='<div class="exam-mk" style="color:'+(ok?'#2e7d32':'#c62828')+'">'+(ok?'○ 正解':'× 正解は '+KANA[correctPos])+(it.expl?'　/　'+escapeHtml(it.expl):'')+'</div>'; }
+    if(fix){
+      if(solved){ html+='<div class="exam-mk" style="color:#2e7d32">⭕ せいかい！'+(it.expl?'　/　'+escapeHtml(it.expl):'')+'</div>'; }
+      else if(fst.lastWrong!=null){ var hint=it.hint||trainHintText(it); html+='<div class="exam-mk" style="color:#c62828">❌ これは違うぞ！　💡ヒント: '+escapeHtml(hint)+'　→ もう一度えらんでみて！</div>'; }
+    }
     html+='</div></div>';
   });
   _rubyMode='std';
   if(lastSubj!==null) html+='</div>';
-  if(!rs.graded){
+  if(fix){
+    if(solvedCount===rs.items.length && rs.items.length){
+      if(!rs.rewarded){ rs.rewarded=true; earnYen(10); }
+      html+='<div style="text-align:center;margin-top:22px"><div style="font-size:26px;font-weight:800;color:#2e7d32">💯 100点！ぜんぶ正解！</div><div style="font-size:13px;color:#666;margin-top:6px">まちがいを ぜんぶ 直してクリア！この成功体験を わすれずに！</div><button class="exam-submit" id="relRetry" style="margin-top:12px">🔁 もう一回</button></div>';
+    } else {
+      html+='<div style="text-align:center;margin-top:18px;font-size:13px;color:#555">まちがえたら 💡ヒントを見て もう一度えらぼう。ぜんぶ直すと <b>100点</b>！（のこり '+(rs.items.length-solvedCount)+'問）</div>';
+    }
+  } else if(!rs.graded){
     html+='<div style="text-align:center;margin-top:22px"><button class="exam-submit" id="relGrade">⚡ 採点する（実力解放！）</button></div>';
   } else {
     html+='<div style="text-align:center;margin-top:22px"><div style="font-size:18px;font-weight:800;margin-bottom:12px">得点 '+rs.score+' 点（正解 '+rs.correct+' / '+rs.items.length+'）</div>'+
@@ -6209,11 +6237,21 @@ function renderRelease(){
   }
   html+='</div>';
   main.innerHTML=html; _rubyMode='std';
-  if(!rs.graded){
+  main.querySelectorAll('.rel-mode[data-rmode]').forEach(function(b){ b.onclick=function(){ setReleaseMode(b.dataset.rmode); }; });
+  var sc=document.getElementById('relScore'); if(sc) sc.textContent = fix ? (solvedCount*5) : (rs.graded?rs.score:'―');
+  if(fix){
+    main.querySelectorAll('.choice-pill[data-rq]').forEach(function(b){ b.onclick=function(){
+      var qi=parseInt(b.dataset.rq,10); if(rs.fix[qi]&&rs.fix[qi].solved) return;
+      var pos=parseInt(b.dataset.c,10); var item=rs.items[qi]; var cp=(item.order||[]).indexOf(item.it.correct);
+      if(pos===cp){ rs.fix[qi]={solved:true}; } else { rs.fix[qi]={solved:false,lastWrong:pos}; }
+      renderRelease();
+    }; });
+    var rr=document.getElementById('relRetry'); if(rr) rr.onclick=function(){ startRelease(rs.pattern); };
+  } else if(!rs.graded){
     main.querySelectorAll('.choice-pill[data-rq]').forEach(function(b){ b.onclick=function(){ var qi=parseInt(b.dataset.rq,10); rs.answers[qi]=parseInt(b.dataset.c,10); var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){ p.classList.remove('sel'); }); b.classList.add('sel'); }; });
     document.getElementById('relGrade').onclick=gradeRelease;
   } else {
-    document.getElementById('relRetry').onclick=function(){ startRelease(releaseState.pattern); };
+    document.getElementById('relRetry').onclick=function(){ startRelease(rs.pattern); };
   }
 }
 

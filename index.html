@@ -205,7 +205,8 @@ button{font-family:inherit;color:inherit}
 .cr-en{font-size:16px;font-weight:800;letter-spacing:.01em}
 .cr-ja{font-size:12px;color:var(--muted);margin-top:2px}
 /* 🔥 5科目集中トレーニング */
-.mode-train{background:linear-gradient(135deg,#ff6b3d,#ff3d77)!important;color:#fff!important;border:1px solid transparent!important}
+.mode-train{background:linear-gradient(135deg,#ff8f3d,#ff6b3d)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
+.mode-finisher{background:linear-gradient(135deg,#ff3d77,#c2185b)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
 .train-wrap{max-width:680px;margin:0 auto;padding:6px 4px 28px}
 .train-subjtabs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
 .train-subjtab{padding:7px 17px;border-radius:20px;border:1px solid var(--border);background:var(--paper-2);color:var(--muted);font-weight:700;cursor:pointer;font-size:13px;transition:all .12s}
@@ -1126,6 +1127,7 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
     <button class="mode-btn" data-mode="cards">暗記</button>
     <button class="mode-btn" data-mode="mock">模試</button>
     <button class="mode-btn mode-train" data-mode="train">🔥 これでいくぞ！</button>
+    <button class="mode-btn mode-finisher" data-mode="finisher">💥 必殺テスト</button>
     <button class="mode-btn mode-release" data-mode="release">⚡ このまま行こうぜ！</button>
   </div>
 
@@ -2750,6 +2752,11 @@ function switchMode(mode){
     title.innerHTML = 'これでいくぞ！<em>5科目集中・選ぶだけ</em>';
     trainState.mode = 'train';
     renderTrain();
+  } else if(mode === 'finisher'){
+    hdrRight.innerHTML = '<div class="hdr-stat"><b id="finScore">―</b><span>正解</span></div>';
+    eyebrow.textContent = '5科目集中 必殺テスト / 項目ごと一気に';
+    title.innerHTML = '必殺テスト<em>5科目・項目ごと一気に</em>';
+    startFinisher();
   } else if(mode === 'release'){
     hdrRight.innerHTML = '<div class="hdr-stat"><b id="relScore">―</b><span>得点</span></div>';
     eyebrow.textContent = '5科目 実力解放テスト / 本番形式';
@@ -5909,7 +5916,6 @@ function renderTrain(){
   var it=cat.items[trainState.idx];
   var KANA=['ア','イ','ウ','エ','オ','カ'];
   var html='<div class="train-wrap">';
-  html+='<div class="train-finisher-cta"><button id="trainFinisherBtn">💥 必殺テストに挑戦！<small>5教科ミックス・一気に！</small></button></div>';
   html+='<div class="train-subjtabs">';
   TRAIN_SUBJS.forEach(function(s){ var nm=(TRAIN_DATA[s]&&TRAIN_DATA[s].name)||(SUBJECTS[s]&&SUBJECTS[s].name)||s; html+='<button class="train-subjtab'+(s===trainState.subj?' on':'')+'" data-tsubj="'+s+'">'+nm+'</button>'; });
   html+='</div>';
@@ -5942,7 +5948,6 @@ function renderTrain(){
   main.innerHTML=html;
   _rubyMode='std';
   trainBindTabs(main);
-  var fbtn=document.getElementById('trainFinisherBtn'); if(fbtn) fbtn.onclick=startFinisher;
   main.querySelectorAll('.tc[data-tc]').forEach(function(b){ b.onclick=function(){ if(answered) return; trainState.picked=parseInt(b.dataset.tc,10); if(trainState.picked===it.correct){ trainState.done++; var d=document.getElementById('trainDone'); if(d) d.textContent=trainState.done; } renderTrain(); }; });
   document.getElementById('tHint').onclick=function(){ trainState.hintShown=!trainState.hintShown; document.getElementById('tHintBox').style.display=trainState.hintShown?'block':'none'; };
   document.getElementById('tSpecial').onclick=function(){ var wrongs=[]; for(var c=0;c<it.choices.length;c++){ if(c!==it.correct) wrongs.push(c); } trainState.elim=wrongs.slice(0,2); renderTrain(); };
@@ -6033,9 +6038,10 @@ function renderFinisherResult(){
     '</div></div>';
   main.innerHTML=html;
   var fw=document.getElementById('finWeak'); if(fw) fw.onclick=function(){ startWeak(fs.wrong); };
+  var sc=document.getElementById('finScore'); if(sc) sc.textContent=fs.correct;
   document.getElementById('finRelease').onclick=function(){ switchMode('release'); };
   document.getElementById('finRetry').onclick=startFinisher;
-  document.getElementById('finBack').onclick=function(){ trainState.mode='train'; renderTrain(); };
+  document.getElementById('finBack').onclick=function(){ switchMode('train'); };
 }
 
 // ===== 💪 5科目集中 弱点克服（必殺でできなかった所を科目別に・連続で）=====
@@ -6047,7 +6053,7 @@ function startWeak(wrongList){
   trainState.mode='weak'; trainResetItem();
   renderWeak();
 }
-function weakExit(){ trainState.mode='train'; trainResetItem(); renderTrain(); }
+function weakExit(){ trainState.mode='train'; trainResetItem(); switchMode('train'); }
 function weakNext(){
   var arr=weakData[trainState.subj]||[]; var it=arr[0];
   if(it){ if(trainState.picked===it.correct){ arr.shift(); } else { arr.push(arr.shift()); } } // 正解→克服(削除) / まちがい→後ろへ

@@ -6382,20 +6382,25 @@ function buildReleaseTest(pattern){
   }
   var subjs=scopeSubjs();
   if(subjs.length===1){
-    // 1科目: 項目(カテゴリ)ごとに大問。合計約20問
+    // 1科目: プールを固定順にシャッフル → パターンごとに重複しない取り分（被りゼロ）。大問＝項目
     var subj=subjs[0]; var cats=trainBaseCats(subj);
-    var perCat=Math.max(2, Math.ceil(20/Math.max(1,cats.length)));
-    cats.forEach(function(c,ci){
-      mockSeededShuffle(c.items||[], pattern*13 + ci + 1).slice(0,perCat).forEach(function(it){ pushItem(subj, c.name, it); });
-    });
-    items=items.slice(0,20);
+    var catIdx={}; cats.forEach(function(c,ci){ catIdx[c.name]=ci; });
+    var all=[]; cats.forEach(function(c){ (c.items||[]).forEach(function(it){ all.push({it:it, cat:c.name}); }); });
+    var shuffled=mockSeededShuffle(all, 7777); // パターンに依存しない固定順
+    var size=Math.min(20, Math.max(5, Math.floor(shuffled.length/RELEASE_PATTERNS)));
+    var start=pattern*size, slice=[];
+    for(var i=0;i<size;i++){ slice.push(shuffled[(start+i)%shuffled.length]); }
+    slice.sort(function(a,b){ return (catIdx[a.cat]||0)-(catIdx[b.cat]||0); }); // 大問＝項目順
+    slice.forEach(function(s){ pushItem(subj, s.cat, s.it); });
   } else {
-    // 総合: 科目ごとに大問、各科目4問
+    // 総合: 科目ごとに固定順シャッフル → 各パターン4問（被りゼロ）。大問＝科目
     subjs.forEach(function(subj,si){
       var all=[];
       trainBaseCats(subj).forEach(function(c){ (c.items||[]).forEach(function(it){ all.push(it); }); });
       var snm=(TRAIN_DATA[subj]&&TRAIN_DATA[subj].name)||(SUBJECTS[subj]&&SUBJECTS[subj].name)||subj;
-      mockSeededShuffle(all, pattern*13 + si + 1).slice(0,4).forEach(function(it){ pushItem(subj, snm, it); });
+      var shuffled=mockSeededShuffle(all, 8800+si);
+      var per=4, start=pattern*per;
+      for(var i=0;i<per;i++){ pushItem(subj, snm, shuffled[(start+i)%shuffled.length]); }
     });
   }
   return items;
@@ -6436,7 +6441,8 @@ function renderRelease(){
   html+=scopeBarHTML();
   html+='<div class="rel-modes"><button class="rel-mode'+(!fix?' on':'')+'" data-rmode="full">📝 完全テスト</button><button class="rel-mode'+(fix?' on fix':'')+'" data-rmode="fix">✏️ 違うぞモード（直して100点）</button></div>';
   html+='<div class="exam-paper">';
-  var scoreV = fix ? (solvedCount*5) : (rs.graded ? rs.score : '／100');
+  var ptsEach = rs.items.length ? Math.round(100/rs.items.length) : 5;
+  var scoreV = fix ? (rs.items.length?Math.round(solvedCount/rs.items.length*100):0) : (rs.graded ? rs.score : '／100');
   var scopeName=(trainScope==='総合')?'5科目':(TRAIN_SCOPES.filter(function(s){return s.k===trainScope;})[0]||{n:''}).n;
   html+='<div class="exam-head"><div><div class="exam-title">'+escapeHtml(scopeName)+' 実力解放テスト　パターン'+((rs.pattern||0)+1)+'</div><div class="exam-sub">中1 1学期 中間範囲 ・ 全'+rs.items.length+'問 ・ '+(fix?'まちがえたらヒントを見て直そう（直して100点）':'記号で答えなさい')+'</div></div>'+
     '<div class="exam-score"><span class="lbl">得点</span><span class="v">'+scoreV+'</span></div></div>';
@@ -6446,7 +6452,7 @@ function renderRelease(){
     if(item.group!==lastSubj){
       if(lastSubj!==null) html+='</div>';
       daimon++;
-      html+='<div class="exam-daimon"><div class="exam-daimon-head"><span>大問 '+daimon+'　'+escapeHtml(item.group||'')+'</span><span class="haiten">各5点</span></div>';
+      html+='<div class="exam-daimon"><div class="exam-daimon-head"><span>大問 '+daimon+'　'+escapeHtml(item.group||'')+'</span><span class="haiten">各'+ptsEach+'点</span></div>';
       lastSubj=item.group;
     }
     qno++;
@@ -6493,7 +6499,7 @@ function renderRelease(){
   main.innerHTML=html; _rubyMode='std';
   bindScopeBar(main, function(){ startRelease(releaseState.pattern); try{ document.querySelector('.main').scrollTop=0; }catch(e){} });
   main.querySelectorAll('.rel-mode[data-rmode]').forEach(function(b){ b.onclick=function(){ setReleaseMode(b.dataset.rmode); }; });
-  var sc=document.getElementById('relScore'); if(sc) sc.textContent = fix ? (solvedCount*5) : (rs.graded?rs.score:'―');
+  var sc=document.getElementById('relScore'); if(sc) sc.textContent = fix ? (rs.items.length?Math.round(solvedCount/rs.items.length*100):0) : (rs.graded?rs.score:'―');
   if(fix){
     main.querySelectorAll('.choice-pill[data-rq]').forEach(function(b){ b.onclick=function(){
       var qi=parseInt(b.dataset.rq,10); if(rs.fix[qi]&&rs.fix[qi].solved) return;

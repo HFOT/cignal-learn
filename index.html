@@ -216,6 +216,9 @@ button{font-family:inherit;color:inherit}
 .train-cat{padding:5px 13px;border-radius:14px;border:1px solid var(--border);background:var(--paper);color:var(--ink);font-size:12px;cursor:pointer;transition:all .12s}
 .train-cat:hover{border-color:var(--accent)}
 .train-cat.on{background:rgba(68,104,255,.18);border-color:var(--accent);color:var(--accent);font-weight:700}
+.train-cursubj{text-align:center;font-size:13px;font-weight:800;color:var(--accent);margin:2px 0 8px}
+.train-feedback{font-size:14px;font-weight:800;margin-top:12px;text-align:center}
+.train-feedback.ok{color:var(--ok)} .train-feedback.ng{color:var(--ng)}
 .train-card{background:var(--paper);border:1px solid var(--border-h);border-radius:16px;padding:20px 22px;box-shadow:0 3px 14px var(--shadow)}
 .train-progress{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-bottom:10px}
 .train-qlabel{font-size:12px;color:var(--accent);font-weight:700;margin-bottom:6px}
@@ -5855,7 +5858,17 @@ function dailyFinish(){
 
 // ============ 🔥 5科目集中トレーニング ============
 var TRAIN_SUBJS = ['en','math','jp','sci','soc'];
-var trainState = { subj:'en', cat:0, idx:0, picked:null, revealed:false, elim:[], done:0, hintShown:false, mode:'train' };
+// 3モード共通の科目スコープ（総合 or 1科目）
+var TRAIN_SCOPES = [{k:'総合',n:'総合'},{k:'en',n:'英語'},{k:'math',n:'数学'},{k:'jp',n:'国語'},{k:'sci',n:'理科'},{k:'soc',n:'社会'}];
+var trainScope = '総合';
+function scopeSubjs(){ return (trainScope==='総合') ? TRAIN_SUBJS.slice() : [trainScope]; }
+function scopeBarHTML(){
+  var h='<div class="train-subjtabs">';
+  TRAIN_SCOPES.forEach(function(s){ h+='<button class="train-subjtab'+(s.k===trainScope?' on':'')+'" data-tscope="'+s.k+'">'+s.n+'</button>'; });
+  return h+'</div>';
+}
+function bindScopeBar(main, onChange){ main.querySelectorAll('.train-subjtab[data-tscope]').forEach(function(b){ b.onclick=function(){ if(trainScope===b.dataset.tscope) return; trainScope=b.dataset.tscope; onChange(); }; }); }
+var trainState = { subj:'en', cat:0, idx:0, picked:null, revealed:false, elim:[], done:0, hintShown:false, mode:'train', doneAll:false };
 // 英語＝日本語→英語の連動（手作り）。ヒント/スペシャルヒント/説明つき
 var TRAIN_DATA = {
   en: { name:'英語', cats:[
@@ -5936,9 +5949,23 @@ function trainBindTabs(main){
   main.querySelectorAll('.train-cat[data-tcat]').forEach(function(b){ b.onclick=function(){ trainState.cat=parseInt(b.dataset.tcat,10); trainResetItem(); renderTrain(); }; });
 }
 function trainResetItem(){ trainState.idx=0; trainState.picked=null; trainState.revealed=false; trainState.elim=[]; trainState.hintShown=false; }
-function trainNext(){
-  var cats=trainGetCats(trainState.subj); var cat=cats[trainState.cat]||{items:[]};
-  trainState.idx=(trainState.idx+1)%Math.max(1,cat.items.length);
+function trainResetFlow(){
+  var subjs=scopeSubjs(); trainState.subj=subjs[0]; trainState.cat=0; trainState.idx=0; trainState.doneAll=false;
+  trainState.picked=null; trainState.revealed=false; trainState.elim=[]; trainState.hintShown=false;
+}
+// 正解で次へ：項目内→次の項目→（総合なら）次の科目
+function trainAdvance(){
+  var subjs=scopeSubjs(); var cats=trainBaseCats(trainState.subj);
+  trainState.idx++;
+  if(trainState.idx >= ((cats[trainState.cat]&&cats[trainState.cat].items.length)||0)){
+    trainState.idx=0; trainState.cat++;
+    if(trainState.cat >= cats.length){
+      trainState.cat=0;
+      var si=subjs.indexOf(trainState.subj);
+      if(si>=0 && si<subjs.length-1){ trainState.subj=subjs[si+1]; }
+      else { trainState.doneAll=true; }
+    }
+  }
   trainState.picked=null; trainState.revealed=false; trainState.elim=[]; trainState.hintShown=false;
   renderTrain();
 }
@@ -5946,22 +5973,36 @@ function renderTrain(){
   if(trainState.mode==='finisher'){ renderFinisher(); return; }
   if(trainState.mode==='weak'){ renderWeak(); return; }
   var main=document.getElementById('main');
+  var subjs=scopeSubjs();
+  if(subjs.indexOf(trainState.subj)<0){ trainState.subj=subjs[0]; trainState.cat=0; trainState.idx=0; trainState.doneAll=false; }
   _rubyMode = (trainState.subj==='jp')?'jp':'std';
-  var cats=trainGetCats(trainState.subj);
+  var KANA=['ア','イ','ウ','エ','オ','カ'];
+  var html='<div class="train-wrap">';
+  html+=scopeBarHTML();
+  // 全部おわり
+  if(trainState.doneAll){
+    html+='<div class="train-card" style="text-align:center"><h2 style="margin:6px 0">🎉 ぜんぶ おわり！</h2><div class="fin-msg">'+(trainScope==='総合'?'5科目':(TRAIN_SCOPES.filter(function(s){return s.k===trainScope;})[0]||{n:''}).n)+'の項目を ぜんぶ クリア！</div><div class="train-next"><button id="trainAgain">🔁 もう一周</button></div></div></div>';
+    main.innerHTML=html; _rubyMode='std';
+    bindScopeBar(main, function(){ trainResetFlow(); renderTrain(); });
+    document.getElementById('trainAgain').onclick=function(){ trainResetFlow(); renderTrain(); };
+    return;
+  }
+  var cats=trainBaseCats(trainState.subj);
   if(trainState.cat>=cats.length) trainState.cat=0;
   var cat=cats[trainState.cat]||{items:[]};
   if(trainState.idx>=cat.items.length) trainState.idx=0;
   var it=cat.items[trainState.idx];
-  var KANA=['ア','イ','ウ','エ','オ','カ'];
-  var html='<div class="train-wrap">';
-  html+='<div class="train-subjtabs">';
-  TRAIN_SUBJS.forEach(function(s){ var nm=(TRAIN_DATA[s]&&TRAIN_DATA[s].name)||(SUBJECTS[s]&&SUBJECTS[s].name)||s; html+='<button class="train-subjtab'+(s===trainState.subj?' on':'')+'" data-tsubj="'+s+'">'+nm+'</button>'; });
-  html+='</div>';
+  // 現在の科目名（総合のとき）
+  if(trainScope==='総合'){ var cnm=(TRAIN_DATA[trainState.subj]&&TRAIN_DATA[trainState.subj].name)||(SUBJECTS[trainState.subj]&&SUBJECTS[trainState.subj].name)||trainState.subj; html+='<div class="train-cursubj">'+escapeHtml(cnm)+'</div>'; }
+  // 項目チップ（現在の科目の項目、現在地ハイライト）
   html+='<div class="train-cats">';
   cats.forEach(function(c,ci){ html+='<button class="train-cat'+(ci===trainState.cat?' on':'')+'" data-tcat="'+ci+'">'+furigana(escapeHtml(c.name))+'</button>'; });
   html+='</div>';
-  if(!it){ html+='<div class="train-card">この項目は準備中です。</div></div>'; main.innerHTML=html; _rubyMode='std'; trainBindTabs(main); return; }
-  var answered=(trainState.picked!=null||trainState.revealed);
+  if(!it){ html+='<div class="train-card">この項目は準備中です。</div></div>'; main.innerHTML=html; _rubyMode='std'; bindScopeBar(main, function(){ trainResetFlow(); renderTrain(); }); return; }
+  var solved=(trainState.picked!=null && trainState.picked===it.correct);
+  var revealed=trainState.revealed;
+  var locked=(solved||revealed);
+  var wrongPick=(trainState.picked!=null && trainState.picked!==it.correct && !revealed);
   var prompt=it.ja||it.prompt;
   var qlabel=it.ja?'次の日本語を 英語に すると？':'正しい答えを えらぼう';
   html+='<div class="train-card">';
@@ -5972,25 +6013,35 @@ function renderTrain(){
   for(var c=0;c<it.choices.length;c++){
     var cls='tc';
     if(trainState.elim.indexOf(c)>=0) cls+=' elim';
-    if(answered){ if(c===it.correct) cls+=' correct'; else if(trainState.picked===c) cls+=' wrong'; }
+    if(locked){ if(c===it.correct) cls+=' correct'; else if(trainState.picked===c) cls+=' wrong'; }
+    else if(wrongPick && trainState.picked===c){ cls+=' wrong'; }
     var chtxt=it.ja?escapeHtml(it.choices[c]):fracText(it.choices[c]);
-    html+='<button class="'+cls+'" data-tc="'+c+'"'+(answered?' disabled':'')+'><span class="kana">'+KANA[c]+'</span>'+chtxt+'</button>';
+    html+='<button class="'+cls+'" data-tc="'+c+'"'+(locked?' disabled':'')+'><span class="kana">'+KANA[c]+'</span>'+chtxt+'</button>';
   }
   html+='</div>';
+  if(solved){ html+='<div class="train-feedback ok">⭕ 正解！つぎへ進むよ</div>'; }
+  else if(wrongPick){ html+='<div class="train-feedback ng">❌ ちがうよ。ヒントを見て もう一度えらぼう！</div>'; }
   html+='<div class="train-help"><button class="hint" id="tHint">💡 ヒント</button><button class="special" id="tSpecial">⭐ スペシャルヒント</button><button class="ans" id="tAns">👀 答えを見る</button></div>';
   html+='<div class="train-hintbox hint" id="tHintBox" style="display:'+(trainState.hintShown?'block':'none')+'">'+furigana(escapeHtml(trainHintText(it)))+'</div>';
   html+='<div class="train-hintbox special" id="tSpecialBox" style="display:'+(trainState.elim.length?'block':'none')+'">まちがいを 2つ 消したよ。のこりから えらぼう！</div>';
-  html+='<div class="train-expl'+(answered?' show':'')+'" id="tExpl">📘 '+furigana(escapeHtml(it.expl||''))+'</div>';
-  html+='<div class="train-next"><button id="tNext">つぎへ →</button></div>';
+  html+='<div class="train-expl'+(locked?' show':'')+'" id="tExpl">📘 '+furigana(escapeHtml(it.expl||''))+'</div>';
+  if(revealed && !solved){ html+='<div class="train-next"><button id="tNext">つぎへ →</button></div>'; }
   html+='</div></div>';
   main.innerHTML=html;
   _rubyMode='std';
-  trainBindTabs(main);
-  main.querySelectorAll('.tc[data-tc]').forEach(function(b){ b.onclick=function(){ if(answered) return; trainState.picked=parseInt(b.dataset.tc,10); if(trainState.picked===it.correct){ trainState.done++; var d=document.getElementById('trainDone'); if(d) d.textContent=trainState.done; } renderTrain(); }; });
+  bindScopeBar(main, function(){ trainResetFlow(); renderTrain(); });
+  main.querySelectorAll('.train-cat[data-tcat]').forEach(function(b){ b.onclick=function(){ trainState.cat=parseInt(b.dataset.tcat,10); trainResetItem(); renderTrain(); }; });
+  main.querySelectorAll('.tc[data-tc]').forEach(function(b){ b.onclick=function(){
+    if(locked) return;
+    var c=parseInt(b.dataset.tc,10);
+    trainState.picked=c;
+    if(c===it.correct){ trainState.done++; var d=document.getElementById('trainDone'); if(d) d.textContent=trainState.done; renderTrain(); setTimeout(function(){ if(trainState.mode==='train' && trainState.picked===it.correct){ trainAdvance(); } }, 650); }
+    else { renderTrain(); }
+  }; });
   document.getElementById('tHint').onclick=function(){ trainState.hintShown=!trainState.hintShown; document.getElementById('tHintBox').style.display=trainState.hintShown?'block':'none'; };
   document.getElementById('tSpecial').onclick=function(){ var wrongs=[]; for(var c=0;c<it.choices.length;c++){ if(c!==it.correct) wrongs.push(c); } trainState.elim=wrongs.slice(0,2); renderTrain(); };
   document.getElementById('tAns').onclick=function(){ trainState.revealed=true; renderTrain(); };
-  document.getElementById('tNext').onclick=function(){ trainNext(); };
+  var tn=document.getElementById('tNext'); if(tn) tn.onclick=function(){ trainAdvance(); };
 }
 
 // ===== 💥 5科目集中 必殺テスト（5教科ミックス・一気に） =====
@@ -5998,10 +6049,12 @@ var finisherState = { pool:[], idx:0, correct:0, picked:null, bySubj:{}, rewarde
 function _finShuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function buildFinisherPool(){
   var pool=[];
-  // 項目ごと：科目→項目の順に、各項目から2問ずつ（シャッフルは項目内のみ）
-  TRAIN_SUBJS.forEach(function(subj){
+  var subjs=scopeSubjs();
+  var per=(subjs.length===1)?3:2; // 1科目のときは項目あたり多めに
+  // 項目ごと：科目→項目の順に（シャッフルは項目内のみ）
+  subjs.forEach(function(subj){
     trainBaseCats(subj).forEach(function(c){
-      _finShuffle(c.items||[]).slice(0,2).forEach(function(it){ pool.push({subj:subj, cat:c.name, it:it}); });
+      _finShuffle(c.items||[]).slice(0,per).forEach(function(it){ pool.push({subj:subj, cat:c.name, it:it}); });
     });
   });
   return pool;
@@ -6025,6 +6078,7 @@ function renderFinisher(){
   var prompt=it.ja||it.prompt;
   var pct=Math.round(fs.idx/fs.pool.length*100);
   var html='<div class="train-wrap">';
+  html+=scopeBarHTML();
   html+='<div class="fin-top"><div class="fin-bar"><i style="width:'+pct+'%"></i></div><div class="fin-meta"><span>'+(fs.idx+1)+' / '+fs.pool.length+' 問</span><span>正解 '+fs.correct+'</span></div></div>';
   html+='<div class="train-card">';
   html+='<div class="fin-subj">'+escapeHtml(subjName)+(cur.cat?' ・ '+escapeHtml(cur.cat):'')+(it.ja?' ・ 日本語→英語':'')+'</div>';
@@ -6044,6 +6098,7 @@ function renderFinisher(){
   }
   html+='</div></div>';
   main.innerHTML=html; _rubyMode='std';
+  bindScopeBar(main, function(){ startFinisher(); });
   if(!answered){
     main.querySelectorAll('.tc[data-fc]').forEach(function(b){ b.onclick=function(){
       if(fs.picked!=null) return;
@@ -6164,18 +6219,29 @@ var releaseState = { pattern:0, mode:'full', fix:{}, items:[], answers:{}, grade
 var RELEASE_PATTERNS = 10;
 function buildReleaseTest(pattern){
   var items=[], qi=0;
-  TRAIN_SUBJS.forEach(function(subj,si){
-    var all=[];
-    trainBaseCats(subj).forEach(function(c){ (c.items||[]).forEach(function(it){ all.push(it); }); });
-    // パターンごとにシード固定（同じパターンは毎回同じ問題、別パターンは別の問題）
-    mockSeededShuffle(all, pattern*13 + si + 1).slice(0,4).forEach(function(it){
-      // 選択肢の表示順もシャッフル（正解が先頭に固定されないように・パターンごとに再現性あり）
-      var idx=[]; for(var k=0;k<it.choices.length;k++) idx.push(k);
-      var order=mockSeededShuffle(idx, pattern*131 + qi*7 + 17);
-      qi++;
-      items.push({subj:subj, it:it, order:order});
+  function pushItem(subj, group, it){
+    var idx=[]; for(var k=0;k<it.choices.length;k++) idx.push(k);
+    var order=mockSeededShuffle(idx, pattern*131 + qi*7 + 17); qi++;
+    items.push({subj:subj, group:group, it:it, order:order});
+  }
+  var subjs=scopeSubjs();
+  if(subjs.length===1){
+    // 1科目: 項目(カテゴリ)ごとに大問。合計約20問
+    var subj=subjs[0]; var cats=trainBaseCats(subj);
+    var perCat=Math.max(2, Math.ceil(20/Math.max(1,cats.length)));
+    cats.forEach(function(c,ci){
+      mockSeededShuffle(c.items||[], pattern*13 + ci + 1).slice(0,perCat).forEach(function(it){ pushItem(subj, c.name, it); });
     });
-  });
+    items=items.slice(0,20);
+  } else {
+    // 総合: 科目ごとに大問、各科目4問
+    subjs.forEach(function(subj,si){
+      var all=[];
+      trainBaseCats(subj).forEach(function(c){ (c.items||[]).forEach(function(it){ all.push(it); }); });
+      var snm=(TRAIN_DATA[subj]&&TRAIN_DATA[subj].name)||(SUBJECTS[subj]&&SUBJECTS[subj].name)||subj;
+      mockSeededShuffle(all, pattern*13 + si + 1).slice(0,4).forEach(function(it){ pushItem(subj, snm, it); });
+    });
+  }
   return items;
 }
 function startRelease(pattern){
@@ -6211,20 +6277,21 @@ function renderRelease(){
   var fix=(rs.mode==='fix');
   var solvedCount=0; if(fix){ rs.items.forEach(function(_,i){ if(rs.fix[i]&&rs.fix[i].solved) solvedCount++; }); }
   var html='';
+  html+=scopeBarHTML();
   html+='<div class="rel-modes"><button class="rel-mode'+(!fix?' on':'')+'" data-rmode="full">📝 完全テスト</button><button class="rel-mode'+(fix?' on fix':'')+'" data-rmode="fix">✏️ 違うぞモード（直して100点）</button></div>';
   html+='<div class="exam-paper">';
   var scoreV = fix ? (solvedCount*5) : (rs.graded ? rs.score : '／100');
-  html+='<div class="exam-head"><div><div class="exam-title">5科目 実力解放テスト　パターン'+((rs.pattern||0)+1)+'</div><div class="exam-sub">中1 1学期 中間範囲 ・ 全'+rs.items.length+'問 ・ '+(fix?'まちがえたらヒントを見て直そう（直して100点）':'記号で答えなさい')+'</div></div>'+
+  var scopeName=(trainScope==='総合')?'5科目':(TRAIN_SCOPES.filter(function(s){return s.k===trainScope;})[0]||{n:''}).n;
+  html+='<div class="exam-head"><div><div class="exam-title">'+escapeHtml(scopeName)+' 実力解放テスト　パターン'+((rs.pattern||0)+1)+'</div><div class="exam-sub">中1 1学期 中間範囲 ・ 全'+rs.items.length+'問 ・ '+(fix?'まちがえたらヒントを見て直そう（直して100点）':'記号で答えなさい')+'</div></div>'+
     '<div class="exam-score"><span class="lbl">得点</span><span class="v">'+scoreV+'</span></div></div>';
   html+='<div class="exam-name"><div class="field">名前 <span class="line nameline"></span></div><div class="field">組 <span class="line"></span></div></div>';
   var lastSubj=null, qno=0, daimon=0;
   rs.items.forEach(function(item,i){
-    if(item.subj!==lastSubj){
+    if(item.group!==lastSubj){
       if(lastSubj!==null) html+='</div>';
       daimon++;
-      var nm=(TRAIN_DATA[item.subj]&&TRAIN_DATA[item.subj].name)||(SUBJECTS[item.subj]&&SUBJECTS[item.subj].name)||item.subj;
-      html+='<div class="exam-daimon"><div class="exam-daimon-head"><span>大問 '+daimon+'　'+escapeHtml(nm)+'</span><span class="haiten">各5点</span></div>';
-      lastSubj=item.subj;
+      html+='<div class="exam-daimon"><div class="exam-daimon-head"><span>大問 '+daimon+'　'+escapeHtml(item.group||'')+'</span><span class="haiten">各5点</span></div>';
+      lastSubj=item.group;
     }
     qno++;
     var it=item.it;
@@ -6268,6 +6335,7 @@ function renderRelease(){
   }
   html+='</div>';
   main.innerHTML=html; _rubyMode='std';
+  bindScopeBar(main, function(){ startRelease(releaseState.pattern); try{ document.querySelector('.main').scrollTop=0; }catch(e){} });
   main.querySelectorAll('.rel-mode[data-rmode]').forEach(function(b){ b.onclick=function(){ setReleaseMode(b.dataset.rmode); }; });
   var sc=document.getElementById('relScore'); if(sc) sc.textContent = fix ? (solvedCount*5) : (rs.graded?rs.score:'―');
   if(fix){

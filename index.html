@@ -5863,6 +5863,20 @@ function trainBaseCats(subj){
   });
 }
 var weakData = {}; // 弱点克服用: subj -> [item, ...]
+// 英語の手作り問題は正解がアばかりなので、起動時に選択肢をシャッフルして正解位置を散らす
+function shuffleTrainChoices(){
+  if(!TRAIN_DATA.en) return;
+  TRAIN_DATA.en.cats.forEach(function(cat){
+    (cat.items||[]).forEach(function(it){
+      if(!it.choices || it.choices.length<2) return;
+      var order=[]; for(var k=0;k<it.choices.length;k++) order.push(k);
+      order=_finShuffle(order);
+      var nc=order.map(function(idx){ return it.choices[idx]; });
+      it.correct=order.indexOf(it.correct);
+      it.choices=nc;
+    });
+  });
+}
 function trainGetCats(subj){
   if(trainState.mode==='weak'){ return [{ name:'苦手だった問題', items: (weakData[subj]||[]) }]; }
   return trainBaseCats(subj);
@@ -6173,6 +6187,7 @@ loadProgress();
 currentSubj = state.subj; // 保存済みの科目を全モードの初期選択に合わせる
 loadAllowance();
 loadDaily();
+shuffleTrainChoices();
 hwInit();
 renderRoadmap();
 render();

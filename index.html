@@ -240,6 +240,30 @@ button{font-family:inherit;color:inherit}
 .train-next{margin-top:16px;text-align:center}
 .train-next button{padding:11px 32px;border-radius:24px;border:none;background:var(--accent);color:#fff;font-size:15px;font-weight:800;cursor:pointer;transition:filter .15s}
 .train-next button:hover{filter:brightness(1.1)}
+/* 💥 必殺テスト CTA */
+.train-finisher-cta{text-align:center;margin-bottom:12px}
+.train-finisher-cta button{padding:12px 24px;border-radius:14px;border:none;background:linear-gradient(135deg,#ff6b3d,#ff3d77);color:#fff;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(255,61,119,.35);transition:filter .15s}
+.train-finisher-cta button:hover{filter:brightness(1.08)}
+.train-finisher-cta button small{display:block;font-size:10px;font-weight:600;opacity:.9;margin-top:2px}
+.train-finisher-cta.weak button{background:var(--paper-2);color:var(--muted);box-shadow:none;border:1px solid var(--border);font-size:13px;padding:8px 18px}
+.fin-top{margin-bottom:12px}
+.fin-bar{height:8px;background:var(--paper-2);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.fin-bar>i{display:block;height:100%;background:linear-gradient(90deg,#ff6b3d,#ff3d77);transition:width .3s}
+.fin-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:5px}
+.fin-subj{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:8px}
+.fin-score{font-size:40px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;margin:8px 0 2px}
+.fin-pct{font-size:14px;color:var(--muted);margin-bottom:12px}
+.fin-rrows{max-width:280px;margin:0 auto 8px}
+.fin-rrow{display:flex;justify-content:space-between;padding:6px 12px;border-bottom:1px dashed var(--border);font-size:13px}
+.fin-rrow b{font-family:'JetBrains Mono',monospace;color:var(--ok)}
+.fin-msg{font-size:14px;font-weight:700;margin-top:10px}
+/* 💪 弱点克服 */
+.wk-banner{background:linear-gradient(135deg,rgba(255,107,61,.12),rgba(255,61,119,.08));border:1px solid var(--border-h);border-radius:12px;padding:11px 14px;margin-bottom:14px;text-align:center}
+.wk-title{font-size:13px;font-weight:800;color:#ff6b3d;display:block;margin-bottom:8px}
+.wk-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+.wk-chip{padding:6px 13px;border-radius:16px;border:1px solid var(--border);background:var(--paper-2);color:var(--ink);font-size:12px;font-weight:700;cursor:pointer;transition:all .12s}
+.wk-chip:hover{border-color:#ff6b3d}
+.wk-chip.on{background:linear-gradient(135deg,#ff6b3d,#ff3d77);border-color:transparent;color:#fff}
 .cal-wd{text-align:center;font-size:11px;color:var(--muted);padding:4px 0;font-weight:600}
 .cal-wd.sun{color:var(--ng)} .cal-wd.sat{color:var(--accent)}
 .cal-cell{
@@ -2716,6 +2740,7 @@ function switchMode(mode){
     hdrRight.innerHTML = '<div class="hdr-stat"><b id="trainDone">0</b><span>こなした</span></div>';
     eyebrow.textContent = '5科目集中 / テスト直前 — これでいくぞ！';
     title.innerHTML = 'これでいくぞ！<em>5科目集中・選ぶだけ</em>';
+    trainState.mode = 'train';
     renderTrain();
   }
   // 勉強順ナビが有効なら現在ステップを同期
@@ -5772,7 +5797,7 @@ function dailyFinish(){
 
 // ============ 🔥 5科目集中トレーニング ============
 var TRAIN_SUBJS = ['en','math','jp','sci','soc'];
-var trainState = { subj:'en', cat:0, idx:0, picked:null, revealed:false, elim:[], done:0, hintShown:false };
+var trainState = { subj:'en', cat:0, idx:0, picked:null, revealed:false, elim:[], done:0, hintShown:false, mode:'train' };
 // 英語＝日本語→英語の連動（手作り）。ヒント/スペシャルヒント/説明つき
 var TRAIN_DATA = {
   en: { name:'英語', cats:[
@@ -5815,7 +5840,7 @@ var TRAIN_DATA = {
   ]}
 };
 // 他科目は LEARN(SUBJECTS) のレベルから自動構築（解説つき）
-function trainGetCats(subj){
+function trainBaseCats(subj){
   if(TRAIN_DATA[subj]) return TRAIN_DATA[subj].cats;
   var lv = (SUBJECTS[subj] && SUBJECTS[subj].levels) || [];
   return lv.map(function(level){
@@ -5823,6 +5848,11 @@ function trainGetCats(subj){
       return { prompt:q.q, choices:q.choices, correct:q.a, expl:q.expl||'' };
     }) };
   });
+}
+var weakData = {}; // 弱点克服用: subj -> [item, ...]
+function trainGetCats(subj){
+  if(trainState.mode==='weak'){ return [{ name:'苦手だった問題', items: (weakData[subj]||[]) }]; }
+  return trainBaseCats(subj);
 }
 function trainHintText(it){
   if(it.hint) return it.hint;
@@ -5841,6 +5871,8 @@ function trainNext(){
   renderTrain();
 }
 function renderTrain(){
+  if(trainState.mode==='finisher'){ renderFinisher(); return; }
+  if(trainState.mode==='weak'){ renderWeak(); return; }
   var main=document.getElementById('main');
   _rubyMode = (trainState.subj==='jp')?'jp':'std';
   var cats=trainGetCats(trainState.subj);
@@ -5850,6 +5882,7 @@ function renderTrain(){
   var it=cat.items[trainState.idx];
   var KANA=['ア','イ','ウ','エ','オ','カ'];
   var html='<div class="train-wrap">';
+  html+='<div class="train-finisher-cta"><button id="trainFinisherBtn">💥 必殺テストに挑戦！<small>5教科ミックス・一気に！</small></button></div>';
   html+='<div class="train-subjtabs">';
   TRAIN_SUBJS.forEach(function(s){ var nm=(TRAIN_DATA[s]&&TRAIN_DATA[s].name)||(SUBJECTS[s]&&SUBJECTS[s].name)||s; html+='<button class="train-subjtab'+(s===trainState.subj?' on':'')+'" data-tsubj="'+s+'">'+nm+'</button>'; });
   html+='</div>';
@@ -5882,11 +5915,167 @@ function renderTrain(){
   main.innerHTML=html;
   _rubyMode='std';
   trainBindTabs(main);
+  var fbtn=document.getElementById('trainFinisherBtn'); if(fbtn) fbtn.onclick=startFinisher;
   main.querySelectorAll('.tc[data-tc]').forEach(function(b){ b.onclick=function(){ if(answered) return; trainState.picked=parseInt(b.dataset.tc,10); if(trainState.picked===it.correct){ trainState.done++; var d=document.getElementById('trainDone'); if(d) d.textContent=trainState.done; } renderTrain(); }; });
   document.getElementById('tHint').onclick=function(){ trainState.hintShown=!trainState.hintShown; document.getElementById('tHintBox').style.display=trainState.hintShown?'block':'none'; };
   document.getElementById('tSpecial').onclick=function(){ var wrongs=[]; for(var c=0;c<it.choices.length;c++){ if(c!==it.correct) wrongs.push(c); } trainState.elim=wrongs.slice(0,2); renderTrain(); };
   document.getElementById('tAns').onclick=function(){ trainState.revealed=true; renderTrain(); };
   document.getElementById('tNext').onclick=function(){ trainNext(); };
+}
+
+// ===== 💥 5科目集中 必殺テスト（5教科ミックス・一気に） =====
+var finisherState = { pool:[], idx:0, correct:0, picked:null, bySubj:{}, rewarded:false };
+function _finShuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+function buildFinisherPool(){
+  var pool=[];
+  // 項目ごと：科目→項目の順に、各項目から2問ずつ（シャッフルは項目内のみ）
+  TRAIN_SUBJS.forEach(function(subj){
+    trainBaseCats(subj).forEach(function(c){
+      _finShuffle(c.items||[]).slice(0,2).forEach(function(it){ pool.push({subj:subj, cat:c.name, it:it}); });
+    });
+  });
+  return pool;
+}
+function startFinisher(){
+  finisherState={ pool:buildFinisherPool(), idx:0, correct:0, picked:null, bySubj:{}, wrong:[], rewarded:false };
+  trainState.mode='finisher'; renderFinisher();
+}
+function renderFinisher(){
+  var main=document.getElementById('main'); var fs=finisherState;
+  if(fs.idx>=fs.pool.length){ renderFinisherResult(); return; }
+  var cur=fs.pool[fs.idx], it=cur.it, subj=cur.subj;
+  _rubyMode=(subj==='jp')?'jp':'std';
+  var KANA=['ア','イ','ウ','エ','オ','カ'];
+  var subjName=(TRAIN_DATA[subj]&&TRAIN_DATA[subj].name)||(SUBJECTS[subj]&&SUBJECTS[subj].name)||subj;
+  var answered=(fs.picked!=null);
+  var prompt=it.ja||it.prompt;
+  var pct=Math.round(fs.idx/fs.pool.length*100);
+  var html='<div class="train-wrap">';
+  html+='<div class="fin-top"><div class="fin-bar"><i style="width:'+pct+'%"></i></div><div class="fin-meta"><span>'+(fs.idx+1)+' / '+fs.pool.length+' 問</span><span>正解 '+fs.correct+'</span></div></div>';
+  html+='<div class="train-card">';
+  html+='<div class="fin-subj">'+escapeHtml(subjName)+(cur.cat?' ・ '+escapeHtml(cur.cat):'')+(it.ja?' ・ 日本語→英語':'')+'</div>';
+  html+='<div class="train-prompt">'+(it.ja?furigana(escapeHtml(prompt)):fracText(prompt))+'</div>';
+  html+='<div class="train-choices">';
+  for(var c=0;c<it.choices.length;c++){
+    var cls='tc';
+    if(answered){ if(c===it.correct) cls+=' correct'; else if(fs.picked===c) cls+=' wrong'; }
+    var chtxt=it.ja?escapeHtml(it.choices[c]):fracText(it.choices[c]);
+    html+='<button class="'+cls+'" data-fc="'+c+'"'+(answered?' disabled':'')+'><span class="kana">'+KANA[c]+'</span>'+chtxt+'</button>';
+  }
+  html+='</div>';
+  if(answered){
+    var ok=(fs.picked===it.correct);
+    html+='<div class="train-expl show">'+(ok?'⭕ 正解！':'❌ 正解は '+KANA[it.correct])+(it.expl?'<br>📘 '+furigana(escapeHtml(it.expl)):'')+'</div>';
+    if(!ok) html+='<div class="train-next"><button id="finNext">つぎへ →</button></div>';
+  }
+  html+='</div></div>';
+  main.innerHTML=html; _rubyMode='std';
+  if(!answered){
+    main.querySelectorAll('.tc[data-fc]').forEach(function(b){ b.onclick=function(){
+      if(fs.picked!=null) return;
+      fs.picked=parseInt(b.dataset.fc,10);
+      var ok=(fs.picked===it.correct);
+      fs.bySubj[subj]=fs.bySubj[subj]||{c:0,t:0}; fs.bySubj[subj].t++;
+      if(ok){ fs.correct++; fs.bySubj[subj].c++; }
+      else { fs.wrong.push({subj:subj, cat:cur.cat, it:it}); }
+      renderFinisher();
+      if(ok){ setTimeout(function(){ if(trainState.mode==='finisher' && finisherState===fs && fs.picked!=null){ finNext(); } }, 700); }
+    }; });
+  } else {
+    var fn=document.getElementById('finNext'); if(fn) fn.onclick=finNext;
+  }
+}
+function finNext(){ finisherState.idx++; finisherState.picked=null; renderFinisher(); }
+function renderFinisherResult(){
+  var main=document.getElementById('main'); var fs=finisherState;
+  var total=fs.pool.length, pct=total?Math.round(fs.correct/total*100):0;
+  var msg = pct>=90?'天才！もう完璧だ！💯' : (pct>=70?'よくできた！この調子！🔥' : (pct>=50?'あと一歩！まちがいを見直そう' : 'くりかえせば 必ず のびる！'));
+  var rows='';
+  TRAIN_SUBJS.forEach(function(s){ var b=fs.bySubj[s]; if(!b) return; var nm=(TRAIN_DATA[s]&&TRAIN_DATA[s].name)||(SUBJECTS[s]&&SUBJECTS[s].name)||s; rows+='<div class="fin-rrow"><span>'+escapeHtml(nm)+'</span><b>'+b.c+' / '+b.t+'</b></div>'; });
+  if(!fs.rewarded){ fs.rewarded=true; earnYen(Math.max(1, Math.round(fs.correct/3))); }
+  var nWrong = (fs.wrong||[]).length;
+  var html='<div class="train-wrap"><div class="train-card" style="text-align:center">'+
+    '<h2 style="margin:4px 0">💥 必殺テスト けっか</h2>'+
+    '<div class="fin-score">'+fs.correct+' / '+total+'</div>'+
+    '<div class="fin-pct">正答率 '+pct+'%</div>'+
+    '<div class="fin-rrows">'+rows+'</div>'+
+    '<div class="fin-msg">'+msg+'</div>'+
+    (nWrong ? '<div class="train-next"><button id="finWeak" style="background:linear-gradient(135deg,#ff6b3d,#ff3d77)">💪 弱点克服へ（できなかった '+nWrong+' 問）</button></div>' : '<div class="fin-msg" style="color:var(--ok);margin-top:8px">⭐ 全問正解！弱点なし！</div>')+
+    '<div class="train-help" style="justify-content:center;margin-top:14px"><button class="special" id="finRetry">💥 もう一回</button><button class="ans" id="finBack">← もどる</button></div>'+
+    '</div></div>';
+  main.innerHTML=html;
+  var fw=document.getElementById('finWeak'); if(fw) fw.onclick=function(){ startWeak(fs.wrong); };
+  document.getElementById('finRetry').onclick=startFinisher;
+  document.getElementById('finBack').onclick=function(){ trainState.mode='train'; renderTrain(); };
+}
+
+// ===== 💪 5科目集中 弱点克服（必殺でできなかった所を科目別に・連続で）=====
+function startWeak(wrongList){
+  weakData={};
+  (wrongList||[]).forEach(function(w){ (weakData[w.subj]=weakData[w.subj]||[]).push(w.it); });
+  var ws=TRAIN_SUBJS.filter(function(s){ return (weakData[s]||[]).length; });
+  trainState.subj = ws.length?ws[0]:'en';
+  trainState.mode='weak'; trainResetItem();
+  renderWeak();
+}
+function weakExit(){ trainState.mode='train'; trainResetItem(); renderTrain(); }
+function weakNext(){
+  var arr=weakData[trainState.subj]||[]; var it=arr[0];
+  if(it){ if(trainState.picked===it.correct){ arr.shift(); } else { arr.push(arr.shift()); } } // 正解→克服(削除) / まちがい→後ろへ
+  trainState.picked=null; trainState.revealed=false; trainState.elim=[]; trainState.hintShown=false;
+  if(!(weakData[trainState.subj]||[]).length){ var ws=TRAIN_SUBJS.filter(function(s){ return (weakData[s]||[]).length; }); if(ws.length) trainState.subj=ws[0]; }
+  renderWeak();
+}
+function renderWeak(){
+  var main=document.getElementById('main');
+  _rubyMode=(trainState.subj==='jp')?'jp':'std';
+  var weakSubjs=TRAIN_SUBJS.filter(function(s){ return (weakData[s]||[]).length; });
+  var total=0; weakSubjs.forEach(function(s){ total+=weakData[s].length; });
+  var KANA=['ア','イ','ウ','エ','オ','カ'];
+  var html='<div class="train-wrap">';
+  html+='<div class="train-finisher-cta weak"><button id="weakBack">← 集中トレーニングに もどる</button></div>';
+  if(total===0){
+    html+='<div class="train-card" style="text-align:center"><h2 style="margin:6px 0">🎉 弱点 ぜんぶ 克服！</h2><div class="fin-msg">できなかった問題を ぜんぶ 正解にできたね！もう バッチリ！</div><div class="train-next"><button id="weakDone">これでいくぞ！へ →</button></div></div></div>';
+    main.innerHTML=html; _rubyMode='std';
+    document.getElementById('weakBack').onclick=weakExit; document.getElementById('weakDone').onclick=weakExit; return;
+  }
+  if(!(weakData[trainState.subj]||[]).length) trainState.subj=weakSubjs[0];
+  // 1画面で5科目の苦手を表示
+  html+='<div class="wk-banner"><span class="wk-title">💪 5科目集中 弱点克服</span><div class="wk-chips">';
+  weakSubjs.forEach(function(s){ var nm=(TRAIN_DATA[s]&&TRAIN_DATA[s].name)||(SUBJECTS[s]&&SUBJECTS[s].name)||s; html+='<button class="wk-chip'+(s===trainState.subj?' on':'')+'" data-wksubj="'+s+'">'+nm+' '+weakData[s].length+'</button>'; });
+  html+='</div></div>';
+  var arr=weakData[trainState.subj]; var it=arr[0];
+  var subjName=(TRAIN_DATA[trainState.subj]&&TRAIN_DATA[trainState.subj].name)||(SUBJECTS[trainState.subj]&&SUBJECTS[trainState.subj].name)||trainState.subj;
+  var answered=(trainState.picked!=null||trainState.revealed);
+  var prompt=it.ja||it.prompt;
+  var qlabel=it.ja?'次の日本語を 英語に すると？':'正しい答えを えらぼう';
+  html+='<div class="train-card">';
+  html+='<div class="train-progress">'+escapeHtml(subjName)+'　苦手 のこり '+arr.length+' 問</div>';
+  html+='<div class="train-qlabel">'+qlabel+'</div>';
+  html+='<div class="train-prompt">'+(it.ja?furigana(escapeHtml(prompt)):fracText(prompt))+'</div>';
+  html+='<div class="train-choices">';
+  for(var c=0;c<it.choices.length;c++){
+    var cls='tc';
+    if(trainState.elim.indexOf(c)>=0) cls+=' elim';
+    if(answered){ if(c===it.correct) cls+=' correct'; else if(trainState.picked===c) cls+=' wrong'; }
+    var chtxt=it.ja?escapeHtml(it.choices[c]):fracText(it.choices[c]);
+    html+='<button class="'+cls+'" data-tc="'+c+'"'+(answered?' disabled':'')+'><span class="kana">'+KANA[c]+'</span>'+chtxt+'</button>';
+  }
+  html+='</div>';
+  html+='<div class="train-help"><button class="hint" id="tHint">💡 ヒント</button><button class="special" id="tSpecial">⭐ スペシャルヒント</button><button class="ans" id="tAns">👀 答えを見る</button></div>';
+  html+='<div class="train-hintbox hint" id="tHintBox" style="display:'+(trainState.hintShown?'block':'none')+'">'+furigana(escapeHtml(trainHintText(it)))+'</div>';
+  html+='<div class="train-hintbox special" id="tSpecialBox" style="display:'+(trainState.elim.length?'block':'none')+'">まちがいを 2つ 消したよ。のこりから えらぼう！</div>';
+  html+='<div class="train-expl'+(answered?' show':'')+'">📘 '+furigana(escapeHtml(it.expl||''))+(answered&&trainState.picked===it.correct?'<br>✅ 克服！「つぎへ」でリストから消えるよ':'')+'</div>';
+  html+='<div class="train-next"><button id="tNext">つぎへ →</button></div>';
+  html+='</div></div>';
+  main.innerHTML=html; _rubyMode='std';
+  document.getElementById('weakBack').onclick=weakExit;
+  main.querySelectorAll('.wk-chip[data-wksubj]').forEach(function(b){ b.onclick=function(){ trainState.subj=b.dataset.wksubj; trainResetItem(); renderWeak(); }; });
+  main.querySelectorAll('.tc[data-tc]').forEach(function(b){ b.onclick=function(){ if(answered) return; trainState.picked=parseInt(b.dataset.tc,10); renderWeak(); }; });
+  document.getElementById('tHint').onclick=function(){ trainState.hintShown=!trainState.hintShown; document.getElementById('tHintBox').style.display=trainState.hintShown?'block':'none'; };
+  document.getElementById('tSpecial').onclick=function(){ var wrongs=[]; for(var c=0;c<it.choices.length;c++){ if(c!==it.correct) wrongs.push(c); } trainState.elim=wrongs.slice(0,2); renderWeak(); };
+  document.getElementById('tAns').onclick=function(){ trainState.revealed=true; renderWeak(); };
+  document.getElementById('tNext').onclick=weakNext;
 }
 
 // ============ Init ============

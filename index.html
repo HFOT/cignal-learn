@@ -699,9 +699,18 @@ button{font-family:inherit;color:inherit}
 .read-txt{flex:1 1 auto;min-width:0}
 .read-jp{font-size:14px;color:#1b1b1b}
 .read-en{font-size:15px;font-weight:800;color:#0d33ff;margin-top:2px}
-.read-play{flex:0 0 auto;padding:9px 16px;border:none;border-radius:20px;background:var(--accent);color:#fff;font-weight:800;cursor:pointer;font-size:13px;transition:filter .15s}
+.read-btns{flex:0 0 auto;display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.read-play{padding:9px 16px;border:none;border-radius:20px;background:var(--accent);color:#fff;font-weight:800;cursor:pointer;font-size:13px;transition:filter .15s;white-space:nowrap}
 .read-play:hover{filter:brightness(1.1)}
 .read-play.playing{filter:brightness(1.25)}
+.read-mic{padding:9px 16px;border:none;border-radius:20px;background:#ff3d77;color:#fff;font-weight:800;cursor:pointer;font-size:13px;transition:filter .15s;white-space:nowrap}
+.read-mic:hover{filter:brightness(1.1)}
+.read-mic.done{background:#3ed184}
+@keyframes micpulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4)}}
+.read-mic.listening{animation:micpulse .9s infinite}
+.read-heard{margin-top:5px;font-size:12px;color:#666}
+.read-heard.ok{color:#2e7d32;font-weight:700}
+.read-heard.ng{color:#c62828}
 
 /* テストシート: 左=問題 右=回答 */
 .test-sheet{width:100%;max-width:900px}
@@ -7295,42 +7304,85 @@ function renderWeakness(){
   var eb=document.getElementById('wkExit'); if(eb) eb.onclick=exitWeakness;
 }
 
-// ===== 🔊 英語パーフェクト後の仕上げ：問題＋答え＋音声で読む → 完全オール =====
-var readState={ items:[], read:{}, pattern:0, rewarded:false };
+// ===== 🔊🎤 英語パーフェクト後の仕上げ：聞く＋発音チェック（音声プラス）→ 完全オール =====
+var SR_OK = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+var _srActive=null;
+function normEn(s){ return (s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim(); }
+function speechMatch(said, target){
+  var a=normEn(said), b=normEn(target);
+  if(!a||!b) return false;
+  if(a===b) return true;
+  var setA={}; a.split(' ').forEach(function(w){ setA[w]=1; });
+  var bw=b.split(' '), hit=0; bw.forEach(function(w){ if(setA[w]) hit++; });
+  return bw.length ? (hit/bw.length >= 0.6) : false;
+}
+function recognizeEnglish(target, btn, cb){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ cb(null,false,'unsupported'); return; }
+  try{ if(_srActive) _srActive.abort(); }catch(e){}
+  var r; try{ r=new SR(); }catch(e){ cb(null,false,'init'); return; }
+  _srActive=r; r.lang='en-US'; r.interimResults=false; r.maxAlternatives=3;
+  if(btn){ btn.classList.add('listening'); btn.textContent='🎤 聞いています…'; }
+  var fired=false;
+  r.onresult=function(e){ fired=true; var best='', ok=false, res=e.results[0];
+    for(var i=0;i<res.length;i++){ var t=res[i].transcript; if(!best) best=t; if(speechMatch(t,target)){ ok=true; best=t; break; } }
+    cb(best, ok);
+  };
+  r.onerror=function(ev){ fired=true; cb(null,false,(ev&&ev.error)||'error'); };
+  r.onend=function(){ if(btn) btn.classList.remove('listening'); _srActive=null; if(!fired) cb(null,false,'noresult'); };
+  try{ r.start(); }catch(e){ cb(null,false,'start'); }
+}
+var readState={ items:[], read:{}, said:{}, heard:{}, voice:false, pattern:0, rewarded:false };
 function startReadFinish(){
   var rs=releaseState;
   var items=(rs.items||[]).filter(function(it){ return it.subj==='en' && it.it && it.it.ja; });
   if(!items.length) return;
-  readState={ items:items, read:{}, pattern:rs.pattern, rewarded:false };
+  readState={ items:items, read:{}, said:{}, heard:{}, voice:SR_OK, pattern:rs.pattern, rewarded:false };
   rs.inRead=true; rs.inWeakness=false;
   renderRelease(); try{ document.querySelector('.main').scrollTop=0; }catch(e){}
 }
 function renderReadFinish(){
-  var main=document.getElementById('main'); var st=readState;
-  var doneCount=0; st.items.forEach(function(_,i){ if(st.read[i]) doneCount++; });
+  var main=document.getElementById('main'); var st=readState; var voice=(st.voice && SR_OK);
+  var doneCount=0; st.items.forEach(function(_,i){ if(voice? st.said[i] : st.read[i]) doneCount++; });
   var all=(doneCount===st.items.length && st.items.length>0);
   var html=''; html+=scopeBarHTML();
   html+='<div class="exam-paper">';
-  html+='<div class="exam-head"><div><div class="exam-title">🔊 仕上げ：声に出して読もう</div><div class="exam-sub">英語 パターン'+(st.pattern+1)+' ・ 🔊で聞いて、自分でも読む！ぜんぶ読んだら 完全オール</div></div><div class="exam-score"><span class="lbl">読んだ</span><span class="v">'+doneCount+'/'+st.items.length+'</span></div></div>';
+  html+='<div class="exam-head"><div><div class="exam-title">'+(voice?'🎤 音声プラス：聞いて・言ってみよう':'🔊 仕上げ：声に出して読もう')+'</div><div class="exam-sub">英語 パターン'+(st.pattern+1)+' ・ '+(voice?'🔊で聞いて、🎤で発音チェック！ぜんぶ言えたら 完全オール':'🔊で聞いて、自分でも読む！ぜんぶ読んだら 完全オール')+'</div></div><div class="exam-score"><span class="lbl">'+(voice?'言えた':'読んだ')+'</span><span class="v">'+doneCount+'/'+st.items.length+'</span></div></div>';
+  html+='<div class="rel-modes" style="margin-bottom:12px"><button class="rel-mode'+(voice?' on':'')+'" data-rdmode="voice"'+(SR_OK?'':' disabled')+'>🎤 音声プラス</button><button class="rel-mode'+(!voice?' on':'')+'" data-rdmode="read">🔊 聞くだけ</button></div>';
+  if(!SR_OK) html+='<div style="font-size:12px;color:#c62828;margin-bottom:8px">※ この環境はマイク発音チェックに未対応です。ブラウザ（Chrome等）で開くと使えます。</div>';
   st.items.forEach(function(item,i){
-    var it=item.it; var ans=it.choices[it.correct]; var done=st.read[i];
+    var it=item.it; var ans=it.choices[it.correct];
+    var lineDone = voice? st.said[i] : st.read[i];
     _rubyMode='jp';
-    html+='<div class="read-row'+(done?' done':'')+'"><div class="read-txt"><div class="read-jp">'+furigana(escapeHtml(it.ja))+'</div><div class="read-en">'+escapeHtml(ans)+'</div></div><button class="read-play" data-ri="'+i+'">🔊 再生'+(done?' ✓':'')+'</button></div>';
+    html+='<div class="read-row'+(lineDone?' done':'')+'"><div class="read-txt"><div class="read-jp">'+furigana(escapeHtml(it.ja))+'</div><div class="read-en">'+escapeHtml(ans)+'</div>';
+    if(voice && st.heard[i]!=null){ html+='<div class="read-heard'+(st.said[i]?' ok':' ng')+'">'+(st.said[i]?'⭕ 言えた！':'🗣️ ')+(st.heard[i]?'「'+escapeHtml(st.heard[i])+'」':'')+'</div>'; }
+    html+='</div><div class="read-btns"><button class="read-play" data-ri="'+i+'">🔊 再生'+((!voice&&st.read[i])?' ✓':'')+'</button>';
+    if(voice) html+='<button class="read-mic'+(st.said[i]?' done':'')+'" data-mi="'+i+'">'+(st.said[i]?'🎤 ✓ 言えた':'🎤 言ってみよう')+'</button>';
+    html+='</div></div>';
   });
   _rubyMode='std';
   if(all){
-    if(!st.rewarded){ st.rewarded=true; earnYen(15); markRelDone(relProgKey(), st.pattern, 2); renderReleasePatternBar(); }
-    html+='<div style="text-align:center;margin-top:22px"><div style="font-size:26px;font-weight:800;color:#ff3d77">💯 完全オール！</div><div style="font-size:13px;color:#666;margin-top:6px">答えて・聞いて・読んで、ぜんぶ達成！🎉</div><button class="exam-submit" id="readExit" style="margin-top:12px">↩ テストにもどる</button></div>';
+    if(!st.rewarded){ st.rewarded=true; earnYen(voice?20:15); markRelDone(relProgKey(), st.pattern, 2); renderReleasePatternBar(); }
+    html+='<div style="text-align:center;margin-top:22px"><div style="font-size:26px;font-weight:800;color:#ff3d77">💯 完全オール'+(voice?'（音声）':'')+'！</div><div style="font-size:13px;color:#666;margin-top:6px">'+(voice?'答えて・聞いて・発音まで、ぜんぶ達成！🎉':'答えて・聞いて・読んで、ぜんぶ達成！🎉')+'</div><button class="exam-submit" id="readExit" style="margin-top:12px">↩ テストにもどる</button></div>';
   } else {
-    html+='<div style="text-align:center;margin-top:16px;font-size:13px;color:#555">🔊で発音を聞いて、自分でも声に出して読もう。読んだら次へ（のこり '+(st.items.length-doneCount)+'）</div><div style="text-align:center;margin-top:10px"><button class="exam-submit" id="readExit" style="background:#888">↩ あとでにする</button></div>';
+    html+='<div style="text-align:center;margin-top:16px;font-size:13px;color:#555">'+(voice?'🔊で聞いて、🎤で言ってみよう（うまく拾えなければ「🔊 聞くだけ」に切替OK）。のこり '+(st.items.length-doneCount):'🔊で発音を聞いて、自分でも読もう。のこり '+(st.items.length-doneCount))+'</div><div style="text-align:center;margin-top:10px"><button class="exam-submit" id="readExit" style="background:#888">↩ あとでにする</button></div>';
   }
   html+='</div>';
   main.innerHTML=html; _rubyMode='std';
   bindScopeBar(main, function(){ releaseState.inRead=false; startRelease(releaseState.pattern); });
+  main.querySelectorAll('.rel-mode[data-rdmode]').forEach(function(b){ b.onclick=function(){ if(b.disabled) return; readState.voice=(b.dataset.rdmode==='voice'); renderReadFinish(); }; });
   main.querySelectorAll('.read-play[data-ri]').forEach(function(b){ b.onclick=function(){
     var i=parseInt(b.dataset.ri,10); var it=readState.items[i].it;
     speakEnglish(it.choices[it.correct], b);
-    readState.read[i]=true; renderReadFinish();
+    readState.read[i]=true; if(!readState.voice) renderReadFinish();
+  }; });
+  main.querySelectorAll('.read-mic[data-mi]').forEach(function(b){ b.onclick=function(){
+    var i=parseInt(b.dataset.mi,10); var target=readState.items[i].it.choices[readState.items[i].it.correct];
+    recognizeEnglish(target, b, function(heard, ok, err){
+      readState.heard[i] = heard || (err==='not-allowed'||err==='service-not-allowed' ? '（マイクが許可されていません）' : (err==='no-speech'||err==='noresult' ? '（声が聞こえなかった）' : (err? '（聞き取れなかった）' : '')));
+      if(ok) readState.said[i]=true;
+      renderReadFinish();
+    });
   }; });
   var eb=document.getElementById('readExit'); if(eb) eb.onclick=function(){ releaseState.inRead=false; renderReleasePatternBar(); startRelease(releaseState.pattern); };
 }

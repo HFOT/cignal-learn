@@ -3436,6 +3436,7 @@ function switchMode(mode){
     eyebrow.textContent = '5科目 実力解放テスト / 本番形式';
     title.innerHTML = 'このまま行こうぜ！<em>5科目・実力解放テスト（10パターン）</em>';
     setBar.style.display = '';
+    releaseState.inWeakness=false;
     renderReleasePatternBar();
     if(!releaseState.items.length) startRelease(releaseState.pattern); else renderRelease();
   }
@@ -7088,6 +7089,7 @@ function gradeRelease(){
 }
 function renderRelease(){
   var main=document.getElementById('main'); var rs=releaseState;
+  if(rs.inWeakness){ renderWeakness(); return; }
   var KANA=['ア','イ','ウ','エ','オ','カ'];
   var fix=(rs.mode==='fix');
   var solvedCount=0; if(fix){ rs.items.forEach(function(_,i){ if(rs.fix[i]&&rs.fix[i].solved) solvedCount++; }); }
@@ -7139,15 +7141,22 @@ function renderRelease(){
   if(fix){
     if(solvedCount===rs.items.length && rs.items.length){
       if(!rs.rewarded){ rs.rewarded=true; earnYen(10); }
-      html+='<div style="text-align:center;margin-top:22px"><div style="font-size:26px;font-weight:800;color:#2e7d32">💯 100点！ぜんぶ正解！</div><div style="font-size:13px;color:#666;margin-top:6px">まちがいを ぜんぶ 直してクリア！この成功体験を わすれずに！</div><button class="exam-submit" id="relRetry" style="margin-top:12px">🔁 もう一回</button></div>';
+      var wkN=0; rs.items.forEach(function(_,i){ if(rs.fix[i]&&rs.fix[i].wasWrong) wkN++; });
+      html+='<div style="text-align:center;margin-top:22px"><div style="font-size:26px;font-weight:800;color:#2e7d32">💯 100点！ぜんぶ正解！</div>';
+      if(wkN){ html+='<div style="font-size:13px;color:#666;margin-top:6px">さっき直した <b>'+wkN+'問</b>、こんどはヒントなしで全部できるかな？</div><button class="exam-submit wk-start" style="margin-top:12px;background:linear-gradient(135deg,#ff8f3d,#ff3d77)">💪 弱点なんてないモード（'+wkN+'問）</button><div style="margin-top:8px"><button class="exam-submit" id="relRetry" style="background:#888">🔁 もう一回（テスト）</button></div>'; }
+      else { html+='<div style="font-size:13px;color:#666;margin-top:6px">一度もまちがえずクリア！弱点ゼロ！</div><button class="exam-submit" id="relRetry" style="margin-top:12px">🔁 もう一回</button>'; }
+      html+='</div>';
     } else {
       html+='<div style="text-align:center;margin-top:18px;font-size:13px;color:#555">まちがえたら 💡ヒントを見て もう一度えらぼう。ぜんぶ直すと <b>100点</b>！（のこり '+(rs.items.length-solvedCount)+'問）</div>';
     }
   } else if(!rs.graded){
     html+='<div style="text-align:center;margin-top:22px"><button class="exam-submit" id="relGrade">⚡ 採点する（実力解放！）</button></div>';
   } else {
-    html+='<div style="text-align:center;margin-top:22px"><div style="font-size:18px;font-weight:800;margin-bottom:12px">得点 '+rs.score+' 点（正解 '+rs.correct+' / '+rs.items.length+'）</div>'+
-      '<button class="exam-submit" id="relRetry">🔁 もう一回（同じパターン）</button><div style="font-size:12px;color:#666;margin-top:8px">上の「パターン」で別のテストに挑戦できるよ</div></div>';
+    var wkW=rs.items.length-rs.correct;
+    html+='<div style="text-align:center;margin-top:22px"><div style="font-size:18px;font-weight:800;margin-bottom:12px">得点 '+rs.score+' 点（正解 '+rs.correct+' / '+rs.items.length+'）</div>';
+    if(wkW>0){ html+='<button class="exam-submit wk-start" style="background:linear-gradient(135deg,#ff8f3d,#ff3d77)">💪 弱点なんてないモード（まちがえた'+wkW+'問）</button><div style="margin-top:8px"><button class="exam-submit" id="relRetry" style="background:#888">🔁 もう一回（同じパターン）</button></div>'; }
+    else { html+='<div style="font-size:15px;color:#2e7d32;font-weight:800">💯 全問正解！弱点なし！</div><button class="exam-submit" id="relRetry" style="margin-top:10px">🔁 もう一回（同じパターン）</button>'; }
+    html+='<div style="font-size:12px;color:#666;margin-top:8px">上の「パターン」で別のテストに挑戦できるよ</div></div>';
   }
   html+='</div>';
   main.innerHTML=html; _rubyMode='std';
@@ -7158,16 +7167,95 @@ function renderRelease(){
     main.querySelectorAll('.choice-pill[data-rq]').forEach(function(b){ b.onclick=function(){
       var qi=parseInt(b.dataset.rq,10); if(rs.fix[qi]&&rs.fix[qi].solved) return;
       var pos=parseInt(b.dataset.c,10); var item=rs.items[qi]; var cp=(item.order||[]).indexOf(item.it.correct);
-      if(pos===cp){ rs.fix[qi]={solved:true}; } else { rs.fix[qi]={solved:false,lastWrong:pos}; }
+      var prevf=rs.fix[qi]||{};
+      if(pos===cp){ rs.fix[qi]={solved:true, wasWrong:prevf.wasWrong||false}; } else { rs.fix[qi]={solved:false,lastWrong:pos,wasWrong:true}; }
       renderRelease();
     }; });
     var rr=document.getElementById('relRetry'); if(rr) rr.onclick=function(){ startRelease(rs.pattern); };
+    var wb=main.querySelector('.wk-start'); if(wb) wb.onclick=function(){ startWeakness(collectWrongItems()); };
   } else if(!rs.graded){
     main.querySelectorAll('.choice-pill[data-rq]').forEach(function(b){ b.onclick=function(){ var qi=parseInt(b.dataset.rq,10); rs.answers[qi]=parseInt(b.dataset.c,10); var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){ p.classList.remove('sel'); }); b.classList.add('sel'); }; });
     document.getElementById('relGrade').onclick=gradeRelease;
   } else {
-    document.getElementById('relRetry').onclick=function(){ startRelease(rs.pattern); };
+    var rr2=document.getElementById('relRetry'); if(rr2) rr2.onclick=function(){ startRelease(rs.pattern); };
+    var wb2=main.querySelector('.wk-start'); if(wb2) wb2.onclick=function(){ startWeakness(collectWrongItems()); };
   }
+}
+
+// ===== 💪 弱点なんてないモード（違うぞ／完全テストで間違えた問題に再挑戦・ラウンド制） =====
+var weaknessState={ items:[], answers:{}, judged:false, round:1, startCount:0, rewarded:false };
+function collectWrongItems(){
+  var rs=releaseState, out=[];
+  rs.items.forEach(function(item,i){
+    var order=item.order||[]; var cp=order.indexOf(item.it.correct);
+    var wrong = (rs.mode==='fix') ? (rs.fix[i]&&rs.fix[i].wasWrong) : (rs.answers[i]!==cp);
+    if(wrong) out.push(item);
+  });
+  return out;
+}
+function startWeakness(items){
+  if(!items||!items.length) return;
+  weaknessState={
+    items: items.map(function(item){ return { subj:item.subj, group:item.group, it:item.it, order:_finOrder(item.it.choices.length) }; }),
+    answers:{}, judged:false, round:1, startCount:items.length, rewarded:false
+  };
+  releaseState.inWeakness=true;
+  renderRelease(); try{ document.querySelector('.main').scrollTop=0; }catch(e){}
+}
+function judgeWeakness(){ weaknessState.judged=true; renderRelease(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
+function weaknessNextRound(){
+  var ws=weaknessState, remain=[];
+  ws.items.forEach(function(item,i){ var cp=(item.order||[]).indexOf(item.it.correct); if(ws.answers[i]!==cp){ remain.push({ subj:item.subj, group:item.group, it:item.it, order:_finOrder(item.it.choices.length) }); } });
+  ws.items=remain; ws.answers={}; ws.judged=false; ws.round++;
+  renderRelease(); try{ document.querySelector('.main').scrollTop=0; }catch(e){}
+}
+function exitWeakness(){ releaseState.inWeakness=false; startRelease(releaseState.pattern); }
+function renderWeakness(){
+  var main=document.getElementById('main'); var ws=weaknessState; var KANA=['ア','イ','ウ','エ','オ','カ'];
+  var total=ws.items.length, correctNow=0;
+  ws.items.forEach(function(item,i){ var cp=(item.order||[]).indexOf(item.it.correct); if(ws.answers[i]===cp) correctNow++; });
+  var remaining=total-correctNow;
+  var html=''; html+=scopeBarHTML();
+  html+='<div class="exam-paper">';
+  html+='<div class="exam-head"><div><div class="exam-title">💪 弱点なんてないモード</div><div class="exam-sub">さっき間違えた問題に再挑戦 ・ ラウンド'+ws.round+' ・ ヒントなし</div></div><div class="exam-score"><span class="lbl">のこり</span><span class="v">'+(ws.judged?remaining:total)+'</span></div></div>';
+  html+='<div style="margin:6px 0 14px;font-size:13px;color:#555">最初の弱点 <b>'+ws.startCount+'問</b>。ぜんぶ正解で <b style="color:#ff3d77">パーフェクト</b>！</div>';
+  html+='<div class="exam-daimon"><div class="exam-daimon-head"><span>のこり弱点 '+total+'問</span><span class="haiten">ヒントなし</span></div>';
+  ws.items.forEach(function(item,i){
+    var it=item.it; _rubyMode=(item.subj==='jp')?'jp':'std';
+    var ptext = it.ja ? (furigana(escapeHtml(it.ja))+' <span style="color:#888;font-size:12px">（英語で？）</span>') : fracText(it.prompt);
+    var order=item.order||[]; var cp=order.indexOf(it.correct); var ans=ws.answers[i];
+    html+='<div class="exam-q"><div class="exam-qno">('+(i+1)+')</div><div class="exam-qbody"><div class="exam-qtext"><span style="font-size:11px;color:#999">'+escapeHtml(item.group||'')+'</span><br>'+ptext+'</div><div class="choice-row">';
+    for(var pos=0;pos<order.length;pos++){
+      var origIdx=order[pos]; var cls='choice-pill';
+      if(ws.judged){ if(pos===cp) cls+=' gr-correct'; else if(ans===pos) cls+=' gr-wrong'; }
+      else if(ans===pos) cls+=' sel';
+      var chtxt=it.ja?escapeHtml(it.choices[origIdx]):fracText(it.choices[origIdx]);
+      html+='<button class="'+cls+'" data-wq="'+i+'" data-c="'+pos+'"'+(ws.judged?' disabled':'')+'>'+KANA[pos]+'. '+chtxt+'</button>';
+    }
+    html+='</div>';
+    if(ws.judged){ var ok=(ans===cp); html+='<div class="exam-mk" style="color:'+(ok?'#2e7d32':'#c62828')+'">'+(ok?'⭕ 正解！弱点こくふく':'× 正解は '+KANA[cp])+(it.expl?'　/　'+escapeHtml(it.expl):'')+'</div>'; }
+    html+='</div></div>';
+  });
+  _rubyMode='std';
+  html+='</div>';
+  if(!ws.judged){
+    html+='<div style="text-align:center;margin-top:20px"><button class="exam-submit" id="wkJudge">⚡ 判定する</button><div style="font-size:12px;color:#666;margin-top:8px">えらんでから判定。えらんでいない問題は ×になるよ</div><div style="margin-top:8px"><button class="exam-submit" id="wkExit" style="background:#888">↩ テストにもどる</button></div></div>';
+  } else if(remaining===0){
+    if(!ws.rewarded){ ws.rewarded=true; earnYen(12); }
+    html+='<div style="text-align:center;margin-top:22px"><div style="font-size:26px;font-weight:800;color:#ff3d77">💯 パーフェクト！弱点なんてない！</div><div style="font-size:13px;color:#666;margin-top:6px">最初の弱点 '+ws.startCount+'問を ぜんぶ こくふく！🎉</div><button class="exam-submit" id="wkExit" style="margin-top:12px">↩ テストにもどる</button></div>';
+  } else {
+    html+='<div style="text-align:center;margin-top:22px"><div style="font-size:20px;font-weight:800;color:#2e7d32">'+total+'問中 '+correctNow+'問 正解！</div><div style="font-size:15px;color:#c62828;margin-top:4px;font-weight:700">のこり '+remaining+'問！</div><div style="font-size:12px;color:#666;margin-top:6px">のこった問題だけ、もう一度（選択肢の位置はかわるよ）</div><button class="exam-submit" id="wkNext" style="margin-top:12px;background:linear-gradient(135deg,#ff8f3d,#ff3d77)">🔥 のこり '+remaining+'問に もう一回！</button><div style="margin-top:8px"><button class="exam-submit" id="wkExit" style="background:#888">↩ テストにもどる</button></div></div>';
+  }
+  html+='</div>';
+  main.innerHTML=html; _rubyMode='std';
+  bindScopeBar(main, function(){ releaseState.inWeakness=false; startRelease(releaseState.pattern); });
+  if(!ws.judged){
+    main.querySelectorAll('.choice-pill[data-wq]').forEach(function(b){ b.onclick=function(){ var qi=parseInt(b.dataset.wq,10); ws.answers[qi]=parseInt(b.dataset.c,10); var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){ p.classList.remove('sel'); }); b.classList.add('sel'); }; });
+    var jb=document.getElementById('wkJudge'); if(jb) jb.onclick=judgeWeakness;
+  } else {
+    var nb=document.getElementById('wkNext'); if(nb) nb.onclick=weaknessNextRound;
+  }
+  var eb=document.getElementById('wkExit'); if(eb) eb.onclick=exitWeakness;
 }
 
 // ============ Init ============

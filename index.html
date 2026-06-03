@@ -688,6 +688,20 @@ button{font-family:inherit;color:inherit}
 }
 .test-set-btn:hover{border-color:var(--border-h)}
 .test-set-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.test-set-btn.rel-clear{border-color:#3ed184}
+.test-set-btn.rel-clear small{color:#3ed184;font-weight:700}
+.test-set-btn.rel-all{border-color:#e0a800;box-shadow:0 0 0 1px #e0a800 inset}
+.test-set-btn.rel-all small{color:#e0a800;font-weight:800}
+.test-set-btn.active small{color:#fff!important}
+/* 仕上げ：読む */
+.read-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid #ccc;border-radius:8px;background:#fff;margin:7px 0}
+.read-row.done{border-color:#3ed184;background:rgba(62,209,132,0.12)}
+.read-txt{flex:1 1 auto;min-width:0}
+.read-jp{font-size:14px;color:#1b1b1b}
+.read-en{font-size:15px;font-weight:800;color:#0d33ff;margin-top:2px}
+.read-play{flex:0 0 auto;padding:9px 16px;border:none;border-radius:20px;background:var(--accent);color:#fff;font-weight:800;cursor:pointer;font-size:13px;transition:filter .15s}
+.read-play:hover{filter:brightness(1.1)}
+.read-play.playing{filter:brightness(1.25)}
 
 /* テストシート: 左=問題 右=回答 */
 .test-sheet{width:100%;max-width:900px}
@@ -3438,7 +3452,7 @@ function switchMode(mode){
     eyebrow.textContent = '5科目 実力解放テスト / 本番形式';
     title.innerHTML = 'このまま行こうぜ！<em>5科目・実力解放テスト（10パターン）</em>';
     setBar.style.display = '';
-    releaseState.inWeakness=false;
+    releaseState.inWeakness=false; releaseState.inRead=false;
     renderReleasePatternBar();
     if(!releaseState.items.length) startRelease(releaseState.pattern); else renderRelease();
   }
@@ -7073,10 +7087,25 @@ function setReleaseMode(m){
   releaseState.mode=m; releaseState.answers={}; releaseState.fix={}; releaseState.graded=false; releaseState.score=0; releaseState.correct=0; releaseState.rewarded=false;
   renderRelease(); try{ document.querySelector('.main').scrollTop=0; }catch(e){}
 }
+// ===== 実力解放テストの進行度（スコープ別・パターン別）。0=未挑戦 1=クリア(100点) 2=完全オール =====
+function relProgKey(){ return trainScope||'総合'; }
+function loadRelProg(){ try{ return JSON.parse(localStorage.getItem('cignal_rel_prog')||'{}'); }catch(e){ return {}; } }
+function getRelLevel(scope,p){ var d=loadRelProg(); return (d[scope]&&d[scope][p])||0; }
+function markRelDone(scope,p,level){
+  var d=loadRelProg(); if(!d[scope]) d[scope]={};
+  if((d[scope][p]||0) < level){ d[scope][p]=level; try{ localStorage.setItem('cignal_rel_prog', JSON.stringify(d)); }catch(e){} }
+}
 function renderReleasePatternBar(){
   var el=document.getElementById('testSetBar'); if(!el) return;
-  var html='<span class="lv-label">実力解放</span>';
-  for(var i=0;i<RELEASE_PATTERNS;i++){ html+='<button class="test-set-btn'+(i===releaseState.pattern?' active':'')+'" data-rp="'+i+'">パターン'+(i+1)+'<br><small>20問</small></button>'; }
+  var scope=relProgKey(); var nClear=0, nAll=0;
+  for(var j=0;j<RELEASE_PATTERNS;j++){ var l=getRelLevel(scope,j); if(l>=1) nClear++; if(l>=2) nAll++; }
+  var html='<span class="lv-label">実力解放 <b style="color:#3ed184">✓'+nClear+'</b>/'+RELEASE_PATTERNS+(nAll?' <b style="color:#e0a800">💯'+nAll+'</b>':'')+'</span>';
+  for(var i=0;i<RELEASE_PATTERNS;i++){
+    var lv=getRelLevel(scope,i);
+    var sub = lv>=2 ? '💯 完全オール' : (lv>=1 ? '✓ クリア' : '20問');
+    var extra = lv>=2 ? ' rel-all' : (lv>=1 ? ' rel-clear' : '');
+    html+='<button class="test-set-btn'+(i===releaseState.pattern?' active':'')+extra+'" data-rp="'+i+'">パターン'+(i+1)+'<br><small>'+sub+'</small></button>';
+  }
   el.innerHTML=html;
   el.querySelectorAll('.test-set-btn[data-rp]').forEach(function(b){ b.onclick=function(){ startRelease(parseInt(b.dataset.rp,10)); renderReleasePatternBar(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }; });
 }
@@ -7085,12 +7114,14 @@ function gradeRelease(){
   rs.items.forEach(function(item,i){ var order=item.order||[]; var cp=order.indexOf(item.it.correct); if(rs.answers[i]===cp) correct++; });
   rs.correct=correct; rs.score=rs.items.length?Math.round(correct/rs.items.length*100):0; rs.graded=true;
   if(!rs.rewarded){ rs.rewarded=true; earnYen(Math.max(1,Math.round(correct/2))); }
+  if(rs.score===100){ markRelDone(relProgKey(), rs.pattern, (trainScope==='en')?1:2); renderReleasePatternBar(); }
   var sc=document.getElementById('relScore'); if(sc) sc.textContent=rs.score;
   renderRelease();
   try{ document.querySelector('.main').scrollTop=0; }catch(e){}
 }
 function renderRelease(){
   var main=document.getElementById('main'); var rs=releaseState;
+  if(rs.inRead){ renderReadFinish(); return; }
   if(rs.inWeakness){ renderWeakness(); return; }
   var KANA=['ア','イ','ウ','エ','オ','カ'];
   var fix=(rs.mode==='fix');
@@ -7143,10 +7174,12 @@ function renderRelease(){
   if(fix){
     if(solvedCount===rs.items.length && rs.items.length){
       if(!rs.rewarded){ rs.rewarded=true; earnYen(10); }
+      markRelDone(relProgKey(), rs.pattern, (trainScope==='en')?1:2); renderReleasePatternBar();
       var wkN=0; rs.items.forEach(function(_,i){ if(rs.fix[i]&&rs.fix[i].wasWrong) wkN++; });
       html+='<div style="text-align:center;margin-top:22px"><div style="font-size:26px;font-weight:800;color:#2e7d32">💯 100点！ぜんぶ正解！</div>';
-      if(wkN){ html+='<div style="font-size:13px;color:#666;margin-top:6px">さっき直した <b>'+wkN+'問</b>、こんどはヒントなしで全部できるかな？</div><button class="exam-submit wk-start" style="margin-top:12px;background:linear-gradient(135deg,#ff8f3d,#ff3d77)">💪 弱点なんてないモード（'+wkN+'問）</button><div style="margin-top:8px"><button class="exam-submit" id="relRetry" style="background:#888">🔁 もう一回（テスト）</button></div>'; }
-      else { html+='<div style="font-size:13px;color:#666;margin-top:6px">一度もまちがえずクリア！弱点ゼロ！</div><button class="exam-submit" id="relRetry" style="margin-top:12px">🔁 もう一回</button>'; }
+      if(trainScope==='en'){ html+='<div style="font-size:13px;color:#666;margin-top:6px">仕上げに、英語を声に出して読もう！</div><button class="exam-submit rd-start" style="margin-top:12px;background:linear-gradient(135deg,#4468ff,#7c5cff)">🔊 声に出して読む（完全オールへ）</button>'; }
+      if(wkN){ html+='<div style="margin-top:10px;font-size:13px;color:#666">さっき直した <b>'+wkN+'問</b>、こんどはヒントなしで全部できるかな？</div><button class="exam-submit wk-start" style="margin-top:8px;background:linear-gradient(135deg,#ff8f3d,#ff3d77)">💪 弱点なんてないモード（'+wkN+'問）</button>'; }
+      html+='<div style="margin-top:8px"><button class="exam-submit" id="relRetry" style="background:#888">🔁 もう一回（テスト）</button></div>';
       html+='</div>';
     } else {
       html+='<div style="text-align:center;margin-top:18px;font-size:13px;color:#555">まちがえたら 💡ヒントを見て もう一度えらぼう。ぜんぶ直すと <b>100点</b>！（のこり '+(rs.items.length-solvedCount)+'問）</div>';
@@ -7157,7 +7190,7 @@ function renderRelease(){
     var wkW=rs.items.length-rs.correct;
     html+='<div style="text-align:center;margin-top:22px"><div style="font-size:18px;font-weight:800;margin-bottom:12px">得点 '+rs.score+' 点（正解 '+rs.correct+' / '+rs.items.length+'）</div>';
     if(wkW>0){ html+='<button class="exam-submit wk-start" style="background:linear-gradient(135deg,#ff8f3d,#ff3d77)">💪 弱点なんてないモード（まちがえた'+wkW+'問）</button><div style="margin-top:8px"><button class="exam-submit" id="relRetry" style="background:#888">🔁 もう一回（同じパターン）</button></div>'; }
-    else { html+='<div style="font-size:15px;color:#2e7d32;font-weight:800">💯 全問正解！弱点なし！</div><button class="exam-submit" id="relRetry" style="margin-top:10px">🔁 もう一回（同じパターン）</button>'; }
+    else { html+='<div style="font-size:15px;color:#2e7d32;font-weight:800">💯 全問正解！弱点なし！</div>'; if(trainScope==='en'){ html+='<div style="font-size:13px;color:#666;margin-top:6px">仕上げに、英語を声に出して読もう！</div><button class="exam-submit rd-start" style="margin-top:8px;background:linear-gradient(135deg,#4468ff,#7c5cff)">🔊 声に出して読む（完全オールへ）</button><div style="margin-top:8px"><button class="exam-submit" id="relRetry" style="background:#888">🔁 もう一回（同じパターン）</button></div>'; } else { html+='<button class="exam-submit" id="relRetry" style="margin-top:10px">🔁 もう一回（同じパターン）</button>'; } }
     html+='<div style="font-size:12px;color:#666;margin-top:8px">上の「パターン」で別のテストに挑戦できるよ</div></div>';
   }
   html+='</div>';
@@ -7175,12 +7208,14 @@ function renderRelease(){
     }; });
     var rr=document.getElementById('relRetry'); if(rr) rr.onclick=function(){ startRelease(rs.pattern); };
     var wb=main.querySelector('.wk-start'); if(wb) wb.onclick=function(){ startWeakness(collectWrongItems()); };
+    var rdb=main.querySelector('.rd-start'); if(rdb) rdb.onclick=function(){ startReadFinish(); };
   } else if(!rs.graded){
     main.querySelectorAll('.choice-pill[data-rq]').forEach(function(b){ b.onclick=function(){ var qi=parseInt(b.dataset.rq,10); rs.answers[qi]=parseInt(b.dataset.c,10); var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){ p.classList.remove('sel'); }); b.classList.add('sel'); }; });
     document.getElementById('relGrade').onclick=gradeRelease;
   } else {
     var rr2=document.getElementById('relRetry'); if(rr2) rr2.onclick=function(){ startRelease(rs.pattern); };
     var wb2=main.querySelector('.wk-start'); if(wb2) wb2.onclick=function(){ startWeakness(collectWrongItems()); };
+    var rdb2=main.querySelector('.rd-start'); if(rdb2) rdb2.onclick=function(){ startReadFinish(); };
   }
 }
 
@@ -7258,6 +7293,46 @@ function renderWeakness(){
     var nb=document.getElementById('wkNext'); if(nb) nb.onclick=weaknessNextRound;
   }
   var eb=document.getElementById('wkExit'); if(eb) eb.onclick=exitWeakness;
+}
+
+// ===== 🔊 英語パーフェクト後の仕上げ：問題＋答え＋音声で読む → 完全オール =====
+var readState={ items:[], read:{}, pattern:0, rewarded:false };
+function startReadFinish(){
+  var rs=releaseState;
+  var items=(rs.items||[]).filter(function(it){ return it.subj==='en' && it.it && it.it.ja; });
+  if(!items.length) return;
+  readState={ items:items, read:{}, pattern:rs.pattern, rewarded:false };
+  rs.inRead=true; rs.inWeakness=false;
+  renderRelease(); try{ document.querySelector('.main').scrollTop=0; }catch(e){}
+}
+function renderReadFinish(){
+  var main=document.getElementById('main'); var st=readState;
+  var doneCount=0; st.items.forEach(function(_,i){ if(st.read[i]) doneCount++; });
+  var all=(doneCount===st.items.length && st.items.length>0);
+  var html=''; html+=scopeBarHTML();
+  html+='<div class="exam-paper">';
+  html+='<div class="exam-head"><div><div class="exam-title">🔊 仕上げ：声に出して読もう</div><div class="exam-sub">英語 パターン'+(st.pattern+1)+' ・ 🔊で聞いて、自分でも読む！ぜんぶ読んだら 完全オール</div></div><div class="exam-score"><span class="lbl">読んだ</span><span class="v">'+doneCount+'/'+st.items.length+'</span></div></div>';
+  st.items.forEach(function(item,i){
+    var it=item.it; var ans=it.choices[it.correct]; var done=st.read[i];
+    _rubyMode='jp';
+    html+='<div class="read-row'+(done?' done':'')+'"><div class="read-txt"><div class="read-jp">'+furigana(escapeHtml(it.ja))+'</div><div class="read-en">'+escapeHtml(ans)+'</div></div><button class="read-play" data-ri="'+i+'">🔊 再生'+(done?' ✓':'')+'</button></div>';
+  });
+  _rubyMode='std';
+  if(all){
+    if(!st.rewarded){ st.rewarded=true; earnYen(15); markRelDone(relProgKey(), st.pattern, 2); renderReleasePatternBar(); }
+    html+='<div style="text-align:center;margin-top:22px"><div style="font-size:26px;font-weight:800;color:#ff3d77">💯 完全オール！</div><div style="font-size:13px;color:#666;margin-top:6px">答えて・聞いて・読んで、ぜんぶ達成！🎉</div><button class="exam-submit" id="readExit" style="margin-top:12px">↩ テストにもどる</button></div>';
+  } else {
+    html+='<div style="text-align:center;margin-top:16px;font-size:13px;color:#555">🔊で発音を聞いて、自分でも声に出して読もう。読んだら次へ（のこり '+(st.items.length-doneCount)+'）</div><div style="text-align:center;margin-top:10px"><button class="exam-submit" id="readExit" style="background:#888">↩ あとでにする</button></div>';
+  }
+  html+='</div>';
+  main.innerHTML=html; _rubyMode='std';
+  bindScopeBar(main, function(){ releaseState.inRead=false; startRelease(releaseState.pattern); });
+  main.querySelectorAll('.read-play[data-ri]').forEach(function(b){ b.onclick=function(){
+    var i=parseInt(b.dataset.ri,10); var it=readState.items[i].it;
+    speakEnglish(it.choices[it.correct], b);
+    readState.read[i]=true; renderReadFinish();
+  }; });
+  var eb=document.getElementById('readExit'); if(eb) eb.onclick=function(){ releaseState.inRead=false; renderReleasePatternBar(); startRelease(releaseState.pattern); };
 }
 
 // ============ Init ============

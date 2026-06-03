@@ -7317,21 +7317,29 @@ function speechMatch(said, target){
   var bw=b.split(' '), hit=0; bw.forEach(function(w){ if(setA[w]) hit++; });
   return bw.length ? (hit/bw.length >= 0.6) : false;
 }
+var _srBusy=false;
 function recognizeEnglish(target, btn, cb){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){ cb(null,false,'unsupported'); return; }
-  try{ if(_srActive) _srActive.abort(); }catch(e){}
+  if(_srBusy){ return; } // 多重起動を防ぐ（前の認識が終わるまで無視）
   var r; try{ r=new SR(); }catch(e){ cb(null,false,'init'); return; }
-  _srActive=r; r.lang='en-US'; r.interimResults=false; r.maxAlternatives=3;
+  _srBusy=true; _srActive=r;
+  r.lang='en-US'; r.interimResults=false; r.maxAlternatives=3; r.continuous=false;
   if(btn){ btn.classList.add('listening'); btn.textContent='🎤 聞いています…'; }
-  var fired=false;
-  r.onresult=function(e){ fired=true; var best='', ok=false, res=e.results[0];
+  var best='', ok=false, errCode=null, finished=false;
+  var watchdog=setTimeout(function(){ try{ r.stop(); }catch(e){} }, 8000);
+  r.onresult=function(e){ var res=e.results[0];
     for(var i=0;i<res.length;i++){ var t=res[i].transcript; if(!best) best=t; if(speechMatch(t,target)){ ok=true; best=t; break; } }
-    cb(best, ok);
   };
-  r.onerror=function(ev){ fired=true; cb(null,false,(ev&&ev.error)||'error'); };
-  r.onend=function(){ if(btn) btn.classList.remove('listening'); _srActive=null; if(!fired) cb(null,false,'noresult'); };
-  try{ r.start(); }catch(e){ cb(null,false,'start'); }
+  r.onerror=function(ev){ errCode=(ev&&ev.error)||'error'; };
+  r.onend=function(){
+    clearTimeout(watchdog);
+    if(btn) btn.classList.remove('listening');
+    _srBusy=false; _srActive=null;
+    if(finished) return; finished=true;
+    cb(best||null, ok, best? null : (errCode||'noresult'));
+  };
+  try{ r.start(); }catch(e){ clearTimeout(watchdog); _srBusy=false; _srActive=null; if(btn) btn.classList.remove('listening'); cb(null,false,'start'); }
 }
 var readState={ items:[], read:{}, said:{}, heard:{}, voice:false, pattern:0, rewarded:false };
 function startReadFinish(){
@@ -7380,7 +7388,12 @@ function renderReadFinish(){
   main.querySelectorAll('.read-mic[data-mi]').forEach(function(b){ b.onclick=function(){
     var i=parseInt(b.dataset.mi,10); var target=readState.items[i].it.choices[readState.items[i].it.correct];
     recognizeEnglish(target, b, function(heard, ok, err){
-      readState.heard[i] = heard || (err==='not-allowed'||err==='service-not-allowed' ? '（マイクが許可されていません）' : (err==='no-speech'||err==='noresult' ? '（声が聞こえなかった）' : (err? '（聞き取れなかった）' : '')));
+      readState.heard[i] = heard || (
+        err==='not-allowed'||err==='service-not-allowed' ? '（マイクが許可されていません）' :
+        err==='network' ? '（ネット接続を確認してね・少し待って再挑戦）' :
+        err==='no-speech'||err==='noresult' ? '（声が聞こえなかった・もう一回）' :
+        err==='aborted' ? '（中断されました・もう一回）' :
+        err? '（聞き取れなかった・もう一回）' : '');
       if(ok) readState.said[i]=true;
       renderReadFinish();
     });

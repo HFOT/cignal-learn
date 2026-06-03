@@ -7137,7 +7137,7 @@ function renderRelease(){
   var solvedCount=0; if(fix){ rs.items.forEach(function(_,i){ if(rs.fix[i]&&rs.fix[i].solved) solvedCount++; }); }
   var html='';
   html+=scopeBarHTML();
-  html+='<div class="rel-modes"><button class="rel-mode'+(!fix?' on':'')+'" data-rmode="full">📝 完全テスト</button><button class="rel-mode'+(fix?' on fix':'')+'" data-rmode="fix">✏️ 違うぞモード（直して100点）</button></div>';
+  html+='<div class="rel-modes"><button class="rel-mode'+(!fix?' on':'')+'" data-rmode="full">📝 完全テスト</button><button class="rel-mode'+(fix?' on fix':'')+'" data-rmode="fix">✏️ 違うぞモード（直して100点）</button>'+(trainScope==='en'?'<button class="rel-mode" id="relVoiceBtn" style="background:linear-gradient(135deg,#4468ff,#7c5cff);color:#fff;border-color:transparent">🎤 音声プラス（発音）</button>':'')+'</div>';
   html+='<div class="exam-paper">';
   var ptsEach = rs.items.length ? Math.round(100/rs.items.length) : 5;
   var scoreV = fix ? (rs.items.length?Math.round(solvedCount/rs.items.length*100):0) : (rs.graded ? rs.score : '／100');
@@ -7206,6 +7206,7 @@ function renderRelease(){
   main.innerHTML=html; _rubyMode='std';
   bindScopeBar(main, function(){ startRelease(releaseState.pattern); try{ document.querySelector('.main').scrollTop=0; }catch(e){} });
   main.querySelectorAll('.rel-mode[data-rmode]').forEach(function(b){ b.onclick=function(){ setReleaseMode(b.dataset.rmode); }; });
+  var rvb=document.getElementById('relVoiceBtn'); if(rvb) rvb.onclick=function(){ startReadFinish(); };
   var sc=document.getElementById('relScore'); if(sc) sc.textContent = fix ? (rs.items.length?Math.round(solvedCount/rs.items.length*100):0) : (rs.graded?rs.score:'―');
   if(fix){
     main.querySelectorAll('.choice-pill[data-rq]').forEach(function(b){ b.onclick=function(){

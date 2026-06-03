@@ -3684,7 +3684,7 @@ function switchMode(mode){
   } else if(mode === 'matome'){
     hdrRight.innerHTML = '<div class="hdr-stat"><b id="matomeScore">―</b><span>得点</span></div>';
     eyebrow.textContent = '前期中間 / 最終まとめ';
-    title.innerHTML = '最終まとめ<em>数学・前期中間（正負の数）</em>';
+    title.innerHTML = '最終まとめ<em>数学・国語（書き込み式）</em>';
     startMatome();
   }
   // 勉強順ナビが有効なら現在ステップを同期
@@ -7661,48 +7661,97 @@ var MATOME_MATH = [
   {g:'応用', q:'正午の気温、日曜18℃。前日からの変化が月−1,火＋3,水＋2,木−5。木曜は何℃？', c:['17℃','19℃','13℃','23℃'], a:0, e:'18−1＋3＋2−5＝17℃。'},
   {g:'応用', q:'コインで表＝3歩前進、裏＝2歩後退。「裏・表・表・表」と出たとき、スタートから何歩前？', c:['7歩前','5歩前','9歩前','12歩前'], a:0, e:'−2＋3＋3＋3＝＋7 → 7歩前。'}
 ];
-var matomeState={ answers:{}, graded:false, score:0, correct:0, rewarded:false };
-function startMatome(){ matomeState={ answers:{}, graded:false, score:0, correct:0, rewarded:false }; renderMatome(); }
+// 国語：ワーク（新・基礎の学習）の問題文・書き込み形式に似せた最終まとめ
+var MATOME_JP = [
+  {g:'言葉の単位', type:'write', q:'「白い 花が さく。」は、いくつの文節からできていますか。数字で答えなさい。', accept:['3','３','三','3文節','三文節'], e:'白い／花が／さく。の3文節。'},
+  {g:'言葉の単位', type:'write', q:'「弟が 公園で 遊ぶ。」は、いくつの文節からできていますか。', accept:['3','３','三','3文節','三文節'], e:'弟が／公園で／遊ぶ。の3文節。'},
+  {g:'言葉の単位', type:'write', q:'「私は 毎朝 六時に 起きる。」は、いくつの文節からできていますか。', accept:['4','４','四','4文節','四文節'], e:'私は／毎朝／六時に／起きる。の4文節。'},
+  {g:'言葉の単位', type:'write', q:'「犬が ほえる。」は、いくつの文節からできていますか。', accept:['2','２','二','2文節','二文節'], e:'犬が／ほえる。の2文節。'},
+  {g:'言葉の単位', type:'write', q:'「白い花がさく。」を単語に区切ると、いくつの単語になりますか。数字で答えなさい。', accept:['4','４','四','4単語','四単語'], e:'白い／花／が／さく の4単語。'},
+  {g:'言葉の単位', type:'write', q:'文章 → 段落 → 文 → □ → 単語。□に入る言葉を書きなさい。', accept:['文節','ぶんせつ'], e:'文より小さく単語より大きい＝文節。'},
+  {g:'言葉の単位', type:'choice', q:'文の終わりにつける「。」を何といいますか。', c:['読点','句点','中点','かぎ'], a:1, e:'句点（。）。「、」は読点。'},
+  {g:'文節・単語に区切る', type:'choice', q:'「赤い 鳥が 鳴く。」を正しく文節に区切ったものは？', c:['赤い鳥が／鳴く','赤い／鳥が／鳴く','赤／い鳥が／鳴く','赤い鳥／が鳴く'], a:1, e:'赤い／鳥が／鳴く。の3文節。'},
+  {g:'文節・単語に区切る', type:'choice', q:'「妹は 本を 読む。」を正しく文節に区切ったものは？', c:['妹は本を／読む','妹／は本を読む','妹は／本を／読む','妹は本／を読む'], a:2, e:'妹は／本を／読む。の3文節。'},
+  {g:'文節・単語に区切る', type:'choice', q:'「白い花がさく。」を単語に正しく区切ったものは？', c:['白い／花が／さく','白い／花／が／さく','白／い／花／が／さく','白い花／が／さく'], a:1, e:'白い／花／が／さく の4単語。'},
+  {g:'主語・述語', type:'write', q:'「庭の 花が きれいに さいた。」の主語を抜き出しなさい。', accept:['花が','花'], e:'主語は「花が」。「庭の」は修飾語。'},
+  {g:'主語・述語', type:'write', q:'「鳥が 鳴く。」の主語を抜き出しなさい。', accept:['鳥が','鳥'], e:'主語は「鳥が」。'},
+  {g:'主語・述語', type:'write', q:'「兄は 高校生だ。」の述語を抜き出しなさい。', accept:['高校生だ','高校生'], e:'述語は「高校生だ」。'},
+  {g:'主語・述語', type:'write', q:'「妹が ピアノを ひく。」の述語を抜き出しなさい。', accept:['ひく'], e:'述語は文末の「ひく」。'},
+  {g:'主語・述語', type:'choice', q:'「波が おだやかだ。」は、主・述の関係でどの型ですか。', c:['何が どうする','何が どんなだ','何が 何だ','何が ある'], a:1, e:'「おだやかだ」は様子→「何が どんなだ」。'},
+  {g:'主語・述語', type:'choice', q:'「机に 本が ある。」は、どの型ですか。', c:['何が どうする','何が どんなだ','何が 何だ','何が ある・いる・ない'], a:3, e:'存在→「何が ある・いる・ない」。'},
+  {g:'主語・述語', type:'choice', q:'「彼は 医者だ。」は、どの型ですか。', c:['何が 何だ','何が どうする','何が どんなだ','何が ある'], a:0, e:'「医者だ」→「何が 何だ」。'},
+  {g:'修飾語', type:'choice', q:'「朝から 雨が 降る。」の「朝から」は何を表す修飾語ですか。', c:['いつ（時間）','どこ','何を','どうして'], a:0, e:'時間（いつ）。'},
+  {g:'修飾語', type:'choice', q:'「教室で 本を 読む。」の「教室で」は何を表しますか。', c:['いつ','どこ（場所）','何を','原因'], a:1, e:'場所（どこ）。'},
+  {g:'修飾語', type:'choice', q:'「弟が ケーキを 食べる。」の「ケーキを」は何を表しますか。', c:['いつ','どこ','何を（対象）','様子'], a:2, e:'対象（何を）。'},
+  {g:'修飾語', type:'choice', q:'「風で 木が たおれた。」の「風で」は何を表しますか。', c:['いつ','場所','対象','どうして（原因・理由）'], a:3, e:'原因・理由（どうして）。'},
+  {g:'修飾語', type:'write', q:'「白い 鳥が とぶ。」で、「白い」がくわしくしている言葉を抜き出しなさい。', accept:['鳥が','鳥'], e:'「白い」は「鳥」をくわしくする。'},
+  {g:'修飾語', type:'choice', q:'修飾される文節を何といいますか。', c:['被修飾語','主語','述語','接続語'], a:0, e:'修飾される文節＝被修飾語。'},
+  {g:'詩・表現', type:'choice', q:'「風がささやく。」の表現技法は？', c:['擬人法','直喩','隠喩','倒置'], a:0, e:'人でない風を人のように→擬人法。'},
+  {g:'詩・表現', type:'write', q:'「雪のように白い。」のような、「ように」を使ったたとえを何といいますか。', accept:['直喩','明喩','ちょくゆ'], e:'「ように」でたとえる→直喩（明喩）。'}
+];
+var MATOME = { math: MATOME_MATH, jp: MATOME_JP };
+var matomeState={ subj:'math', answers:{}, graded:false, score:0, correct:0, rewarded:false };
+function matomeNorm(s){ return (s||'').replace(/[\s　]/g,'').replace(/[、。「」『』（）()・/／]/g,'').toLowerCase(); }
+function matomeCheck(it, ans){
+  if(it.type==='write'){ var n=matomeNorm(ans); if(!n) return false; return (it.accept||[]).some(function(a){ return matomeNorm(a)===n; }); }
+  return ans===it.a;
+}
+function startMatome(){ matomeState={ subj:matomeState.subj||'math', answers:{}, graded:false, score:0, correct:0, rewarded:false }; renderMatome(); }
+function setMatomeSubj(s){ matomeState={ subj:s, answers:{}, graded:false, score:0, correct:0, rewarded:false }; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
 function gradeMatome(){
-  var ms=matomeState, c=0;
-  MATOME_MATH.forEach(function(it,i){ if(ms.answers[i]===it.a) c++; });
-  ms.correct=c; ms.score=Math.round(c/MATOME_MATH.length*100); ms.graded=true;
+  var ms=matomeState, list=MATOME[ms.subj], c=0;
+  list.forEach(function(it,i){ if(matomeCheck(it, ms.answers[i])) c++; });
+  ms.correct=c; ms.score=Math.round(c/list.length*100); ms.graded=true;
   if(!ms.rewarded){ ms.rewarded=true; earnYen(Math.max(1,Math.round(c/2))); }
   var sc=document.getElementById('matomeScore'); if(sc) sc.textContent=ms.score;
   renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){}
 }
 function renderMatome(){
-  var main=document.getElementById('main'); var ms=matomeState; var KANA=['ア','イ','ウ','エ','オ'];
-  _rubyMode='std';
-  var html='<div class="exam-paper">';
-  html+='<div class="exam-head"><div><div class="exam-title">📐 前期中間 数学 最終まとめ</div><div class="exam-sub">正の数・負の数 ・ 全'+MATOME_MATH.length+'問 ・ 記号で答えなさい</div></div><div class="exam-score"><span class="lbl">得点</span><span class="v">'+(ms.graded?ms.score:'／100')+'</span></div></div>';
+  var main=document.getElementById('main'); var ms=matomeState; var list=MATOME[ms.subj]; var KANA=['ア','イ','ウ','エ','オ'];
+  var jp=(ms.subj==='jp'); _rubyMode = jp?'jp':'std';
+  var subjName = jp ? '国語（言葉のきまり）' : '数学（正の数・負の数）';
+  var html='';
+  html+='<div class="rel-modes" style="margin-bottom:12px;max-width:780px"><button class="rel-mode'+(!jp?' on':'')+'" data-msub="math">📐 数学</button><button class="rel-mode'+(jp?' on':'')+'" data-msub="jp">📖 国語</button></div>';
+  html+='<div class="exam-paper">';
+  html+='<div class="exam-head"><div><div class="exam-title">📐 前期中間 最終まとめ</div><div class="exam-sub">'+escapeHtml(subjName)+' ・ 全'+list.length+'問 ・ 記号や言葉で答えなさい</div></div><div class="exam-score"><span class="lbl">得点</span><span class="v">'+(ms.graded?ms.score:'／100')+'</span></div></div>';
   html+='<div class="exam-name"><div class="field">名前 <span class="line nameline"></span></div><div class="field">組 <span class="line"></span></div></div>';
   var lastG=null, qno=0, daimon=0;
-  MATOME_MATH.forEach(function(it,i){
+  list.forEach(function(it,i){
     if(it.g!==lastG){ if(lastG!==null) html+='</div>'; daimon++; html+='<div class="exam-daimon"><div class="exam-daimon-head"><span>大問 '+daimon+'　'+escapeHtml(it.g)+'</span></div>'; lastG=it.g; }
     qno++;
-    html+='<div class="exam-q"><div class="exam-qno">('+qno+')</div><div class="exam-qbody"><div class="exam-qtext">'+fracText(it.q)+'</div><div class="choice-row">';
-    for(var p=0;p<it.c.length;p++){
-      var cls='choice-pill';
-      if(ms.answers[i]===p) cls+=' sel';
-      if(ms.graded){ if(p===it.a) cls+=' gr-correct'; else if(ms.answers[i]===p) cls+=' gr-wrong'; }
-      html+='<button class="'+cls+'" data-mq="'+i+'" data-c="'+p+'"'+(ms.graded?' disabled':'')+'>'+KANA[p]+'. '+fracText(it.c[p])+'</button>';
+    var qtext = jp ? furigana(escapeHtml(it.q)) : fracText(it.q);
+    html+='<div class="exam-q"><div class="exam-qno">('+qno+')</div><div class="exam-qbody"><div class="exam-qtext">'+qtext+'</div>';
+    if(it.type==='write'){
+      var v=ms.answers[i]||''; var okw=ms.graded && matomeCheck(it, v);
+      html+='<div class="exam-ans"><input type="text" data-mw="'+i+'" value="'+escapeHtml(v)+'"'+(ms.graded?' disabled':'')+' placeholder="ここに書く"></div>';
+      if(ms.graded){ html+='<div class="exam-mk" style="color:'+(okw?'#2e7d32':'#c62828')+'">'+(okw?'○ 正解':'× 正解は「'+escapeHtml((it.accept||[''])[0])+'」')+(it.e?'　/　'+escapeHtml(it.e):'')+'</div>'; }
+    } else {
+      html+='<div class="choice-row">';
+      for(var p=0;p<it.c.length;p++){
+        var cls='choice-pill';
+        if(ms.answers[i]===p) cls+=' sel';
+        if(ms.graded){ if(p===it.a) cls+=' gr-correct'; else if(ms.answers[i]===p) cls+=' gr-wrong'; }
+        var ctxt = jp ? escapeHtml(it.c[p]) : fracText(it.c[p]);
+        html+='<button class="'+cls+'" data-mq="'+i+'" data-c="'+p+'"'+(ms.graded?' disabled':'')+'>'+KANA[p]+'. '+ctxt+'</button>';
+      }
+      html+='</div>';
+      if(ms.graded){ var ok=(ms.answers[i]===it.a); html+='<div class="exam-mk" style="color:'+(ok?'#2e7d32':'#c62828')+'">'+(ok?'○ 正解':'× 正解は '+KANA[it.a])+(it.e?'　/　'+escapeHtml(it.e):'')+'</div>'; }
     }
-    html+='</div>';
-    if(ms.graded){ var ok=(ms.answers[i]===it.a); html+='<div class="exam-mk" style="color:'+(ok?'#2e7d32':'#c62828')+'">'+(ok?'○ 正解':'× 正解は '+KANA[it.a])+(it.e?'　/　'+escapeHtml(it.e):'')+'</div>'; }
     html+='</div></div>';
   });
   if(lastG!==null) html+='</div>';
-  if(!ms.graded){ html+='<div style="text-align:center;margin-top:22px"><button class="exam-submit" id="matomeGrade">⚡ 採点する</button><div style="font-size:12px;color:#666;margin-top:8px">全'+MATOME_MATH.length+'問。本番のつもりで！</div></div>'; }
+  if(!ms.graded){ html+='<div style="text-align:center;margin-top:22px"><button class="exam-submit" id="matomeGrade">⚡ 採点する</button><div style="font-size:12px;color:#666;margin-top:8px">全'+list.length+'問。本番のつもりで！'+(jp?'（書き込みは漢字でもひらがなでもOK）':'')+'</div></div>'; }
   else {
-    html+='<div style="text-align:center;margin-top:22px"><div style="font-size:20px;font-weight:800;margin-bottom:6px">得点 '+ms.score+' 点（正解 '+ms.correct+' / '+MATOME_MATH.length+'）</div>';
+    html+='<div style="text-align:center;margin-top:22px"><div style="font-size:20px;font-weight:800;margin-bottom:6px">得点 '+ms.score+' 点（正解 '+ms.correct+' / '+list.length+'）</div>';
     html+=(ms.score===100?'<div style="font-size:15px;color:#0aa6a6;font-weight:800;margin-bottom:8px">💯 パーフェクト！本番もこの調子！</div>':'<div style="font-size:13px;color:#666;margin-bottom:8px">×の問題の解説を読んで、もう一回！</div>');
     html+='<button class="exam-submit" id="matomeRetry">🔁 もう一回</button></div>';
   }
   html+='</div>';
-  main.innerHTML=html;
+  main.innerHTML=html; _rubyMode='std';
+  main.querySelectorAll('.rel-mode[data-msub]').forEach(function(b){ b.onclick=function(){ setMatomeSubj(b.dataset.msub); }; });
   if(!ms.graded){
     main.querySelectorAll('.choice-pill[data-mq]').forEach(function(b){ b.onclick=function(){ var qi=parseInt(b.dataset.mq,10); ms.answers[qi]=parseInt(b.dataset.c,10); var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){ p.classList.remove('sel'); }); b.classList.add('sel'); }; });
+    main.querySelectorAll('input[data-mw]').forEach(function(inp){ inp.oninput=function(){ ms.answers[parseInt(inp.dataset.mw,10)]=inp.value; }; });
     var gb=document.getElementById('matomeGrade'); if(gb) gb.onclick=gradeMatome;
   } else {
     var rb=document.getElementById('matomeRetry'); if(rb) rb.onclick=startMatome;

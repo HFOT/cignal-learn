@@ -209,6 +209,7 @@ button{font-family:inherit;color:inherit}
 /* 🔥 5科目集中トレーニング */
 .mode-train{background:linear-gradient(135deg,#ff8f3d,#ff6b3d)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
 .mode-finisher{background:linear-gradient(135deg,#ff3d77,#c2185b)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
+.mode-matome{background:linear-gradient(135deg,#0aa6a6,#0d7a9c)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
 .train-wrap{max-width:680px;margin:0 auto;padding:6px 4px 28px}
 .train-subjtabs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
 .train-subjtab{padding:7px 17px;border-radius:20px;border:1px solid var(--border);background:var(--paper-2);color:var(--muted);font-weight:700;cursor:pointer;font-size:13px;transition:all .12s}
@@ -1214,6 +1215,7 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
     <button class="mode-btn mode-train" data-mode="train">🔥 これでいくぞ！</button>
     <button class="mode-btn mode-finisher" data-mode="finisher">💥 必殺テスト</button>
     <button class="mode-btn mode-release" data-mode="release">⚡ このまま行こうぜ！</button>
+    <button class="mode-btn mode-matome" data-mode="matome">📐 最終まとめ</button>
   </div>
 
   <div class="study-guide" id="studyGuide"></div>
@@ -3633,6 +3635,11 @@ function switchMode(mode){
     releaseState.inWeakness=false; releaseState.inRead=false;
     renderReleasePatternBar();
     if(!releaseState.items.length) startRelease(releaseState.pattern); else renderRelease();
+  } else if(mode === 'matome'){
+    hdrRight.innerHTML = '<div class="hdr-stat"><b id="matomeScore">―</b><span>得点</span></div>';
+    eyebrow.textContent = '前期中間 / 最終まとめ';
+    title.innerHTML = '最終まとめ<em>数学・前期中間（正負の数）</em>';
+    startMatome();
   }
   // 勉強順ナビが有効なら現在ステップを同期
   if(guide.active) renderGuide();
@@ -3649,14 +3656,14 @@ function toggleFocus(){
   var on=root.classList.toggle('focus-mode');
   try{ localStorage.setItem('cignal_focus', on?'1':'0'); }catch(e){}
   var btn=document.getElementById('focusToggle'); if(btn) btn.textContent = on ? '↩ もどす' : '🎯 中間集中';
-  if(on && ['train','finisher','release'].indexOf(currentMode)<0) switchMode('train');
+  if(on && ['train','finisher','release','matome'].indexOf(currentMode)<0) switchMode('train');
 }
 function loadFocus(){
   try{
     if(localStorage.getItem('cignal_focus')==='1'){
       document.getElementById('root').classList.add('focus-mode');
       var btn=document.getElementById('focusToggle'); if(btn) btn.textContent='↩ もどす';
-      if(['train','finisher','release'].indexOf(currentMode)<0) switchMode('train');
+      if(['train','finisher','release','matome'].indexOf(currentMode)<0) switchMode('train');
     }
   }catch(e){}
 }
@@ -7568,6 +7575,92 @@ function renderReadFinish(){
     });
   }; });
   var eb=document.getElementById('readExit'); if(eb) eb.onclick=function(){ releaseState.inRead=false; renderReleasePatternBar(); startRelease(releaseState.pattern); };
+}
+
+// ===== 📐 最終まとめ（前期中間 数学・正の数負の数）本番形式 =====
+var MATOME_MATH = [
+  {g:'用語', q:'正の数・負の数で、0を基準として数の大小（向き）を表すものは？', c:['符号','絶対値','不等号','指数'], a:0, e:'＋−の符号で向きを表す。'},
+  {g:'用語', q:'数直線上で、0からの距離を表すものは？', c:['符号','絶対値','不等号','指数'], a:1, e:'絶対値＝0からの距離。'},
+  {g:'用語', q:'「<」「>」の記号を何という？', c:['等号','不等号','符号','括弧'], a:1, e:'大小を表す記号＝不等号。'},
+  {g:'用語', q:'a＋b＝b＋a のように、順序を変えても答えが同じになる決まりは？', c:['交換法則','結合法則','分配法則','四則'], a:0, e:'交換法則。'},
+  {g:'用語', q:'(a×b)×c＝a×(b×c) が成り立つ決まりは？', c:['交換法則','結合法則','分配法則','四則'], a:1, e:'結合法則。'},
+  {g:'用語', q:'(a＋b)×c＝a×c＋b×c が成り立つ決まりは？', c:['交換法則','結合法則','分配法則','四則'], a:2, e:'分配法則。'},
+  {g:'用語', q:'加法・減法・乗法・除法をまとめて何という？', c:['四則','累乗','素因数','逆数'], a:0, e:'四則（しそく）。'},
+  {g:'基礎', q:'−0.5 の逆数は？', c:['0.5','−2','2','−0.5'], a:1, e:'−0.5＝−1/2、逆数は−2。'},
+  {g:'基礎', q:'自然数の中で一番小さい数は？', c:['0','1','−1','2'], a:1, e:'自然数は1,2,3…。0はふくめない。'},
+  {g:'基礎', q:'絶対値が2.5以上5未満の整数は全部で何個？', c:['2個','3個','4個','5個'], a:2, e:'−4,−3,3,4 の4個。'},
+  {g:'基礎', q:'(−3)² を計算すると？', c:['−9','9','−6','6'], a:1, e:'(−3)×(−3)＝9。'},
+  {g:'基礎', q:'−3² を計算すると？', c:['9','−9','6','−6'], a:1, e:'−(3×3)＝−9。符号に注意。'},
+  {g:'基礎', q:'120m を 20秒で走ったときの速さは？', c:['秒速6m','秒速2m','秒速60m','秒速12m'], a:0, e:'120÷20＝6 → 秒速6m。'},
+  {g:'加減', q:'−3＋2 ＝', c:['−1','1','−5','5'], a:0, e:'−3＋2＝−1。'},
+  {g:'加減', q:'−9−11 ＝', c:['−2','2','−20','20'], a:2, e:'−9−11＝−20。'},
+  {g:'加減', q:'8＋(−10) ＝', c:['2','−2','18','−18'], a:1, e:'8−10＝−2。'},
+  {g:'加減', q:'−12−(−9) ＝', c:['−21','21','−3','3'], a:2, e:'−12＋9＝−3。'},
+  {g:'乗除', q:'(−9)×10 ＝', c:['90','−90','−19','19'], a:1, e:'異符号→−。−90。'},
+  {g:'乗除', q:'(−10)×(−35) ＝', c:['−350','350','−45','45'], a:1, e:'同符号→＋。350。'},
+  {g:'乗除', q:'10÷(−2) ＝', c:['5','−5','−20','20'], a:1, e:'異符号→−5。'},
+  {g:'乗除', q:'−24÷(−14) を約分すると？', c:['12/7','−12/7','7/12','−7/12'], a:0, e:'同符号→＋。24/14＝12/7。'},
+  {g:'累乗・四則', q:'2³ ＝', c:['6','8','9','16'], a:1, e:'2×2×2＝8。'},
+  {g:'累乗・四則', q:'(−1)¹⁰⁰² ＝', c:['1','−1','1002','−1002'], a:0, e:'マイナスが偶数個→＋1。'},
+  {g:'累乗・四則', q:'−1¹⁰⁰² ＝', c:['1','−1','1002','0'], a:1, e:'1¹⁰⁰²＝1 に−をつけて−1。'},
+  {g:'累乗・四則', q:'15−(6−3²)×2 ＝', c:['21','3','−3','9'], a:0, e:'6−9＝−3、−3×2＝−6、15−(−6)＝21。'},
+  {g:'累乗・四則', q:'(−6)²×5−(−4²) ＝', c:['196','164','−164','144'], a:0, e:'36×5＝180、−4²＝−16、−(−16)＝＋16、180＋16＝196。'},
+  {g:'素数', q:'1とその数のほかに約数がない自然数を何という？', c:['素数','整数','偶数','倍数'], a:0, e:'素数。'},
+  {g:'素数', q:'次のうち素数はどれ？', c:['51','27','29','21'], a:2, e:'51＝3×17、27＝3³、21＝3×7。29が素数。'},
+  {g:'素数', q:'350 を素因数分解すると？', c:['2×5²×7','2²×5×7','2×5×7²','5²×14'], a:0, e:'350＝2×5×5×7＝2×5²×7。'},
+  {g:'素数', q:'280にできるだけ小さい数をかけて21の倍数にするには、何をかける？', c:['2','3','5','7'], a:1, e:'280＝2³×5×7、21＝3×7。3が足りない→×3。'},
+  {g:'誤り発見', q:'(−6)÷12÷(−4)＝(−6)÷(−3)＝2。どこが誤り？', c:['12÷(−4)を先に計算している','(−6)÷12が誤り','符号の付け方が誤り','誤りはない'], a:0, e:'除法は左から順に。正しくは(−6)÷12÷(−4)＝(−1/2)÷(−4)＝1/8。'},
+  {g:'応用', q:'テストの基準との差が 最高＋16・最低−12。最高の人は最低の人より何点高い？', c:['4点','28点','12点','16点'], a:1, e:'16−(−12)＝28点。'},
+  {g:'応用', q:'基準0点のタマが73点。5人の差が＋6,＋16,−12,−5,0 のとき5人の平均点は？', c:['73点','74点','75点','72点'], a:1, e:'差の合計＝＋5、平均の差＝＋1 → 73＋1＝74点。'},
+  {g:'応用', q:'正午の気温、日曜18℃。前日からの変化が月−1,火＋3,水＋2,木−5。木曜は何℃？', c:['17℃','19℃','13℃','23℃'], a:0, e:'18−1＋3＋2−5＝17℃。'},
+  {g:'応用', q:'コインで表＝3歩前進、裏＝2歩後退。「裏・表・表・表」と出たとき、スタートから何歩前？', c:['7歩前','5歩前','9歩前','12歩前'], a:0, e:'−2＋3＋3＋3＝＋7 → 7歩前。'}
+];
+var matomeState={ answers:{}, graded:false, score:0, correct:0, rewarded:false };
+function startMatome(){ matomeState={ answers:{}, graded:false, score:0, correct:0, rewarded:false }; renderMatome(); }
+function gradeMatome(){
+  var ms=matomeState, c=0;
+  MATOME_MATH.forEach(function(it,i){ if(ms.answers[i]===it.a) c++; });
+  ms.correct=c; ms.score=Math.round(c/MATOME_MATH.length*100); ms.graded=true;
+  if(!ms.rewarded){ ms.rewarded=true; earnYen(Math.max(1,Math.round(c/2))); }
+  var sc=document.getElementById('matomeScore'); if(sc) sc.textContent=ms.score;
+  renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){}
+}
+function renderMatome(){
+  var main=document.getElementById('main'); var ms=matomeState; var KANA=['ア','イ','ウ','エ','オ'];
+  _rubyMode='std';
+  var html='<div class="exam-paper">';
+  html+='<div class="exam-head"><div><div class="exam-title">📐 前期中間 数学 最終まとめ</div><div class="exam-sub">正の数・負の数 ・ 全'+MATOME_MATH.length+'問 ・ 記号で答えなさい</div></div><div class="exam-score"><span class="lbl">得点</span><span class="v">'+(ms.graded?ms.score:'／100')+'</span></div></div>';
+  html+='<div class="exam-name"><div class="field">名前 <span class="line nameline"></span></div><div class="field">組 <span class="line"></span></div></div>';
+  var lastG=null, qno=0, daimon=0;
+  MATOME_MATH.forEach(function(it,i){
+    if(it.g!==lastG){ if(lastG!==null) html+='</div>'; daimon++; html+='<div class="exam-daimon"><div class="exam-daimon-head"><span>大問 '+daimon+'　'+escapeHtml(it.g)+'</span></div>'; lastG=it.g; }
+    qno++;
+    html+='<div class="exam-q"><div class="exam-qno">('+qno+')</div><div class="exam-qbody"><div class="exam-qtext">'+fracText(it.q)+'</div><div class="choice-row">';
+    for(var p=0;p<it.c.length;p++){
+      var cls='choice-pill';
+      if(ms.answers[i]===p) cls+=' sel';
+      if(ms.graded){ if(p===it.a) cls+=' gr-correct'; else if(ms.answers[i]===p) cls+=' gr-wrong'; }
+      html+='<button class="'+cls+'" data-mq="'+i+'" data-c="'+p+'"'+(ms.graded?' disabled':'')+'>'+KANA[p]+'. '+fracText(it.c[p])+'</button>';
+    }
+    html+='</div>';
+    if(ms.graded){ var ok=(ms.answers[i]===it.a); html+='<div class="exam-mk" style="color:'+(ok?'#2e7d32':'#c62828')+'">'+(ok?'○ 正解':'× 正解は '+KANA[it.a])+(it.e?'　/　'+escapeHtml(it.e):'')+'</div>'; }
+    html+='</div></div>';
+  });
+  if(lastG!==null) html+='</div>';
+  if(!ms.graded){ html+='<div style="text-align:center;margin-top:22px"><button class="exam-submit" id="matomeGrade">⚡ 採点する</button><div style="font-size:12px;color:#666;margin-top:8px">全'+MATOME_MATH.length+'問。本番のつもりで！</div></div>'; }
+  else {
+    html+='<div style="text-align:center;margin-top:22px"><div style="font-size:20px;font-weight:800;margin-bottom:6px">得点 '+ms.score+' 点（正解 '+ms.correct+' / '+MATOME_MATH.length+'）</div>';
+    html+=(ms.score===100?'<div style="font-size:15px;color:#0aa6a6;font-weight:800;margin-bottom:8px">💯 パーフェクト！本番もこの調子！</div>':'<div style="font-size:13px;color:#666;margin-bottom:8px">×の問題の解説を読んで、もう一回！</div>');
+    html+='<button class="exam-submit" id="matomeRetry">🔁 もう一回</button></div>';
+  }
+  html+='</div>';
+  main.innerHTML=html;
+  if(!ms.graded){
+    main.querySelectorAll('.choice-pill[data-mq]').forEach(function(b){ b.onclick=function(){ var qi=parseInt(b.dataset.mq,10); ms.answers[qi]=parseInt(b.dataset.c,10); var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){ p.classList.remove('sel'); }); b.classList.add('sel'); }; });
+    var gb=document.getElementById('matomeGrade'); if(gb) gb.onclick=gradeMatome;
+  } else {
+    var rb=document.getElementById('matomeRetry'); if(rb) rb.onclick=startMatome;
+  }
 }
 
 // ============ Init ============

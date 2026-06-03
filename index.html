@@ -1069,16 +1069,55 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
 }
 .card-result .msg{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px}
 
-@media (max-width:520px){
-  .choices{grid-template-columns:1fr}
-  .subj-tab{padding:8px 12px;font-size:12px}
-  .hdr{padding:12px 14px 8px}
-  .lv-bar{padding:10px 14px;gap:6px}
-  .lv-btn{min-width:52px;padding:5px 8px;font-size:11px}
-  .test-result-grid{grid-template-columns:1fr}
+@media (max-width:600px){
+  /* ===== スマホ最適化 ===== */
+  .main{padding:12px 10px;gap:12px}
+  /* ヘッダー */
+  .hdr{padding:12px 14px 8px;gap:8px;flex-wrap:wrap;align-items:center}
+  .title{font-size:19px}
+  .title em{font-size:13px;margin-left:5px}
+  .eyebrow{font-size:9px;letter-spacing:0.2em}
+  .hdr-right{gap:8px}
+  /* 科目タブ・レベルバー・パターンバーは横スクロール */
+  .subj-tabs{overflow-x:auto;flex-wrap:nowrap;padding:8px 10px;-webkit-overflow-scrolling:touch}
+  .subj-tab{flex:0 0 auto;padding:7px 13px;font-size:13px}
+  .lv-bar{overflow-x:auto;flex-wrap:nowrap;padding:10px 12px;gap:6px;-webkit-overflow-scrolling:touch}
+  .lv-btn{flex:0 0 auto;min-width:52px;padding:5px 8px;font-size:11px}
+  .test-set-bar{overflow-x:auto;flex-wrap:nowrap;padding:10px 12px;-webkit-overflow-scrolling:touch}
+  .test-set-btn{flex:0 0 auto}
   .mode-btn{padding:8px 12px;font-size:11px}
+  /* 選択肢は1列・タップしやすく */
+  .choices{grid-template-columns:1fr}
+  .test-result-grid{grid-template-columns:1fr}
   .test-row{grid-template-columns:1fr}
   .test-q{border-right:none;border-bottom:1px solid var(--border)}
+  /* これでいくぞ／必殺 */
+  .train-card{padding:16px 14px}
+  .train-choices .tc{padding:13px 14px;font-size:15px;min-height:46px}
+  .train-subjtabs{gap:5px}
+  .train-subjtab{padding:6px 12px;font-size:12px}
+  /* このまま行こうぜ（試験用紙） */
+  .exam-paper{padding:14px 12px 20px;box-shadow:0 3px 14px rgba(0,0,0,0.25);border-radius:8px}
+  .exam-head{flex-direction:column;gap:8px}
+  .exam-score{align-self:flex-start;min-width:72px}
+  .exam-title{font-size:16px}
+  .exam-qtext{font-size:15px}
+  .exam-paper .choice-row{flex-direction:column}
+  .exam-paper .choice-pill{width:100%;padding:11px 12px;font-size:15px;text-align:left}
+  .rel-modes{flex-wrap:wrap;gap:8px}
+  .rel-mode{flex:1 1 45%;min-width:0;text-align:center}
+  /* 読み上げ／音声プラス */
+  .read-row{flex-direction:column;align-items:stretch;gap:8px}
+  .read-btns{flex-direction:row}
+  .read-play,.read-mic{flex:1;min-height:44px}
+  /* タイムアタック */
+  .ta-card{padding:16px 14px}
+  .ta-q{font-size:16px}
+  .ta-title{font-size:16px}
+  .ta-timer{font-size:22px;min-width:64px}
+  /* 送信ボタン */
+  .exam-submit{padding:12px 22px;font-size:14px;width:100%;max-width:340px}
+  /* フラッシュカード */
   .flashcard-face{min-height:180px;padding:24px 20px}
   .flashcard-face .content{font-size:17px}
 }

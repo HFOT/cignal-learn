@@ -7341,9 +7341,10 @@ function renderReleasePatternBar(){
     var extra = lv>=2 ? ' rel-all' : (lv>=1 ? ' rel-clear' : '');
     html+='<button class="test-set-btn'+(i===releaseState.pattern?' active':'')+extra+'" data-rp="'+i+'">パターン'+(i+1)+'<br><small>'+sub+'</small></button>';
   }
+  if(nClear>0){ html+='<button class="test-set-btn" id="relProgReset" style="border-color:#d8a0a0;color:#b0392a" title="この科目の ✓・💯 の記録を消す">↺<br><small>記録リセット</small></button>'; }
   el.innerHTML=html;
   el.querySelectorAll('.test-set-btn[data-rp]').forEach(function(b){ b.onclick=function(){ startRelease(parseInt(b.dataset.rp,10)); renderReleasePatternBar(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }; });
-}
+  var rpr=document.getElementById('relProgReset'); if(rpr) rpr.onclick=function(){ var d=loadRelProg(); delete d[scope]; try{ localStorage.setItem('cignal_rel_prog', JSON.stringify(d)); }catch(e){} renderReleasePatternBar(); try{ showToast && showToast('この科目の記録をリセットしました'); }catch(e){} }; }
 function gradeRelease(){
   var rs=releaseState, correct=0;
   rs.items.forEach(function(item,i){ var order=item.order||[]; var cp=order.indexOf(item.it.correct); if(rs.answers[i]===cp) correct++; });
@@ -7737,7 +7738,33 @@ var MATOME_SCI = [
   {g:'種子をつくらない植物', type:'choice', q:'コケ植物の仮根（かこん）のはたらきは？', c:['水を吸う','体を地面に固定する','光を集める','花を作る'], a:1, e:'仮根は体を固定する。水は体全体で吸収。'},
   {g:'種子をつくらない植物', type:'choice', q:'コケ植物は、水や養分を体のどこからとり入れる？', c:['根から','体の表面全体から','葉脈から','花から'], a:1, e:'体の表面全体から吸収する。'},
   {g:'種子をつくらない植物', type:'choice', q:'シダ植物・コケ植物の両方にあてはまるのは？', c:['胞子でなかまをふやす','種子でふえる','子房がある','花がさく'], a:0, e:'どちらも胞子でふえる。'},
-  {g:'種子をつくらない植物', type:'choice', q:'シダ植物にあって、コケ植物にないものは？', c:['維管束（根・茎・葉の区別）','胞子','緑色のからだ','日かげを好む性質'], a:0, e:'シダには維管束があり根・茎・葉の区別がある。'}
+  {g:'種子をつくらない植物', type:'choice', q:'シダ植物にあって、コケ植物にないものは？', c:['維管束（根・茎・葉の区別）','胞子','緑色のからだ','日かげを好む性質'], a:0, e:'シダには維管束があり根・茎・葉の区別がある。'},
+  {g:'花のつくり', type:'choice', q:'花の一番外側にあって、つぼみを守るのは？', c:['がく','花びら','おしべ','めしべ'], a:0, e:'一番外側のがくがつぼみを守る。'},
+  {g:'花のつくり', type:'choice', q:'花を外側から順に正しく並べたものは？', c:['がく→花びら→おしべ→めしべ','めしべ→おしべ→花びら→がく','花びら→がく→めしべ→おしべ','おしべ→めしべ→がく→花びら'], a:0, e:'外→内：がく→花びら→おしべ→めしべ。'},
+  {g:'花のつくり', type:'choice', q:'アブラナの花びら（花弁）は何枚？', c:['4枚','5枚','6枚','たくさん'], a:0, e:'アブラナは4枚（十字形）。'},
+  {g:'花のつくり', type:'choice', q:'ツツジの花は合弁花・離弁花のどちら？', c:['合弁花','離弁花','単性花','裸花'], a:0, e:'花弁がくっつく→合弁花。'},
+  {g:'花のつくり', type:'choice', q:'エンドウ（マメ）の花は合弁花・離弁花のどちら？', c:['合弁花','離弁花','単性花','裸花'], a:1, e:'花弁が離れる→離弁花。'},
+  {g:'マツの花', type:'choice', q:'マツの雌花と雄花のつき方は？', c:['同じ花にある','別々の場所につく','雄花だけ','雌花だけ'], a:1, e:'マツは雌花と雄花が別々につく。'},
+  {g:'マツの花', type:'choice', q:'マツの2年前の雌花は成長して何になる？', c:['まつかさ（球果）','花びら','葉','根'], a:0, e:'受粉した雌花が成長してまつかさになる。'},
+  {g:'マツの花', type:'choice', q:'マツの花に「ない」ものは？', c:['花びらやがく','雌花','雄花','花粉'], a:0, e:'マツは裸子植物で花びらやがく、子房がない。'},
+  {g:'種子植物の分類', type:'choice', q:'タンポポの分類は？', c:['双子葉類','単子葉類','裸子植物','シダ植物'], a:0, e:'タンポポは双子葉類。'},
+  {g:'種子植物の分類', type:'choice', q:'ヒマワリの分類は？', c:['双子葉類','単子葉類','裸子植物','シダ植物'], a:0, e:'ヒマワリは双子葉類。'},
+  {g:'種子植物の分類', type:'choice', q:'ユリの分類は？', c:['双子葉類','単子葉類','裸子植物','シダ植物'], a:1, e:'ユリは単子葉類。'},
+  {g:'種子植物の分類', type:'choice', q:'トウモロコシの分類は？', c:['双子葉類','単子葉類','裸子植物','シダ植物'], a:1, e:'トウモロコシは単子葉類。'},
+  {g:'種子植物の分類', type:'choice', q:'アサガオの分類は？', c:['双子葉類','単子葉類','裸子植物','シダ植物'], a:0, e:'アサガオは双子葉類。'},
+  {g:'種子植物の分類', type:'choice', q:'スギは何植物？', c:['被子植物','裸子（らし）植物','シダ植物','コケ植物'], a:1, e:'スギは裸子植物。'},
+  {g:'種子植物の分類', type:'choice', q:'アブラナは被子植物・裸子植物のどちら？', c:['被子（ひし）植物','裸子植物','シダ植物','コケ植物'], a:0, e:'アブラナは子房があり被子植物。'},
+  {g:'葉と根', type:'choice', q:'双子葉類の子葉は何枚？', c:['1枚','2枚','3枚','たくさん'], a:1, e:'双子葉類は子葉2枚。'},
+  {g:'葉と根', type:'choice', q:'単子葉類の子葉は何枚？', c:['1枚','2枚','3枚','たくさん'], a:0, e:'単子葉類は子葉1枚。'},
+  {g:'葉と根', type:'choice', q:'根の先近くにある、水を吸う細い毛を何という？', c:['側根','主根','仮根','根毛（こんもう）'], a:3, e:'根毛。水や養分を吸う。'},
+  {g:'葉と根', type:'choice', q:'根毛があると、何が有利になる？', c:['水や養分を吸う表面積が増える','光を多く受ける','花が早く咲く','背が高くなる'], a:0, e:'表面積が増え効率よく吸収できる。'},
+  {g:'種子をつくらない植物', type:'choice', q:'イヌワラビ（シダ）に、根・茎・葉の区別は？', c:['ある','ない','根だけある','葉だけある'], a:0, e:'シダには根・茎・葉の区別がある。'},
+  {g:'種子をつくらない植物', type:'choice', q:'胞子（ほうし）は種子とくらべてどう？', c:['とても大きい','とても小さい','かたい殻がある','色がついている'], a:1, e:'胞子は種子よりずっと小さい粉のような粒。'},
+  {g:'種子をつくらない植物', type:'choice', q:'ゼニゴケ・スギゴケは何植物？', c:['シダ植物','コケ植物','裸子植物','被子植物'], a:1, e:'ゼニゴケ・スギゴケはコケ植物。'},
+  {g:'双眼実体顕微鏡', type:'choice', q:'（ふつうの）顕微鏡で、対物レンズ40倍・接眼レンズ10倍のときの倍率は？', c:['50倍','400倍','410倍','4倍'], a:1, e:'40×10＝400倍。'},
+  {g:'双眼実体顕微鏡', type:'choice', q:'顕微鏡で観察するとき、最初に使う倍率は？', c:['低い倍率','高い倍率','中くらい','関係ない'], a:0, e:'まず低倍率で全体を見てから高倍率に。'},
+  {g:'双眼実体顕微鏡', type:'choice', q:'ルーペで太陽を見るのは？', c:['見てはいけない','見てよい','倍率次第','曇りならよい'], a:0, e:'ルーペで太陽を見ると目を痛める。ぜったいにいけない。'},
+  {g:'双眼実体顕微鏡', type:'choice', q:'スケッチの正しいかき方は？', c:['細い1本の線で描く','影をつけてぼかす','色をぬる','太い線を重ねる'], a:0, e:'細い1本の線でくっきり描く。'}
 ];
 var MATOME = { math: MATOME_MATH, jp: MATOME_JP, sci: MATOME_SCI };
 // 数学：章末問題（学びをたしかめよう）を数字違いで自動生成。パターンごとに別問題
@@ -7814,16 +7841,17 @@ function buildMatomeMath(p){
   mc('素数','次の自然数の中から、素数を選びなさい。', ''+pr, cset.map(String), '素数＝1とその数のほかに約数がない数。');
   return Q;
 }
-function getMatomeList(ms){ return (ms.subj==='math') ? buildMatomeMath(ms.mathPat||0) : MATOME[ms.subj]; }
-var matomeState={ subj:'math', mathPat:0, mode:'full', fix:{}, answers:{}, graded:false, score:0, correct:0, rewarded:false };
+function getSciSet(s){ return mockSeededShuffle(MATOME_SCI, 701 + (s|0)).slice(0,20); }
+function getMatomeList(ms){ return (ms.subj==='math') ? buildMatomeMath(ms.mathPat||0) : (ms.subj==='sci') ? getSciSet(ms.sciPat||0) : MATOME[ms.subj]; }
+var matomeState={ subj:'math', mathPat:0, sciPat:0, mode:'full', fix:{}, answers:{}, graded:false, score:0, correct:0, rewarded:false };
 function matomeNorm(s){ return (s||'').replace(/[\s　]/g,'').replace(/[、。「」『』（）()・/／]/g,'').toLowerCase(); }
 function matomeCheck(it, ans){
   if(it.type==='write'){ var n=matomeNorm(ans); if(!n) return false; return (it.accept||[]).some(function(a){ return matomeNorm(a)===n; }); }
   return ans===it.a;
 }
-function startMatome(){ matomeState={ subj:matomeState.subj||'math', mathPat:matomeState.mathPat||0, mode:matomeState.mode||'full', fix:{}, answers:{}, graded:false, score:0, correct:0, rewarded:false }; renderMatome(); }
-function setMatomeSubj(s){ matomeState={ subj:s, mathPat:matomeState.mathPat||0, mode:matomeState.mode||'full', fix:{}, answers:{}, graded:false, score:0, correct:0, rewarded:false }; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
-function setMatomeMathPat(p){ matomeState.mathPat=p; matomeState.fix={}; matomeState.answers={}; matomeState.graded=false; matomeState.score=0; matomeState.correct=0; matomeState.rewarded=false; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
+function startMatome(){ matomeState={ subj:matomeState.subj||'math', mathPat:matomeState.mathPat||0, sciPat:matomeState.sciPat||0, mode:matomeState.mode||'full', fix:{}, answers:{}, graded:false, score:0, correct:0, rewarded:false }; renderMatome(); }
+function setMatomeSubj(s){ matomeState={ subj:s, mathPat:matomeState.mathPat||0, sciPat:matomeState.sciPat||0, mode:matomeState.mode||'full', fix:{}, answers:{}, graded:false, score:0, correct:0, rewarded:false }; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
+function setMatomePat(p){ if(matomeState.subj==='sci') matomeState.sciPat=p; else matomeState.mathPat=p; matomeState.fix={}; matomeState.answers={}; matomeState.graded=false; matomeState.score=0; matomeState.correct=0; matomeState.rewarded=false; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
 function setMatomeMode(m){ matomeState.mode=m; matomeState.fix={}; matomeState.answers={}; matomeState.graded=false; matomeState.score=0; matomeState.correct=0; matomeState.rewarded=false; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
 function gradeMatome(){
   var ms=matomeState, list=getMatomeList(ms), c=0;
@@ -7842,7 +7870,8 @@ function renderMatome(){
   var scoreV = fix ? (list.length?Math.round(solvedCount/list.length*100):0) : (ms.graded?ms.score:'／100');
   var html='';
   html+='<div class="rel-modes" style="margin-bottom:10px;max-width:780px;flex-wrap:wrap"><button class="rel-mode'+(math?' on':'')+'" data-msub="math">📐 数学</button><button class="rel-mode'+(jp?' on':'')+'" data-msub="jp">📖 国語</button><button class="rel-mode'+(sci?' on':'')+'" data-msub="sci">🔬 理科</button></div>';
-  if(math){ html+='<div class="test-set-bar" style="border:none;background:transparent;padding:2px 0 8px;justify-content:center"><span class="lv-label">パターン</span>'; for(var pp=0;pp<MATOME_MATH_PATTERNS;pp++){ html+='<button class="test-set-btn'+(pp===(ms.mathPat||0)?' active':'')+'" data-mpat="'+pp+'">'+(pp+1)+'</button>'; } html+='</div>'; }
+  var nPat = math?MATOME_MATH_PATTERNS:(sci?6:0); var curPat = math?(ms.mathPat||0):(ms.sciPat||0);
+  if(nPat){ html+='<div class="test-set-bar" style="border:none;background:transparent;padding:2px 0 8px;justify-content:center"><span class="lv-label">'+(sci?'セット':'パターン')+'</span>'; for(var pp=0;pp<nPat;pp++){ html+='<button class="test-set-btn'+(pp===curPat?' active':'')+'" data-mpat="'+pp+'">'+(pp+1)+'</button>'; } html+='</div>'; }
   html+='<div class="rel-modes" style="margin-bottom:12px;max-width:780px;flex-wrap:wrap"><button class="rel-mode'+(!fix?' on':'')+'" data-mmode="full">📝 完全テスト</button><button class="rel-mode'+(fix?' on fix':'')+'" data-mmode="fix">✏️ 違うぞモード（直して100点）</button></div>';
   html+='<div class="exam-paper">';
   html+='<div class="exam-head"><div><div class="exam-title">📐 前期中間 最終まとめ</div><div class="exam-sub">'+escapeHtml(subjName)+' ・ 全'+list.length+'問 ・ '+(fix?'まちがえたらヒントを見て直そう（直して100点）':'記号や言葉で答えなさい')+'</div></div><div class="exam-score"><span class="lbl">得点</span><span class="v">'+scoreV+'</span></div></div>';
@@ -7897,7 +7926,7 @@ function renderMatome(){
   main.innerHTML=html; _rubyMode='std';
   main.querySelectorAll('.rel-mode[data-msub]').forEach(function(b){ b.onclick=function(){ setMatomeSubj(b.dataset.msub); }; });
   main.querySelectorAll('.rel-mode[data-mmode]').forEach(function(b){ b.onclick=function(){ setMatomeMode(b.dataset.mmode); }; });
-  main.querySelectorAll('.test-set-btn[data-mpat]').forEach(function(b){ b.onclick=function(){ setMatomeMathPat(parseInt(b.dataset.mpat,10)); }; });
+  main.querySelectorAll('.test-set-btn[data-mpat]').forEach(function(b){ b.onclick=function(){ setMatomePat(parseInt(b.dataset.mpat,10)); }; });
   if(fix){
     main.querySelectorAll('.choice-pill[data-mq]').forEach(function(b){ b.onclick=function(){
       var qi=parseInt(b.dataset.mq,10); if(ms.fix[qi]&&ms.fix[qi].solved) return;

@@ -809,6 +809,8 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
 .exam-qbody{flex:1;min-width:0}
 .exam-qtext{font-size:14px;line-height:1.8}
 .exam-ans{margin-top:8px}
+.exam-fig{text-align:center;margin:8px 0 6px;padding:8px;background:#fff;border:1px solid #ddd6c4;border-radius:6px}
+.exam-fig svg{vertical-align:middle;max-width:100%;height:auto}
 /* 用紙内の解答ウィジェットを白系に */
 .exam-paper input[type="text"]{background:#fff;border:1px solid #999;color:#1b1b1b;border-radius:3px;padding:6px 9px;font-size:13px;width:100%;max-width:280px}
 .exam-paper input[type="text"]:focus{outline:none;border-color:#b8860b}
@@ -3684,7 +3686,7 @@ function switchMode(mode){
   } else if(mode === 'matome'){
     hdrRight.innerHTML = '<div class="hdr-stat"><b id="matomeScore">―</b><span>得点</span></div>';
     eyebrow.textContent = '前期中間 / 最終まとめ';
-    title.innerHTML = '最終まとめ<em>数学・国語（書き込み式）</em>';
+    title.innerHTML = '最終まとめ<em>数学・国語・理科（図解つき）</em>';
     startMatome();
   }
   // 勉強順ナビが有効なら現在ステップを同期
@@ -7689,7 +7691,53 @@ var MATOME_JP = [
   {g:'詩・表現', type:'choice', q:'「風がささやく。」の表現技法は？', c:['擬人法','直喩','隠喩','倒置'], a:0, e:'人でない風を人のように→擬人法。'},
   {g:'詩・表現', type:'write', q:'「雪のように白い。」のような、「ように」を使ったたとえを何といいますか。', accept:['直喩','明喩','ちょくゆ'], e:'「ように」でたとえる→直喩（明喩）。'}
 ];
-var MATOME = { math: MATOME_MATH, jp: MATOME_JP };
+// 理科：図解（インラインSVG）入りの植物のなかま分け最終まとめ
+var SVG_FLOWER = '<svg viewBox="0 0 300 215" style="max-width:260px;width:100%"><g font-family="sans-serif" font-size="13"><ellipse cx="150" cy="120" rx="68" ry="78" fill="#fde6ef" stroke="#d98bb0"/><rect x="146" y="72" width="8" height="58" fill="#8bbf8b"/><circle cx="150" cy="68" r="10" fill="#e57aa0"/><ellipse cx="150" cy="150" rx="22" ry="27" fill="#cfeccf" stroke="#5a9a5a"/><circle cx="150" cy="150" r="6" fill="#fff" stroke="#5a9a5a"/><rect x="108" y="96" width="5" height="44" fill="#caa24b"/><ellipse cx="110" cy="91" rx="9" ry="6" fill="#e0b84e"/><rect x="187" y="96" width="5" height="44" fill="#caa24b"/><ellipse cx="190" cy="91" rx="9" ry="6" fill="#e0b84e"/><line x1="159" y1="66" x2="235" y2="38" stroke="#555"/><text x="240" y="43" font-weight="bold">A</text><line x1="171" y1="150" x2="244" y2="158" stroke="#555"/><text x="249" y="163" font-weight="bold">B</text><line x1="150" y1="150" x2="58" y2="182" stroke="#555"/><text x="44" y="187" font-weight="bold">C</text><line x1="110" y1="88" x2="52" y2="58" stroke="#555"/><text x="40" y="58" font-weight="bold">D</text></g></svg>';
+var SVG_TREE = '<svg viewBox="0 0 400 215" style="max-width:380px;width:100%"><g font-family="sans-serif" font-size="11" fill="#1b1b1b" text-anchor="middle"><line x1="200" y1="34" x2="110" y2="60" stroke="#999"/><line x1="200" y1="34" x2="300" y2="60" stroke="#999"/><line x1="110" y1="80" x2="70" y2="110" stroke="#999"/><line x1="110" y1="80" x2="166" y2="110" stroke="#999"/><line x1="70" y1="130" x2="45" y2="160" stroke="#999"/><line x1="70" y1="130" x2="127" y2="160" stroke="#999"/><rect x="150" y="16" width="100" height="20" rx="4" fill="#eef" stroke="#88a"/><text x="200" y="30">観察した植物</text><rect x="62" y="60" width="96" height="20" rx="4" fill="#def5f5" stroke="#6aa"/><text x="110" y="74">①種子をつくる</text><rect x="240" y="60" width="120" height="20" rx="4" fill="#fdeaea" stroke="#c88"/><text x="300" y="74">②種子をつくらない</text><rect x="24" y="110" width="92" height="20" rx="4" fill="#def5f5" stroke="#6aa"/><text x="70" y="124">③被子植物</text><rect x="120" y="110" width="92" height="20" rx="4" fill="#fdf6da" stroke="#cb6"/><text x="166" y="124">④裸子植物(マツ)</text><rect x="6" y="160" width="78" height="20" rx="4" fill="#def5f5" stroke="#6aa"/><text x="45" y="174">⑤双子葉類</text><rect x="88" y="160" width="78" height="20" rx="4" fill="#def5f5" stroke="#6aa"/><text x="127" y="174">⑥単子葉類</text><text x="40" y="205">アサガオ</text><text x="98" y="205">サクラ</text><text x="150" y="205">イネ</text><text x="225" y="205">マツ</text><text x="320" y="205">イヌワラビ</text></g></svg>';
+var SVG_LEAFROOT = '<svg viewBox="0 0 320 195" style="max-width:300px;width:100%"><g font-family="sans-serif" font-size="11" fill="#1b1b1b" text-anchor="middle"><text x="80" y="14" font-weight="bold">双子葉類</text><text x="240" y="14" font-weight="bold">単子葉類</text><ellipse cx="80" cy="50" rx="34" ry="21" fill="#e1f0e1" stroke="#5a9a5a"/><path d="M50 50 H110 M80 31 V69 M63 39 Q80 50 97 39 M63 61 Q80 50 97 61" stroke="#5a9a5a" fill="none"/><text x="123" y="54" font-weight="bold">C</text><ellipse cx="240" cy="50" rx="34" ry="21" fill="#e1f0e1" stroke="#5a9a5a"/><path d="M210 44 H270 M210 50 H270 M210 56 H270" stroke="#5a9a5a" fill="none"/><text x="283" y="54" font-weight="bold">D</text><path d="M80 98 V158 M80 118 L60 138 M80 128 L100 148 M80 112 L63 122 M80 140 L97 153" stroke="#9a7a4a" fill="none" stroke-width="2"/><text x="80" y="176">主根と側根</text><path d="M240 98 V106 M240 106 L218 158 M240 106 L230 160 M240 106 L240 160 M240 106 L250 160 M240 106 L262 158" stroke="#9a7a4a" fill="none" stroke-width="2"/><text x="240" y="176">ひげ根</text></g></svg>';
+var MATOME_SCI = [
+  {g:'双眼実体顕微鏡', type:'choice', q:'双眼実体顕微鏡で、両目でのぞく上のレンズを何という？', c:['接眼レンズ','対物レンズ','視度調節リング','ステージ'], a:0, e:'目に近い上が接眼レンズ。'},
+  {g:'双眼実体顕微鏡', type:'choice', q:'観察するものをのせる台を何という？', c:['鏡筒','ステージ','粗動ねじ','やく'], a:1, e:'観察物をのせる台＝ステージ。'},
+  {g:'双眼実体顕微鏡', type:'choice', q:'大きく動かして、まずおおよそのピントを合わせるねじは？', c:['微動ねじ','視度調節リング','粗動ねじ','しぼり'], a:2, e:'粗動（そどう）ねじで近づける。'},
+  {g:'双眼実体顕微鏡', type:'choice', q:'細かく動かして、しっかりピントを合わせるねじは？', c:['粗動ねじ','視度調節リング','微動ねじ','接眼レンズ'], a:2, e:'微動（びどう）ねじで仕上げる。'},
+  {g:'双眼実体顕微鏡', type:'choice', q:'左目だけでのぞき、左右のピントの差を合わせる部分は？', c:['視度調節リング','粗動ねじ','微動ねじ','鏡筒'], a:0, e:'視度調節リングで左右の差を調節。'},
+  {g:'双眼実体顕微鏡', type:'choice', q:'双眼実体顕微鏡の特徴として正しいのは？', c:['プレパラートが必要','立体的に観察できる','像が上下左右逆になる','水中の生物専用'], a:1, e:'プレパラート不要で、ものを立体的に見られる。'},
+  {g:'双眼実体顕微鏡', type:'choice', q:'両目でのぞき、視野が重なって見えるように調節するのは何の間隔？', c:['対物レンズ','接眼レンズ','ステージ','ねじ'], a:1, e:'接眼レンズの間隔を目の幅に合わせる。'},
+  {g:'花のつくり', type:'choice', svg:SVG_FLOWER, q:'図のA（めしべの先）を何という？', c:['柱頭（ちゅうとう）','やく','子房（しぼう）','胚珠（はいしゅ）'], a:0, e:'めしべの先＝柱頭。花粉がつく。'},
+  {g:'花のつくり', type:'choice', svg:SVG_FLOWER, q:'図のB（めしべの根もとのふくらみ）を何という？', c:['やく','子房（しぼう）','胚珠（はいしゅ）','柱頭'], a:1, e:'めしべの根もと＝子房。'},
+  {g:'花のつくり', type:'choice', svg:SVG_FLOWER, q:'図のC（子房の中の小さな粒）を何という？', c:['花粉','胚珠（はいしゅ）','やく','がく'], a:1, e:'子房の中の粒＝胚珠。'},
+  {g:'花のつくり', type:'choice', svg:SVG_FLOWER, q:'図のD（おしべの先の、花粉が入った袋）を何という？', c:['柱頭','子房','やく','胚珠'], a:2, e:'おしべの先＝やく。花粉ができる。'},
+  {g:'花のつくり', type:'choice', q:'受粉のあと、子房（しぼう）は何になる？', c:['種子','果実','花びら','根'], a:1, e:'子房→果実。'},
+  {g:'花のつくり', type:'choice', q:'受粉のあと、胚珠（はいしゅ）は何になる？', c:['果実','種子','がく','茎'], a:1, e:'胚珠→種子。'},
+  {g:'花のつくり', type:'choice', q:'胚珠が子房に包まれている植物を何という？', c:['被子（ひし）植物','裸子（らし）植物','シダ植物','コケ植物'], a:0, e:'子房に包まれる→被子植物。'},
+  {g:'マツの花', type:'choice', q:'マツのように子房がなく、胚珠がむき出しの植物を何という？', c:['被子植物','裸子（らし）植物','シダ植物','コケ植物'], a:1, e:'胚珠がむき出し→裸子植物。'},
+  {g:'マツの花', type:'choice', q:'マツの花のつくりとして正しいのは？', c:['雌花と雄花がある','花びらがある','子房がある','みつが出る'], a:0, e:'マツは雌花と雄花が別々につく。'},
+  {g:'マツの花', type:'choice', q:'マツの花粉はどうやって運ばれる？', c:['虫','風','水','鳥'], a:1, e:'マツは風で花粉が運ばれる（風媒花）。'},
+  {g:'マツの花', type:'choice', q:'裸子植物を、マツ以外で正しく選びなさい。', c:['スギ・イチョウ','サクラ・タンポポ','イネ・ムギ','ワラビ・ゼニゴケ'], a:0, e:'スギ・イチョウも裸子植物。'},
+  {g:'マツの花', type:'choice', q:'アブラナもマツも種子でふえる。種子をつくる植物をまとめて何という？', c:['種子植物','胞子植物','被子植物','裸子植物'], a:0, e:'種子をつくる→種子植物。'},
+  {g:'なかま分け（図16）', type:'choice', svg:SVG_TREE, q:'樹形図の①にあてはまるのは？', c:['種子をつくる','種子をつくらない','子房がある','子葉が2枚'], a:0, e:'①は「種子をつくる」なかま。'},
+  {g:'なかま分け（図16）', type:'choice', svg:SVG_TREE, q:'樹形図の②にあてはまるのは？', c:['種子をつくる','種子をつくらない','子房がある','子葉が1枚'], a:1, e:'②はシダ・コケ＝種子をつくらない。'},
+  {g:'なかま分け（図16）', type:'choice', svg:SVG_TREE, q:'③（被子植物）の特徴にあてはまるのは？', c:['胚珠が子房に包まれている','子房がなく胚珠はむき出し','子葉は1枚','種子をつくらない'], a:0, e:'被子植物＝胚珠が子房に包まれる。'},
+  {g:'なかま分け（図16）', type:'choice', svg:SVG_TREE, q:'④（裸子植物＝マツ）の特徴にあてはまるのは？', c:['胚珠が子房に包まれている','子房がなく胚珠はむき出し','子葉は2枚','種子をつくらない'], a:1, e:'裸子植物＝子房がなく胚珠むき出し。'},
+  {g:'なかま分け（図16）', type:'choice', svg:SVG_TREE, q:'⑤（双子葉類）の特徴にあてはまるのは？', c:['子葉は2枚','子葉は1枚','子房がない','種子をつくらない'], a:0, e:'双子葉類＝子葉2枚。'},
+  {g:'なかま分け（図16）', type:'choice', svg:SVG_TREE, q:'⑥（単子葉類）の特徴にあてはまるのは？', c:['子葉は2枚','子葉は1枚','子房がない','花がさかない'], a:1, e:'単子葉類＝子葉1枚。'},
+  {g:'なかま分け（図16）', type:'choice', q:'イヌワラビは、どのなかまか？', c:['シダ植物','裸子植物','双子葉類','単子葉類'], a:0, e:'イヌワラビはシダ植物。'},
+  {g:'なかま分け（図16）', type:'choice', q:'イネは双子葉類・単子葉類のどちらか？', c:['双子葉類','単子葉類','裸子植物','シダ植物'], a:1, e:'イネは単子葉類。'},
+  {g:'なかま分け（図16）', type:'choice', q:'アサガオのように、花弁（花びら）がくっついている花を何という？', c:['合弁花（ごうべんか）','離弁花（りべんか）','単性花','裸花'], a:0, e:'花弁がくっつく→合弁花。'},
+  {g:'なかま分け（図16）', type:'choice', q:'サクラのように、花弁が1枚ずつ離れている花を何という？', c:['合弁花','離弁花（りべんか）','単性花','裸花'], a:1, e:'花弁が離れる→離弁花。'},
+  {g:'葉と根（図10）', type:'choice', svg:SVG_LEAFROOT, q:'図のCのような、網目状の葉脈（ようみゃく）を何という？', c:['網状脈（もうじょうみゃく）','平行脈','放射脈','格子脈'], a:0, e:'網目状＝網状脈（双子葉類）。'},
+  {g:'葉と根（図10）', type:'choice', svg:SVG_LEAFROOT, q:'図のDのような、平行に走る葉脈を何という？', c:['網状脈','平行脈（へいこうみゃく）','放射脈','格子脈'], a:1, e:'平行＝平行脈（単子葉類）。'},
+  {g:'葉と根（図10）', type:'choice', svg:SVG_LEAFROOT, q:'主根と側根（そっこん）をもつのはどちら？', c:['双子葉類','単子葉類','裸子植物','コケ植物'], a:0, e:'双子葉類は主根と側根。'},
+  {g:'葉と根（図10）', type:'choice', svg:SVG_LEAFROOT, q:'ひげ根をもつのはどちら？', c:['双子葉類','単子葉類','裸子植物','シダ植物'], a:1, e:'単子葉類はひげ根。'},
+  {g:'種子をつくらない植物', type:'choice', q:'シダ植物・コケ植物は何でふえる？', c:['種子','胞子（ほうし）','球根','根'], a:1, e:'胞子でふえる。'},
+  {g:'種子をつくらない植物', type:'choice', q:'イヌワラビ（シダ）の胞子のうがあるのはどこ？', c:['葉の裏','花の中','根の先','茎の中'], a:0, e:'シダは葉の裏に胞子のう。'},
+  {g:'種子をつくらない植物', type:'choice', q:'コケ植物にないつくりは？', c:['維管束（いかんそく）','胞子','仮根（かこん）','葉のような部分'], a:0, e:'コケ植物には維管束がない。'},
+  {g:'種子をつくらない植物', type:'choice', q:'コケ植物の仮根（かこん）のはたらきは？', c:['水を吸う','体を地面に固定する','光を集める','花を作る'], a:1, e:'仮根は体を固定する。水は体全体で吸収。'},
+  {g:'種子をつくらない植物', type:'choice', q:'コケ植物は、水や養分を体のどこからとり入れる？', c:['根から','体の表面全体から','葉脈から','花から'], a:1, e:'体の表面全体から吸収する。'},
+  {g:'種子をつくらない植物', type:'choice', q:'シダ植物・コケ植物の両方にあてはまるのは？', c:['胞子でなかまをふやす','種子でふえる','子房がある','花がさく'], a:0, e:'どちらも胞子でふえる。'},
+  {g:'種子をつくらない植物', type:'choice', q:'シダ植物にあって、コケ植物にないものは？', c:['維管束（根・茎・葉の区別）','胞子','緑色のからだ','日かげを好む性質'], a:0, e:'シダには維管束があり根・茎・葉の区別がある。'}
+];
+var MATOME = { math: MATOME_MATH, jp: MATOME_JP, sci: MATOME_SCI };
 var matomeState={ subj:'math', answers:{}, graded:false, score:0, correct:0, rewarded:false };
 function matomeNorm(s){ return (s||'').replace(/[\s　]/g,'').replace(/[、。「」『』（）()・/／]/g,'').toLowerCase(); }
 function matomeCheck(it, ans){
@@ -7708,10 +7756,10 @@ function gradeMatome(){
 }
 function renderMatome(){
   var main=document.getElementById('main'); var ms=matomeState; var list=MATOME[ms.subj]; var KANA=['ア','イ','ウ','エ','オ'];
-  var jp=(ms.subj==='jp'); _rubyMode = jp?'jp':'std';
-  var subjName = jp ? '国語（言葉のきまり）' : '数学（正の数・負の数）';
+  var jp=(ms.subj==='jp'), sci=(ms.subj==='sci'), math=(ms.subj==='math'); _rubyMode = jp?'jp':'std';
+  var subjName = jp ? '国語（言葉のきまり）' : sci ? '理科（植物のなかま分け）' : '数学（正の数・負の数）';
   var html='';
-  html+='<div class="rel-modes" style="margin-bottom:12px;max-width:780px"><button class="rel-mode'+(!jp?' on':'')+'" data-msub="math">📐 数学</button><button class="rel-mode'+(jp?' on':'')+'" data-msub="jp">📖 国語</button></div>';
+  html+='<div class="rel-modes" style="margin-bottom:12px;max-width:780px;flex-wrap:wrap"><button class="rel-mode'+(math?' on':'')+'" data-msub="math">📐 数学</button><button class="rel-mode'+(jp?' on':'')+'" data-msub="jp">📖 国語</button><button class="rel-mode'+(sci?' on':'')+'" data-msub="sci">🔬 理科</button></div>';
   html+='<div class="exam-paper">';
   html+='<div class="exam-head"><div><div class="exam-title">📐 前期中間 最終まとめ</div><div class="exam-sub">'+escapeHtml(subjName)+' ・ 全'+list.length+'問 ・ 記号や言葉で答えなさい</div></div><div class="exam-score"><span class="lbl">得点</span><span class="v">'+(ms.graded?ms.score:'／100')+'</span></div></div>';
   html+='<div class="exam-name"><div class="field">名前 <span class="line nameline"></span></div><div class="field">組 <span class="line"></span></div></div>';
@@ -7719,8 +7767,8 @@ function renderMatome(){
   list.forEach(function(it,i){
     if(it.g!==lastG){ if(lastG!==null) html+='</div>'; daimon++; html+='<div class="exam-daimon"><div class="exam-daimon-head"><span>大問 '+daimon+'　'+escapeHtml(it.g)+'</span></div>'; lastG=it.g; }
     qno++;
-    var qtext = jp ? furigana(escapeHtml(it.q)) : fracText(it.q);
-    html+='<div class="exam-q"><div class="exam-qno">('+qno+')</div><div class="exam-qbody"><div class="exam-qtext">'+qtext+'</div>';
+    var qtext = math ? fracText(it.q) : (jp ? furigana(escapeHtml(it.q)) : escapeHtml(it.q));
+    html+='<div class="exam-q"><div class="exam-qno">('+qno+')</div><div class="exam-qbody"><div class="exam-qtext">'+qtext+'</div>'+(it.svg?'<div class="exam-fig">'+it.svg+'</div>':'');
     if(it.type==='write'){
       var v=ms.answers[i]||''; var okw=ms.graded && matomeCheck(it, v);
       html+='<div class="exam-ans"><input type="text" data-mw="'+i+'" value="'+escapeHtml(v)+'"'+(ms.graded?' disabled':'')+' placeholder="ここに書く"></div>';
@@ -7731,7 +7779,7 @@ function renderMatome(){
         var cls='choice-pill';
         if(ms.answers[i]===p) cls+=' sel';
         if(ms.graded){ if(p===it.a) cls+=' gr-correct'; else if(ms.answers[i]===p) cls+=' gr-wrong'; }
-        var ctxt = jp ? escapeHtml(it.c[p]) : fracText(it.c[p]);
+        var ctxt = math ? fracText(it.c[p]) : escapeHtml(it.c[p]);
         html+='<button class="'+cls+'" data-mq="'+i+'" data-c="'+p+'"'+(ms.graded?' disabled':'')+'>'+KANA[p]+'. '+ctxt+'</button>';
       }
       html+='</div>';

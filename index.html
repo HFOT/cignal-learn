@@ -7862,7 +7862,7 @@ function gradeMatome(){
   renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){}
 }
 function renderMatome(){
-  var main=document.getElementById('main'); var ms=matomeState; var list=getMatomeList(ms); var KANA=['ア','イ','ウ','エ','オ'];
+  var main=document.getElementById('main'); var ms=matomeState; if(ms.weak){ renderMatomeWeak(); return; } var list=getMatomeList(ms); var KANA=['ア','イ','ウ','エ','オ'];
   var jp=(ms.subj==='jp'), sci=(ms.subj==='sci'), math=(ms.subj==='math'); _rubyMode = jp?'jp':'std';
   var fix=(ms.mode==='fix');
   var subjName = jp ? '国語（言葉のきまり）' : sci ? '理科（植物のなかま分け）' : '数学（正の数・負の数 章末）';
@@ -7918,9 +7918,11 @@ function renderMatome(){
     }
   } else if(!ms.graded){ html+='<div style="text-align:center;margin-top:22px"><button class="exam-submit" id="matomeGrade">⚡ 採点する</button><div style="font-size:12px;color:#666;margin-top:8px">全'+list.length+'問。本番のつもりで！'+(jp?'（書き込みは漢字でもひらがなでもOK）':'')+'</div></div>'; }
   else {
+    var wrongN=0; list.forEach(function(it,i){ if(!matomeCheck(it, ms.answers[i])) wrongN++; });
     html+='<div style="text-align:center;margin-top:22px"><div style="font-size:20px;font-weight:800;margin-bottom:6px">得点 '+ms.score+' 点（正解 '+ms.correct+' / '+list.length+'）</div>';
-    html+=(ms.score===100?'<div style="font-size:15px;color:#0aa6a6;font-weight:800;margin-bottom:8px">💯 パーフェクト！本番もこの調子！</div>':'<div style="font-size:13px;color:#666;margin-bottom:8px">×の問題の解説を読んで、もう一回！または「違うぞモード」で直して100点！</div>');
-    html+='<button class="exam-submit" id="matomeRetry">🔁 もう一回</button></div>';
+    if(ms.score===100){ html+='<div style="font-size:15px;color:#0aa6a6;font-weight:800;margin-bottom:8px">💯 パーフェクト！本番もこの調子！</div><button class="exam-submit" id="matomeRetry">🔁 もう一回</button>'; }
+    else { html+='<div style="font-size:13px;color:#666;margin-bottom:8px">まちがえた問題だけ やり直して、全問正解（100点）にしよう！</div><button class="exam-submit" id="matomeWeakBtn" style="background:linear-gradient(135deg,#ff8f3d,#ff3d77)">💪 まちがいだけ やり直す（'+wrongN+'問）</button><div style="margin-top:8px"><button class="exam-submit" id="matomeRetry" style="background:#888">🔁 最初からもう一回</button></div>'; }
+    html+='</div>';
   }
   html+='</div>';
   main.innerHTML=html; _rubyMode='std';
@@ -7947,7 +7949,68 @@ function renderMatome(){
     var gb=document.getElementById('matomeGrade'); if(gb) gb.onclick=gradeMatome;
   } else {
     var rb=document.getElementById('matomeRetry'); if(rb) rb.onclick=startMatome;
+    var wb=document.getElementById('matomeWeakBtn'); if(wb) wb.onclick=function(){ var wr=[]; list.forEach(function(it,i){ if(!matomeCheck(it, ms.answers[i])) wr.push(it); }); startMatomeWeak(wr); };
   }
+}
+// ===== 最終まとめ：まちがいだけ やり直す（弱点なんてないモード方式・ラウンドで減らす）=====
+function matomeWeakCorrect(wi, ans){ if(wi.it.type==='write'){ return matomeCheck(wi.it, ans); } return ans === (wi.order? wi.order.indexOf(wi.it.a) : wi.it.a); }
+function startMatomeWeak(items){ if(!items||!items.length) return; matomeState.weak={ items: items.map(function(it){ return { it:it, order:(it.type!=='write'?_finOrder(it.c.length):null) }; }), answers:{}, judged:false, round:1, startCount:items.length, rewarded:false }; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
+function judgeMatomeWeak(){ matomeState.weak.judged=true; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
+function matomeWeakNext(){ var w=matomeState.weak, remain=[]; w.items.forEach(function(wi,i){ if(!matomeWeakCorrect(wi, w.answers[i])){ remain.push({ it:wi.it, order:(wi.it.type!=='write'?_finOrder(wi.it.c.length):null) }); } }); w.items=remain; w.answers={}; w.judged=false; w.round++; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
+function exitMatomeWeak(){ matomeState.weak=null; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
+function renderMatomeWeak(){
+  var main=document.getElementById('main'); var ms=matomeState; var w=ms.weak; var KANA=['ア','イ','ウ','エ','オ'];
+  var jp=(ms.subj==='jp'), math=(ms.subj==='math'); _rubyMode=jp?'jp':'std';
+  var total=w.items.length, correctNow=0;
+  w.items.forEach(function(wi,i){ if(matomeWeakCorrect(wi, w.answers[i])) correctNow++; });
+  var remaining=total-correctNow;
+  var html='<div class="exam-paper">';
+  html+='<div class="exam-head"><div><div class="exam-title">💪 まちがいだけ やり直す</div><div class="exam-sub">ラウンド'+w.round+' ・ のこり'+total+'問 ・ 全問正解で100点！</div></div><div class="exam-score"><span class="lbl">のこり</span><span class="v">'+(w.judged?remaining:total)+'</span></div></div>';
+  html+='<div style="margin:6px 0 12px;font-size:13px;color:#555">最初のまちがい <b>'+w.startCount+'問</b>。ぜんぶ正解で <b style="color:#ff3d77">パーフェクト</b>！</div>';
+  html+='<div class="exam-daimon"><div class="exam-daimon-head"><span>のこり '+total+'問</span></div>';
+  w.items.forEach(function(wi,i){
+    var it=wi.it; _rubyMode=jp?'jp':'std';
+    var qtext = math ? fracText(it.q) : (jp ? furigana(escapeHtml(it.q)) : escapeHtml(it.q));
+    html+='<div class="exam-q"><div class="exam-qno">('+(i+1)+')</div><div class="exam-qbody"><div class="exam-qtext">'+qtext+'</div>'+(it.svg?'<div class="exam-fig">'+it.svg+'</div>':'');
+    var ans=w.answers[i];
+    if(it.type==='write'){
+      var okw=w.judged && matomeCheck(it, ans||'');
+      html+='<div class="exam-ans"><input type="text" data-ww="'+i+'" value="'+escapeHtml(ans||'')+'"'+(w.judged?' disabled':'')+' placeholder="ここに書く"></div>';
+      if(w.judged){ html+='<div class="exam-mk" style="color:'+(okw?'#2e7d32':'#c62828')+'">'+(okw?'⭕ 正解！':'× 正解は「'+escapeHtml((it.accept||[''])[0])+'」')+(it.e?'　/　'+escapeHtml(it.e):'')+'</div>'; }
+    } else {
+      var order=wi.order||[]; var correctPos=order.indexOf(it.a);
+      html+='<div class="choice-row">';
+      for(var pos=0;pos<order.length;pos++){
+        var origIdx=order[pos]; var cls='choice-pill';
+        if(w.judged){ if(pos===correctPos) cls+=' gr-correct'; else if(ans===pos) cls+=' gr-wrong'; }
+        else if(ans===pos) cls+=' sel';
+        var ctxt = math ? fracText(it.c[origIdx]) : escapeHtml(it.c[origIdx]);
+        html+='<button class="'+cls+'" data-wq="'+i+'" data-c="'+pos+'"'+(w.judged?' disabled':'')+'>'+KANA[pos]+'. '+ctxt+'</button>';
+      }
+      html+='</div>';
+      if(w.judged){ var ok=(ans===correctPos); html+='<div class="exam-mk" style="color:'+(ok?'#2e7d32':'#c62828')+'">'+(ok?'⭕ 正解！':'× 正解は '+KANA[correctPos])+(it.e?'　/　'+escapeHtml(it.e):'')+'</div>'; }
+    }
+    html+='</div></div>';
+  });
+  _rubyMode='std'; html+='</div>';
+  if(!w.judged){
+    html+='<div style="text-align:center;margin-top:20px"><button class="exam-submit" id="mwJudge">⚡ 判定する</button><div style="font-size:12px;color:#666;margin-top:8px">えらんで／書いてから判定。</div><div style="margin-top:8px"><button class="exam-submit" id="mwExit" style="background:#888">↩ もどる</button></div></div>';
+  } else if(remaining===0){
+    if(!w.rewarded){ w.rewarded=true; earnYen(10); }
+    html+='<div style="text-align:center;margin-top:22px"><div style="font-size:26px;font-weight:800;color:#ff3d77">💯 100点！全問正解！</div><div style="font-size:13px;color:#666;margin-top:6px">最初のまちがい '+w.startCount+'問を ぜんぶ こくふく！🎉</div><button class="exam-submit" id="mwExit" style="margin-top:12px">↩ テストにもどる</button></div>';
+  } else {
+    html+='<div style="text-align:center;margin-top:22px"><div style="font-size:20px;font-weight:800;color:#2e7d32">'+total+'問中 '+correctNow+'問 正解！</div><div style="font-size:15px;color:#c62828;margin-top:4px;font-weight:700">のこり '+remaining+'問！</div><div style="font-size:12px;color:#666;margin-top:6px">のこった問題だけ、もう一度（選択肢の位置はかわるよ）</div><button class="exam-submit" id="mwNext" style="margin-top:12px;background:linear-gradient(135deg,#ff8f3d,#ff3d77)">🔥 のこり '+remaining+'問に もう一回！</button><div style="margin-top:8px"><button class="exam-submit" id="mwExit" style="background:#888">↩ もどる</button></div></div>';
+  }
+  html+='</div>';
+  main.innerHTML=html; _rubyMode='std';
+  if(!w.judged){
+    main.querySelectorAll('.choice-pill[data-wq]').forEach(function(b){ b.onclick=function(){ var qi=parseInt(b.dataset.wq,10); w.answers[qi]=parseInt(b.dataset.c,10); var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){ p.classList.remove('sel'); }); b.classList.add('sel'); }; });
+    main.querySelectorAll('input[data-ww]').forEach(function(inp){ inp.oninput=function(){ w.answers[parseInt(inp.dataset.ww,10)]=inp.value; }; });
+    var jb=document.getElementById('mwJudge'); if(jb) jb.onclick=judgeMatomeWeak;
+  } else {
+    var nb=document.getElementById('mwNext'); if(nb) nb.onclick=matomeWeakNext;
+  }
+  var eb=document.getElementById('mwExit'); if(eb) eb.onclick=exitMatomeWeak;
 }
 
 // ============ Init ============

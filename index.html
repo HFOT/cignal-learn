@@ -809,6 +809,8 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
 .exam-qbody{flex:1;min-width:0}
 .exam-qtext{font-size:14px;line-height:1.8}
 .exam-ans{margin-top:8px}
+.mtm-check{flex:0 0 auto;padding:7px 14px;border:none;border-radius:18px;background:#0aa6a6;color:#fff;font-weight:800;cursor:pointer;font-size:13px}
+.mtm-check:hover{filter:brightness(1.1)}
 .exam-fig{text-align:center;margin:8px 0 6px;padding:8px;background:#fff;border:1px solid #ddd6c4;border-radius:6px}
 .exam-fig svg{vertical-align:middle;max-width:100%;height:auto}
 /* 用紙内の解答ウィジェットを白系に */
@@ -7793,15 +7795,16 @@ function buildMatomeMath(p){
   return Q;
 }
 function getMatomeList(ms){ return (ms.subj==='math') ? buildMatomeMath(ms.mathPat||0) : MATOME[ms.subj]; }
-var matomeState={ subj:'math', mathPat:0, answers:{}, graded:false, score:0, correct:0, rewarded:false };
+var matomeState={ subj:'math', mathPat:0, mode:'full', fix:{}, answers:{}, graded:false, score:0, correct:0, rewarded:false };
 function matomeNorm(s){ return (s||'').replace(/[\s　]/g,'').replace(/[、。「」『』（）()・/／]/g,'').toLowerCase(); }
 function matomeCheck(it, ans){
   if(it.type==='write'){ var n=matomeNorm(ans); if(!n) return false; return (it.accept||[]).some(function(a){ return matomeNorm(a)===n; }); }
   return ans===it.a;
 }
-function startMatome(){ matomeState={ subj:matomeState.subj||'math', mathPat:matomeState.mathPat||0, answers:{}, graded:false, score:0, correct:0, rewarded:false }; renderMatome(); }
-function setMatomeSubj(s){ matomeState={ subj:s, mathPat:matomeState.mathPat||0, answers:{}, graded:false, score:0, correct:0, rewarded:false }; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
-function setMatomeMathPat(p){ matomeState.mathPat=p; matomeState.answers={}; matomeState.graded=false; matomeState.score=0; matomeState.correct=0; matomeState.rewarded=false; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
+function startMatome(){ matomeState={ subj:matomeState.subj||'math', mathPat:matomeState.mathPat||0, mode:matomeState.mode||'full', fix:{}, answers:{}, graded:false, score:0, correct:0, rewarded:false }; renderMatome(); }
+function setMatomeSubj(s){ matomeState={ subj:s, mathPat:matomeState.mathPat||0, mode:matomeState.mode||'full', fix:{}, answers:{}, graded:false, score:0, correct:0, rewarded:false }; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
+function setMatomeMathPat(p){ matomeState.mathPat=p; matomeState.fix={}; matomeState.answers={}; matomeState.graded=false; matomeState.score=0; matomeState.correct=0; matomeState.rewarded=false; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
+function setMatomeMode(m){ matomeState.mode=m; matomeState.fix={}; matomeState.answers={}; matomeState.graded=false; matomeState.score=0; matomeState.correct=0; matomeState.rewarded=false; renderMatome(); try{ document.querySelector('.main').scrollTop=0; }catch(e){} }
 function gradeMatome(){
   var ms=matomeState, list=getMatomeList(ms), c=0;
   list.forEach(function(it,i){ if(matomeCheck(it, ms.answers[i])) c++; });
@@ -7813,49 +7816,83 @@ function gradeMatome(){
 function renderMatome(){
   var main=document.getElementById('main'); var ms=matomeState; var list=getMatomeList(ms); var KANA=['ア','イ','ウ','エ','オ'];
   var jp=(ms.subj==='jp'), sci=(ms.subj==='sci'), math=(ms.subj==='math'); _rubyMode = jp?'jp':'std';
+  var fix=(ms.mode==='fix');
   var subjName = jp ? '国語（言葉のきまり）' : sci ? '理科（植物のなかま分け）' : '数学（正の数・負の数 章末）';
+  var solvedCount=0; if(fix){ list.forEach(function(_,i){ if(ms.fix[i]&&ms.fix[i].solved) solvedCount++; }); }
+  var scoreV = fix ? (list.length?Math.round(solvedCount/list.length*100):0) : (ms.graded?ms.score:'／100');
   var html='';
-  html+='<div class="rel-modes" style="margin-bottom:12px;max-width:780px;flex-wrap:wrap"><button class="rel-mode'+(math?' on':'')+'" data-msub="math">📐 数学</button><button class="rel-mode'+(jp?' on':'')+'" data-msub="jp">📖 国語</button><button class="rel-mode'+(sci?' on':'')+'" data-msub="sci">🔬 理科</button></div>';
-  if(math){ html+='<div class="test-set-bar" style="border:none;background:transparent;padding:2px 0 10px;justify-content:center"><span class="lv-label">パターン</span>'; for(var pp=0;pp<MATOME_MATH_PATTERNS;pp++){ html+='<button class="test-set-btn'+(pp===(ms.mathPat||0)?' active':'')+'" data-mpat="'+pp+'">'+(pp+1)+'</button>'; } html+='</div>'; }
+  html+='<div class="rel-modes" style="margin-bottom:10px;max-width:780px;flex-wrap:wrap"><button class="rel-mode'+(math?' on':'')+'" data-msub="math">📐 数学</button><button class="rel-mode'+(jp?' on':'')+'" data-msub="jp">📖 国語</button><button class="rel-mode'+(sci?' on':'')+'" data-msub="sci">🔬 理科</button></div>';
+  if(math){ html+='<div class="test-set-bar" style="border:none;background:transparent;padding:2px 0 8px;justify-content:center"><span class="lv-label">パターン</span>'; for(var pp=0;pp<MATOME_MATH_PATTERNS;pp++){ html+='<button class="test-set-btn'+(pp===(ms.mathPat||0)?' active':'')+'" data-mpat="'+pp+'">'+(pp+1)+'</button>'; } html+='</div>'; }
+  html+='<div class="rel-modes" style="margin-bottom:12px;max-width:780px;flex-wrap:wrap"><button class="rel-mode'+(!fix?' on':'')+'" data-mmode="full">📝 完全テスト</button><button class="rel-mode'+(fix?' on fix':'')+'" data-mmode="fix">✏️ 違うぞモード（直して100点）</button></div>';
   html+='<div class="exam-paper">';
-  html+='<div class="exam-head"><div><div class="exam-title">📐 前期中間 最終まとめ</div><div class="exam-sub">'+escapeHtml(subjName)+' ・ 全'+list.length+'問 ・ 記号や言葉で答えなさい</div></div><div class="exam-score"><span class="lbl">得点</span><span class="v">'+(ms.graded?ms.score:'／100')+'</span></div></div>';
+  html+='<div class="exam-head"><div><div class="exam-title">📐 前期中間 最終まとめ</div><div class="exam-sub">'+escapeHtml(subjName)+' ・ 全'+list.length+'問 ・ '+(fix?'まちがえたらヒントを見て直そう（直して100点）':'記号や言葉で答えなさい')+'</div></div><div class="exam-score"><span class="lbl">得点</span><span class="v">'+scoreV+'</span></div></div>';
   html+='<div class="exam-name"><div class="field">名前 <span class="line nameline"></span></div><div class="field">組 <span class="line"></span></div></div>';
   var lastG=null, qno=0, daimon=0;
   list.forEach(function(it,i){
     if(it.g!==lastG){ if(lastG!==null) html+='</div>'; daimon++; html+='<div class="exam-daimon"><div class="exam-daimon-head"><span>大問 '+daimon+'　'+escapeHtml(it.g)+'</span></div>'; lastG=it.g; }
     qno++;
     var qtext = math ? fracText(it.q) : (jp ? furigana(escapeHtml(it.q)) : escapeHtml(it.q));
+    var fst=ms.fix[i]||{}; var solved=(fix&&fst.solved);
     html+='<div class="exam-q"><div class="exam-qno">('+qno+')</div><div class="exam-qbody"><div class="exam-qtext">'+qtext+'</div>'+(it.svg?'<div class="exam-fig">'+it.svg+'</div>':'');
     if(it.type==='write'){
-      var v=ms.answers[i]||''; var okw=ms.graded && matomeCheck(it, v);
-      html+='<div class="exam-ans"><input type="text" data-mw="'+i+'" value="'+escapeHtml(v)+'"'+(ms.graded?' disabled':'')+' placeholder="ここに書く"></div>';
-      if(ms.graded){ html+='<div class="exam-mk" style="color:'+(okw?'#2e7d32':'#c62828')+'">'+(okw?'○ 正解':'× 正解は「'+escapeHtml((it.accept||[''])[0])+'」')+(it.e?'　/　'+escapeHtml(it.e):'')+'</div>'; }
+      var v=ms.answers[i]||''; var disabledW = fix ? solved : ms.graded;
+      html+='<div class="exam-ans" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input type="text" data-mw="'+i+'" value="'+escapeHtml(v)+'"'+(disabledW?' disabled':'')+' placeholder="ここに書く">'+(fix&&!solved?'<button class="mtm-check" data-mck="'+i+'">✓ たしかめる</button>':'')+'</div>';
+      if(fix){
+        if(solved){ html+='<div class="exam-mk" style="color:#2e7d32">⭕ せいかい！'+(it.e?'　/　'+escapeHtml(it.e):'')+'</div>'; }
+        else if(fst.lastWrong!=null){ html+='<div class="exam-mk" style="color:#c62828">❌ これは違うぞ！　💡ヒント: '+escapeHtml(it.e||'もう一度よく考えよう')+'　→ もう一度書いてみて！</div>'; }
+      } else if(ms.graded){ var okw=matomeCheck(it,v); html+='<div class="exam-mk" style="color:'+(okw?'#2e7d32':'#c62828')+'">'+(okw?'○ 正解':'× 正解は「'+escapeHtml((it.accept||[''])[0])+'」')+(it.e?'　/　'+escapeHtml(it.e):'')+'</div>'; }
     } else {
+      var disabledC = fix ? solved : ms.graded;
       html+='<div class="choice-row">';
       for(var p=0;p<it.c.length;p++){
         var cls='choice-pill';
-        if(ms.answers[i]===p) cls+=' sel';
-        if(ms.graded){ if(p===it.a) cls+=' gr-correct'; else if(ms.answers[i]===p) cls+=' gr-wrong'; }
+        if(!fix){ if(ms.answers[i]===p) cls+=' sel'; if(ms.graded){ if(p===it.a) cls+=' gr-correct'; else if(ms.answers[i]===p) cls+=' gr-wrong'; } }
+        else { if(solved && p===it.a) cls+=' gr-correct'; else if(!solved && fst.lastWrong===p) cls+=' gr-wrong'; }
         var ctxt = math ? fracText(it.c[p]) : escapeHtml(it.c[p]);
-        html+='<button class="'+cls+'" data-mq="'+i+'" data-c="'+p+'"'+(ms.graded?' disabled':'')+'>'+KANA[p]+'. '+ctxt+'</button>';
+        html+='<button class="'+cls+'" data-mq="'+i+'" data-c="'+p+'"'+(disabledC?' disabled':'')+'>'+KANA[p]+'. '+ctxt+'</button>';
       }
       html+='</div>';
-      if(ms.graded){ var ok=(ms.answers[i]===it.a); html+='<div class="exam-mk" style="color:'+(ok?'#2e7d32':'#c62828')+'">'+(ok?'○ 正解':'× 正解は '+KANA[it.a])+(it.e?'　/　'+escapeHtml(it.e):'')+'</div>'; }
+      if(fix){
+        if(solved){ html+='<div class="exam-mk" style="color:#2e7d32">⭕ せいかい！'+(it.e?'　/　'+escapeHtml(it.e):'')+'</div>'; }
+        else if(fst.lastWrong!=null){ html+='<div class="exam-mk" style="color:#c62828">❌ これは違うぞ！　💡ヒント: '+escapeHtml(it.e||'もう一度よく考えよう')+'　→ もう一度えらんでみて！</div>'; }
+      } else if(ms.graded){ var ok=(ms.answers[i]===it.a); html+='<div class="exam-mk" style="color:'+(ok?'#2e7d32':'#c62828')+'">'+(ok?'○ 正解':'× 正解は '+KANA[it.a])+(it.e?'　/　'+escapeHtml(it.e):'')+'</div>'; }
     }
     html+='</div></div>';
   });
   if(lastG!==null) html+='</div>';
-  if(!ms.graded){ html+='<div style="text-align:center;margin-top:22px"><button class="exam-submit" id="matomeGrade">⚡ 採点する</button><div style="font-size:12px;color:#666;margin-top:8px">全'+list.length+'問。本番のつもりで！'+(jp?'（書き込みは漢字でもひらがなでもOK）':'')+'</div></div>'; }
+  if(fix){
+    if(solvedCount===list.length && list.length){
+      if(!ms.rewarded){ ms.rewarded=true; earnYen(10); }
+      html+='<div style="text-align:center;margin-top:22px"><div style="font-size:26px;font-weight:800;color:#2e7d32">💯 100点！ぜんぶ直してクリア！</div><div style="font-size:13px;color:#666;margin-top:6px">まちがいを ぜんぶ 直せたね。この成功体験を わすれずに！</div><button class="exam-submit" id="matomeRetry" style="margin-top:12px">🔁 もう一回</button></div>';
+    } else {
+      html+='<div style="text-align:center;margin-top:18px;font-size:13px;color:#555">まちがえたら 💡ヒントを見て もう一度。ぜんぶ直すと <b>100点</b>！（のこり '+(list.length-solvedCount)+'問）</div>';
+    }
+  } else if(!ms.graded){ html+='<div style="text-align:center;margin-top:22px"><button class="exam-submit" id="matomeGrade">⚡ 採点する</button><div style="font-size:12px;color:#666;margin-top:8px">全'+list.length+'問。本番のつもりで！'+(jp?'（書き込みは漢字でもひらがなでもOK）':'')+'</div></div>'; }
   else {
     html+='<div style="text-align:center;margin-top:22px"><div style="font-size:20px;font-weight:800;margin-bottom:6px">得点 '+ms.score+' 点（正解 '+ms.correct+' / '+list.length+'）</div>';
-    html+=(ms.score===100?'<div style="font-size:15px;color:#0aa6a6;font-weight:800;margin-bottom:8px">💯 パーフェクト！本番もこの調子！</div>':'<div style="font-size:13px;color:#666;margin-bottom:8px">×の問題の解説を読んで、もう一回！</div>');
+    html+=(ms.score===100?'<div style="font-size:15px;color:#0aa6a6;font-weight:800;margin-bottom:8px">💯 パーフェクト！本番もこの調子！</div>':'<div style="font-size:13px;color:#666;margin-bottom:8px">×の問題の解説を読んで、もう一回！または「違うぞモード」で直して100点！</div>');
     html+='<button class="exam-submit" id="matomeRetry">🔁 もう一回</button></div>';
   }
   html+='</div>';
   main.innerHTML=html; _rubyMode='std';
   main.querySelectorAll('.rel-mode[data-msub]').forEach(function(b){ b.onclick=function(){ setMatomeSubj(b.dataset.msub); }; });
+  main.querySelectorAll('.rel-mode[data-mmode]').forEach(function(b){ b.onclick=function(){ setMatomeMode(b.dataset.mmode); }; });
   main.querySelectorAll('.test-set-btn[data-mpat]').forEach(function(b){ b.onclick=function(){ setMatomeMathPat(parseInt(b.dataset.mpat,10)); }; });
-  if(!ms.graded){
+  if(fix){
+    main.querySelectorAll('.choice-pill[data-mq]').forEach(function(b){ b.onclick=function(){
+      var qi=parseInt(b.dataset.mq,10); if(ms.fix[qi]&&ms.fix[qi].solved) return;
+      var pos=parseInt(b.dataset.c,10); var prev=ms.fix[qi]||{};
+      if(pos===list[qi].a){ ms.fix[qi]={solved:true, wasWrong:prev.wasWrong||false}; } else { ms.fix[qi]={solved:false, lastWrong:pos, wasWrong:true}; }
+      renderMatome();
+    }; });
+    main.querySelectorAll('input[data-mw]').forEach(function(inp){ inp.oninput=function(){ ms.answers[parseInt(inp.dataset.mw,10)]=inp.value; }; });
+    main.querySelectorAll('.mtm-check[data-mck]').forEach(function(b){ b.onclick=function(){
+      var qi=parseInt(b.dataset.mck,10); var prev=ms.fix[qi]||{}; var val=ms.answers[qi]||'';
+      if(matomeCheck(list[qi], val)){ ms.fix[qi]={solved:true, wasWrong:prev.wasWrong||false}; } else { ms.fix[qi]={solved:false, lastWrong:(val||'(空)'), wasWrong:true}; }
+      renderMatome();
+    }; });
+    var rbf=document.getElementById('matomeRetry'); if(rbf) rbf.onclick=startMatome;
+  } else if(!ms.graded){
     main.querySelectorAll('.choice-pill[data-mq]').forEach(function(b){ b.onclick=function(){ var qi=parseInt(b.dataset.mq,10); ms.answers[qi]=parseInt(b.dataset.c,10); var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){ p.classList.remove('sel'); }); b.classList.add('sel'); }; });
     main.querySelectorAll('input[data-mw]').forEach(function(inp){ inp.oninput=function(){ ms.answers[parseInt(inp.dataset.mw,10)]=inp.value; }; });
     var gb=document.getElementById('matomeGrade'); if(gb) gb.onclick=gradeMatome;

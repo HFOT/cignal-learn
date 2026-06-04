@@ -7749,13 +7749,23 @@ function buildMatomeMath(p){
   function nz(a,b){ var v; do{ v=ri(a,b); }while(v===0); return v; }
   function sg(n){ return n<0?(''+n):('+'+n); }
   function par(n){ return '('+sg(n)+')'; }
+  function gcd(a,b){ a=Math.abs(a);b=Math.abs(b); while(b){ var t=b; b=a%b; a=t; } return a||1; }
+  function rf(n,d){ if(d<0){ n=-n; d=-d; } var g=gcd(n,d); return [n/g, d/g]; }
+  function fstr(n,d){ var r=rf(n,d); if(r[1]===1) return ''+r[0]; return (r[0]<0?'-':'')+Math.abs(r[0])+'/'+r[1]; }
+  function fpar(n,d){ var r=rf(n,d); if(r[1]===1) return '('+(r[0]<0?'':'+')+r[0]+')'; return '('+(r[0]<0?'-':'+')+Math.abs(r[0])+'/'+r[1]+')'; }
   var Q=[];
   function mc(g,q,correct,wrongs,e){
-    var cs=[String(correct)];
-    for(var i=0;i<wrongs.length && cs.length<4;i++){ var w=String(wrongs[i]); if(cs.indexOf(w)<0) cs.push(w); }
-    var pad=1; while(cs.length<4){ var w2=String(Number(correct)+pad); if(cs.indexOf(w2)<0) cs.push(w2); pad++; }
+    var cstr=String(correct); var cs=[cstr];
+    for(var i=0;i<wrongs.length && cs.length<4;i++){ var w=String(wrongs[i]); if(w!=='' && w!=='NaN' && cs.indexOf(w)<0) cs.push(w); }
+    var pad=1, guard=0, fm=/^(-?\d+)\/(\d+)$/.exec(cstr);
+    while(cs.length<4 && guard<40){ guard++; var nc=Number(cstr); var w2;
+      if(!isNaN(nc)&&String(nc)===cstr){ w2=String(nc+pad); }
+      else if(fm){ w2=(parseInt(fm[1],10)+pad)+'/'+fm[2]; }
+      else { w2=cstr+'　'.repeat(pad); }
+      if(cs.indexOf(w2)<0) cs.push(w2); pad++; }
+    while(cs.length<4){ cs.push((cs.length+pad)+(fm?('/'+fm[2]):'')); }
     for(var k=cs.length-1;k>0;k--){ var j=Math.floor(rng()*(k+1)); var t=cs[k];cs[k]=cs[j];cs[j]=t; }
-    Q.push({g:g,type:'choice',q:q,c:cs,a:cs.indexOf(String(correct)),e:e});
+    Q.push({g:g,type:'choice',q:q,c:cs,a:cs.indexOf(cstr),e:e});
   }
   // ① 数の表し方
   var a1=ri(3,19); mc('数の表し方','0より '+a1+' 小さい数を、符号をつけて表すと？','-'+a1,['+'+a1,'-'+(a1+1),''+a1],'0より小さい→負の数。');
@@ -7780,7 +7790,17 @@ function buildMatomeMath(p){
   b=nz(-9,9); c=nz(-9,9); mc('乗法・除法', par(b)+' × '+par(c)+' = ?', b*c, [-(b*c),Math.abs(b*c),b-c], '符号→同＋異−、数は絶対値の積。');
   var q1=nz(-9,9), d1=nz(2,9); mc('乗法・除法', par(d1*q1)+' ÷ '+par(d1)+' = ?', q1, [-q1,d1*q1-d1,Math.abs(q1)], '同符号→＋、異符号→−。');
   var q2=nz(-9,9), d2=nz(-9,-2); mc('乗法・除法', par(d2*q2)+' ÷ '+par(d2)+' = ?', q2, [-q2,Math.abs(q2),q2+1], '同符号→＋、異符号→−。');
-  // ⑥ 乗除の混じった式
+  // ⑥ 分数の計算（答えが分数になることもある）
+  var FD=[2,3,4,6];
+  (function(){ var e1=FD[ri(0,3)], e2=FD[ri(0,3)], n1=nz(-5,5), n2=nz(-5,5); var sn=n1*e2+n2*e1, sd=e1*e2;
+    mc('分数の計算', fpar(n1,e1)+' + '+fpar(n2,e2)+' = ?', fstr(sn,sd), [fstr(-sn,sd), fstr(n1*e2-n2*e1,sd), fstr(n1+n2,Math.max(e1,e2))], '通分してから分子をたす。'); })();
+  (function(){ var e1=FD[ri(0,3)], e2=FD[ri(0,3)], n1=nz(-5,5), n2=nz(-5,5); var sn=n1*e2-n2*e1, sd=e1*e2;
+    mc('分数の計算', fpar(n1,e1)+' - '+fpar(n2,e2)+' = ?', fstr(sn,sd), [fstr(-sn,sd), fstr(n1*e2+n2*e1,sd), fstr(n1-n2,Math.max(e1,e2))], '通分してから分子をひく。引く数の符号に注意。'); })();
+  (function(){ var e1=ri(2,7), e2=ri(2,7), n1=nz(-7,7), n2=nz(-7,7); var pn=n1*n2, pd=e1*e2;
+    mc('分数の計算', fpar(n1,e1)+' × '+fpar(n2,e2)+' = ?', fstr(pn,pd), [fstr(-pn,pd), fstr(n1*e2,n2*e1), fstr(pn,pd+1)], '分子どうし・分母どうしをかける。同符号→＋、異符号→−。'); })();
+  (function(){ var e1=ri(2,7), e2=ri(2,7), n1=nz(-7,7), n2=nz(-7,7); var qn=n1*e2, qd=e1*n2;
+    mc('分数の計算', fpar(n1,e1)+' ÷ '+fpar(n2,e2)+' = ?', fstr(qn,qd), [fstr(-qn,qd), fstr(n1*n2,e1*e2), fstr(e1*n2,n1*e2)], 'わる数の逆数をかける（分母と分子を入れかえる）。'); })();
+  // ⑦ 乗除の混じった式
   var m1=nz(-6,6), m2=nz(2,6), m3=nz(2,5); mc('乗除の混じった式', par(m1)+' × '+m2+' × '+m3+' = ?', m1*m2*m3, [-(m1*m2*m3),m1*m2+m3,Math.abs(m1*m2*m3)], '左から順に。符号はマイナスの個数で決まる。');
   var qq=nz(-6,6), dd=nz(2,6), cc=nz(2,5); mc('乗除の混じった式', par(dd*qq)+' ÷ '+par(dd)+' × '+cc+' = ?', qq*cc, [-(qq*cc),qq+cc,Math.abs(qq*cc)], '左から順に計算する。');
   // ⑦ 指数・四則

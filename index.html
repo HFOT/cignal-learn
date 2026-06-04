@@ -7912,7 +7912,11 @@ function renderMatome(){
   if(fix){
     if(solvedCount===list.length && list.length){
       if(!ms.rewarded){ ms.rewarded=true; earnYen(10); }
-      html+='<div style="text-align:center;margin-top:22px"><div style="font-size:26px;font-weight:800;color:#2e7d32">💯 100点！ぜんぶ直してクリア！</div><div style="font-size:13px;color:#666;margin-top:6px">まちがいを ぜんぶ 直せたね。この成功体験を わすれずに！</div><button class="exam-submit" id="matomeRetry" style="margin-top:12px">🔁 もう一回</button></div>';
+      var wwN=0; list.forEach(function(_,i){ if(ms.fix[i]&&ms.fix[i].wasWrong) wwN++; });
+      html+='<div style="text-align:center;margin-top:22px"><div style="font-size:26px;font-weight:800;color:#2e7d32">💯 100点！ぜんぶ直してクリア！</div>';
+      if(wwN){ html+='<div style="font-size:13px;color:#666;margin-top:6px">さっき まちがえた '+wwN+'問、こんどはヒントなしでやってみよう！</div><button class="exam-submit matome-ww" style="margin-top:12px;background:linear-gradient(135deg,#ff8f3d,#ff3d77)">💪 まちがいだけ やり直す（'+wwN+'問）</button><div style="margin-top:8px"><button class="exam-submit" id="matomeRetry" style="background:#888">🔁 もう一回</button></div>'; }
+      else { html+='<div style="font-size:13px;color:#666;margin-top:6px">一度もまちがえずクリア！すごい！</div><button class="exam-submit" id="matomeRetry" style="margin-top:12px">🔁 もう一回</button>'; }
+      html+='</div>';
     } else {
       html+='<div style="text-align:center;margin-top:18px;font-size:13px;color:#555">まちがえたら 💡ヒントを見て もう一度。ぜんぶ直すと <b>100点</b>！（のこり '+(list.length-solvedCount)+'問）</div>';
     }
@@ -7943,6 +7947,7 @@ function renderMatome(){
       renderMatome();
     }; });
     var rbf=document.getElementById('matomeRetry'); if(rbf) rbf.onclick=startMatome;
+    var wwb=main.querySelector('.matome-ww'); if(wwb) wwb.onclick=function(){ var wr=[]; list.forEach(function(it,i){ if(ms.fix[i]&&ms.fix[i].wasWrong) wr.push(it); }); startMatomeWeak(wr); };
   } else if(!ms.graded){
     main.querySelectorAll('.choice-pill[data-mq]').forEach(function(b){ b.onclick=function(){ var qi=parseInt(b.dataset.mq,10); ms.answers[qi]=parseInt(b.dataset.c,10); var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){ p.classList.remove('sel'); }); b.classList.add('sel'); }; });
     main.querySelectorAll('input[data-mw]').forEach(function(inp){ inp.oninput=function(){ ms.answers[parseInt(inp.dataset.mw,10)]=inp.value; }; });

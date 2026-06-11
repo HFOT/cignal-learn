@@ -3555,6 +3555,22 @@ var TEST_DATA = {
         {text:'マツの花に花びらはあるか。', type:'writing', keywords:['ない','なし'], point:10},
         {text:'柱頭はどの部分の先端か。', type:'writing', keywords:['めしべ'], point:10},
         {text:'双子葉類の葉脈のパターンを何というか。', type:'writing', keywords:['網状脈'], point:10}
+      ]},
+      {name:'動物の分類【期末】', exam:true, questions:[
+        {text:'背骨をもつ動物を何というか。', type:'writing', keywords:['脊椎動物','せきつい動物'], point:10},
+        {text:'背骨をもたない動物を何というか。', type:'writing', keywords:['無脊椎動物'], point:10},
+        {text:'親が卵を産み、卵から子がかえる生まれ方を何というか。', type:'writing', keywords:['卵生'], point:10},
+        {text:'母親の体内である程度育ってから生まれる生まれ方を何というか。', type:'writing', keywords:['胎生'], point:10},
+        {text:'胎生でふえる脊椎動物のなかまは？', type:'choice', choices:['魚類','鳥類','哺乳類','は虫類'], correct:2, point:10},
+        {text:'魚類の呼吸のしかたは？', type:'choice', choices:['肺','えら','皮膚','気管'], correct:1, point:10},
+        {text:'両生類の子（おたまじゃくし）の呼吸のしかたを書きなさい。', type:'writing', keywords:['えらと皮膚','えら'], point:10},
+        {text:'鳥類の体表のようすは？', type:'choice', choices:['うろこ','毛','羽毛','しめった皮膚'], correct:2, point:10},
+        {text:'哺乳類の体表のようすを書きなさい。', type:'writing', keywords:['毛'], point:10},
+        {text:'肉食動物で発達している歯を何というか。', type:'writing', keywords:['犬歯'], point:10},
+        {text:'草食動物で発達している歯を何というか。', type:'writing', keywords:['臼歯'], point:10},
+        {text:'次のうちは虫類はどれか。', type:'choice', choices:['ハト','イモリ','カメ','フナ'], correct:2, point:10},
+        {text:'殻のある卵を陸上に産むのは、は虫類とあと1つは？', type:'writing', keywords:['鳥類'], point:10},
+        {text:'イモリは何類か。', type:'choice', choices:['両生類','は虫類','魚類','哺乳類'], correct:0, point:10}
       ]}
     ]
   },
@@ -6461,10 +6477,23 @@ function buildDayItems(day){
   var sets = dailyTierSets(day);
   var items = [];
   DAILY_SUBJS.forEach(function(subj, si){
-    var pool = [];
-    sets.forEach(function(idx){ var s = TEST_DATA[subj].sets[idx]; if(s) s.questions.forEach(function(q){ pool.push(q); }); });
+    var examPool = [], tierPool = [];
+    (TEST_DATA[subj].sets||[]).forEach(function(s, idx){
+      if(!s) return;
+      if(s.exam){ s.questions.forEach(function(q){ examPool.push(q); }); }        // 期末範囲（中間後に追加した新単元）
+      else if(sets.indexOf(idx)>=0){ s.questions.forEach(function(q){ tierPool.push(q); }); } // 中間の復習（つみあげ）
+    });
     var n = DAILY_WEIGHTS[subj] || 5;
-    var picked = mockSeededShuffle(pool, day*11 + si + 1).slice(0, n);
+    var picked;
+    if(examPool.length){
+      // 期末範囲があれば6割を期末、残りは中間の復習。無い科目は中間だけ（＝追加されなければ復習）
+      var nExam = Math.min(examPool.length, Math.max(1, Math.ceil(n*0.6)));
+      var e = mockSeededShuffle(examPool, day*13 + si + 1).slice(0, nExam);
+      var t = mockSeededShuffle(tierPool, day*11 + si + 1).slice(0, Math.max(0, n - e.length));
+      picked = e.concat(t);
+    } else {
+      picked = mockSeededShuffle(tierPool, day*11 + si + 1).slice(0, n);
+    }
     picked.forEach(function(q){ items.push({ subj:subj, q:q }); });
   });
   return items;
@@ -6484,7 +6513,8 @@ function buildTimeAttackPool(day){
   var maxSet = pastMaxSet(day); // set 0..maxSet を累積で（中間～昨日まで）
   DAILY_SUBJS.forEach(function(subj){
     (TEST_DATA[subj].sets||[]).forEach(function(s, si){
-      if(!s || si>maxSet) return;
+      if(!s) return;
+      if(!s.exam && si>maxSet) return; // 中間はtier範囲まで、期末(exam)は常に累積に含める
       s.questions.forEach(function(q){ if(q.choices && q.type!=='listening' && q.type!=='fraction') pool.push({subj:subj, q:q}); });
     });
   });

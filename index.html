@@ -210,6 +210,7 @@ button{font-family:inherit;color:inherit}
 .mode-train{background:linear-gradient(135deg,#ff8f3d,#ff6b3d)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
 .mode-finisher{background:linear-gradient(135deg,#ff3d77,#c2185b)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
 .mode-matome{background:linear-gradient(135deg,#0aa6a6,#0d7a9c)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
+.mode-yomatsu{background:linear-gradient(135deg,#7c5cff,#a23ca6)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
 .train-wrap{max-width:680px;margin:0 auto;padding:6px 4px 28px}
 .train-subjtabs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
 .train-subjtab{padding:7px 17px;border-radius:20px;border:1px solid var(--border);background:var(--paper-2);color:var(--muted);font-weight:700;cursor:pointer;font-size:13px;transition:all .12s}
@@ -1220,6 +1221,7 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
     <button class="mode-btn mode-finisher" data-mode="finisher">💥 必殺テスト</button>
     <button class="mode-btn mode-release" data-mode="release">⚡ このまま行こうぜ！</button>
     <button class="mode-btn mode-matome" data-mode="matome">📐 最終まとめ</button>
+    <button class="mode-btn mode-yomatsu" data-mode="yomatsu">📒 期末つみあげ</button>
   </div>
 
   <div class="study-guide" id="studyGuide"></div>
@@ -3670,6 +3672,7 @@ function getTestHint(subj, setIdx, qi){
 // ===== MODE TOGGLE =====
 function switchMode(mode){
   currentMode = mode;
+  trainState.yomatsu = (mode === 'yomatsu'); // 期末つみあげ時だけ【期末】単元を対象に
   document.querySelectorAll('.mode-btn').forEach(function(b){
     b.classList.toggle('active', b.dataset.mode === mode);
   });
@@ -3742,6 +3745,17 @@ function switchMode(mode){
     eyebrow.textContent = '前期中間 / 最終まとめ';
     title.innerHTML = '最終まとめ<em>数学・国語・理科（図解つき）</em>';
     startMatome();
+  } else if(mode === 'yomatsu'){
+    hdrRight.innerHTML = '<div class="hdr-stat"><b id="trainDone">0</b><span>こなした</span></div>';
+    eyebrow.textContent = '中間のあとに学んだこと / 期末つみあげ';
+    title.innerHTML = '期末つみあげ<em>毎日たまっていく・期末範囲だけ</em>';
+    trainState.mode = 'train';
+    // 期末コンテンツがある科目を初期表示にする（空の科目から始まらないように）
+    var fsubj = ['en','math','jp','sci','soc'].filter(function(s){ return trainBaseCats(s).length>0; })[0];
+    if(fsubj){ trainScope = fsubj; trainState.subj = fsubj; }
+    trainState.cat=0; trainState.idx=0; trainState.doneAll=false;
+    trainState.picked=null; trainState.revealed=false; trainState.elim=[]; trainState.hintShown=false;
+    renderTrain();
   }
   // 勉強順ナビが有効なら現在ステップを同期
   if(guide.active) renderGuide();
@@ -6922,7 +6936,7 @@ function scopeBarHTML(){
   return h+'</div>';
 }
 function bindScopeBar(main, onChange){ main.querySelectorAll('.train-subjtab[data-tscope]').forEach(function(b){ b.onclick=function(){ if(trainScope===b.dataset.tscope) return; trainScope=b.dataset.tscope; onChange(); }; }); }
-var trainState = { subj:'en', cat:0, idx:0, picked:null, revealed:false, elim:[], done:0, hintShown:false, mode:'train', doneAll:false };
+var trainState = { subj:'en', cat:0, idx:0, picked:null, revealed:false, elim:[], done:0, hintShown:false, mode:'train', doneAll:false, yomatsu:false };
 // 英語＝日本語→英語の連動（手作り）。ヒント/スペシャルヒント/説明つき
 var TRAIN_DATA = {
   en: { name:'英語', cats:[
@@ -7016,13 +7030,20 @@ var TRAIN_DATA = {
 };
 // 他科目は LEARN(SUBJECTS) のレベルから自動構築（解説つき）
 function trainBaseCats(subj){
-  if(TRAIN_DATA[subj]) return TRAIN_DATA[subj].cats;
-  var lv = (SUBJECTS[subj] && SUBJECTS[subj].levels) || [];
-  return lv.map(function(level){
-    return { name: level.name, items: (level.questions||[]).filter(function(q){ return q.choices; }).map(function(q){
-      return { prompt:q.q, choices:q.choices, correct:q.a, expl:q.expl||'' };
-    }) };
-  });
+  var cats;
+  if(TRAIN_DATA[subj]){
+    cats = TRAIN_DATA[subj].cats;
+  } else {
+    var lv = (SUBJECTS[subj] && SUBJECTS[subj].levels) || [];
+    cats = lv.map(function(level){
+      return { name: level.name, items: (level.questions||[]).filter(function(q){ return q.choices; }).map(function(q){
+        return { prompt:q.q, choices:q.choices, correct:q.a, expl:q.expl||'' };
+      }) };
+    });
+  }
+  // 期末つみあげ＝【期末】タグの単元だけ／中間モード＝【期末】を除外（被り解消）
+  var wantFinal = !!trainState.yomatsu;
+  return cats.filter(function(c){ var isFinal = /【期末】/.test(c.name); return wantFinal ? isFinal : !isFinal; });
 }
 var weakData = {}; // 弱点克服用: subj -> [item, ...]
 // 英語の手作り問題は正解がアばかりなので、起動時に選択肢をシャッフルして正解位置を散らす

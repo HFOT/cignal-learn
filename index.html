@@ -4449,8 +4449,9 @@ function gradeAnswer(q, ua){
     return (u[0] === c[0] && u[1] === c[1]) ? 10 : 0;
   }
   if(ua === undefined || ua === null || ua === '') return 0;
+  if(q.choices != null && typeof ua === 'number') return (ua === q.correct) ? 10 : 0; // 選択式(分数4択・リスニング選択含む)
   if(q.type === 'choice') return (ua === q.correct) ? 10 : 0;
-  var kws = q.keywords, text = String(ua).toLowerCase();
+  var kws = q.keywords || [], text = String(ua).toLowerCase();
   var m = kws.filter(function(kw){ return text.indexOf(kw.toLowerCase()) !== -1; }).length;
   if(m >= kws.length) return 10;
   if(m > 0) return Math.ceil((m / kws.length) * 10);
@@ -6527,7 +6528,57 @@ function dailyTierSets(day){
   if(day<=20) return [2,3,4];
   return [0,1,2,3,4,5,6];
 }
-// その日の5教科ミックス問題を作る
+// 打ち込みゼロ化: 分数→4択に変換、リスニングは選択肢があれば採用、書き取りは除外（手書きパートへ）
+function fracToChoice(q){
+  var c = fracReduce(q.num, q.den);
+  function fstr(n,d){ return (n<0?'−':'')+Math.abs(n)+'/'+d; }
+  var correct = fstr(c[0], c[1]);
+  var seen = {}; seen[correct]=true;
+  var opts = [correct];
+  var tries = [
+    fstr(-c[0], c[1]),
+    fstr(c[0], c[1]+1),
+    (c[1]>1 ? fstr(c[0], c[1]-1) : null),
+    fstr(c[0]+1, c[1]),
+    (Math.abs(c[0])>1 ? fstr(c[0]-1, c[1]) : fstr(c[0]+2, c[1])),
+    fstr(c[1]||1, Math.abs(c[0])||1)
+  ];
+  for(var i=0;i<tries.length && opts.length<4;i++){ var t=tries[i]; if(t && !seen[t]){ seen[t]=true; opts.push(t); } }
+  var k=2; while(opts.length<4 && k<30){ var t2=fstr(c[0], c[1]+k); if(!seen[t2]){ seen[t2]=true; opts.push(t2); } k++; }
+  var seed = (Math.abs(q.num)||1)*131 + (Math.abs(q.den)||1)*17 + (q.text ? q.text.length : 0);
+  var shuffled = mockSeededShuffle(opts.slice(0,4), seed);
+  return { text:q.text, type:'choice', choices:shuffled, correct: shuffled.indexOf(correct) };
+}
+// リスニング: 音声(英文)はそのまま、答えを「正しい英文を選ぶ」4択化（錯乱肢は他問の英文）
+var _listenPool = null;
+function listenAudioPool(){
+  if(_listenPool) return _listenPool;
+  var seen={}, arr=[];
+  DAILY_SUBJS.forEach(function(subj){
+    (TEST_DATA[subj].sets||[]).forEach(function(s){ if(!s) return; (s.questions||[]).forEach(function(q){
+      if(q.type==='listening' && q.audio && !seen[q.audio]){ seen[q.audio]=1; arr.push(q.audio); }
+    }); });
+  });
+  _listenPool = arr; return arr;
+}
+function listeningToChoice(q){
+  var correct = q.audio;
+  var others = listenAudioPool().filter(function(a){ return a !== correct; });
+  var seed = (correct ? correct.length : 0)*37 + (correct ? correct.charCodeAt(0) : 0)*3 + 11;
+  others = mockSeededShuffle(others, seed).slice(0, 3);
+  if(others.length < 1) return null; // 錯乱肢が作れないなら除外
+  var opts = mockSeededShuffle([correct].concat(others), seed + 1);
+  return { text:'音声を聞いて、正しい英文を えらびなさい。', type:'listening', audio:q.audio, choices:opts, correct:opts.indexOf(correct) };
+}
+function dailyToSelect(q){
+  if(!q) return null;
+  if(q.type === 'writing') return null;            // 書き取りは手書きパートへ（今日の復習からは外す）
+  if(q.type === 'fraction') return fracToChoice(q);
+  if(q.type === 'listening') return q.audio ? listeningToChoice(q) : (q.choices ? q : null);
+  if(q.choices) return q;                           // 選択問題はそのまま
+  return null;                                      // 選択肢が無い＝打ち込みになるので除外
+}
+// その日の5教科ミックス問題を作る（すべて選択式・打ち込みゼロ）
 function buildDayItems(day){
   var sets = dailyTierSets(day);
   var items = [];
@@ -6535,8 +6586,8 @@ function buildDayItems(day){
     var examPool = [], tierPool = [];
     (TEST_DATA[subj].sets||[]).forEach(function(s, idx){
       if(!s) return;
-      if(s.exam){ s.questions.forEach(function(q){ examPool.push(q); }); }        // 期末範囲（中間後に追加した新単元）
-      else if(sets.indexOf(idx)>=0){ s.questions.forEach(function(q){ tierPool.push(q); }); } // 中間の復習（つみあげ）
+      if(s.exam){ s.questions.forEach(function(q){ var sq=dailyToSelect(q); if(sq) examPool.push(sq); }); }        // 期末範囲（中間後に追加した新単元）
+      else if(sets.indexOf(idx)>=0){ s.questions.forEach(function(q){ var sq=dailyToSelect(q); if(sq) tierPool.push(sq); }); } // 中間の復習（つみあげ）
     });
     var n = DAILY_WEIGHTS[subj] || 5;
     var picked;
@@ -6854,18 +6905,19 @@ function renderDailyReview(){
       else ctxt = q.choices ? q.choices[q.correct] : (q.keywords ? q.keywords.join(', ') : '');
       html += '<span class="mark ok">○</span> <span class="correct-answer show" style="display:inline">'+fracText(ctxt)+'</span>';
     } else {
-      if(q.type === 'fraction'){
+      if(q.choices){
+        // すべて選択式（分数は4択化済み・リスニングは🎧を聞いて選ぶ）＝打ち込みゼロ
+        html += '<div class="choice-row">';
+        for(var c=0;c<q.choices.length;c++){ var sel=(dailyState.answers[i]===c)?' sel':''; html += '<button class="choice-pill'+sel+'" data-dqc="'+i+'" data-c="'+c+'"><span class="kana">'+KANA[c]+'</span>'+fracText(q.choices[c])+'</button>'; }
+        html += '</div>';
+      } else if(q.type === 'fraction'){
         var fa = dailyState.answers[i] || {}; var fsign = fa.sign === -1 ? -1 : 1;
         html += '<div class="frac-input"><button class="frac-sign'+(fsign===-1?' minus':'')+'" data-dq="'+i+'">'+(fsign===-1?'−':'＋')+'</button><div class="frac-stack">';
         html += '<input class="frac-num" data-dq="'+i+'" inputmode="numeric" value="'+escapeHtml(String(fa.n!=null?fa.n:''))+'" placeholder="分子"><div class="frac-bar"></div>';
         html += '<input class="frac-den" data-dq="'+i+'" inputmode="numeric" value="'+escapeHtml(String(fa.d!=null?fa.d:''))+'" placeholder="分母"></div></div>';
-      } else if(q.type === 'writing' || q.type === 'listening'){
+      } else {
         var val = dailyState.answers[i] !== undefined ? String(dailyState.answers[i]) : '';
         html += '<div class="hw-input-wrap"><input type="text" data-dq="'+i+'" value="'+escapeHtml(val)+'" placeholder="答え"><button class="hw-ico-btn" data-dqhw="'+i+'" title="手書き入力">✍</button></div>';
-      } else {
-        html += '<div class="choice-row">';
-        for(var c=0;c<q.choices.length;c++){ var sel=(dailyState.answers[i]===c)?' sel':''; html += '<button class="choice-pill'+sel+'" data-dqc="'+i+'" data-c="'+c+'"><span class="kana">'+KANA[c]+'</span>'+fracText(q.choices[c])+'</button>'; }
-        html += '</div>';
       }
       if(checked){ html += '<div class="dq-retry">× もう一度！</div>'; }
     }

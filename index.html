@@ -623,6 +623,16 @@ button{font-family:inherit;color:inherit}
 .result .actions{justify-content:center}
 
 /* ===== MODE TOGGLE ===== */
+.menu-bar{
+  display:flex;justify-content:flex-end;padding:5px 20px;background:var(--paper);
+  border-bottom:1px solid var(--border);
+}
+.menu-toggle{
+  font-size:12px;font-weight:700;color:var(--muted);background:var(--paper-2);
+  border:1px solid var(--border);border-radius:16px;padding:5px 14px;cursor:pointer;transition:all .15s;
+}
+.menu-toggle:hover{color:var(--accent);border-color:var(--accent)}
+.menu-toggle.open{color:var(--accent);border-color:var(--accent);background:rgba(68,104,255,.08)}
 .mode-toggle{
   display:flex;gap:0 4px;padding:6px 20px;background:var(--paper);border-bottom:1px solid var(--border);
   flex-wrap:wrap;align-items:center;
@@ -1222,8 +1232,11 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
       </div>
     </div>
   </div>
-  <div class="mode-toggle" id="modeToggle">
-    <button class="mode-btn mode-home" data-mode="daily">🏠 毎日1時間</button>
+  <div class="menu-bar">
+    <button id="menuToggle" class="menu-toggle" onclick="toggleMenu()">🧰 練習メニュー ▾</button>
+  </div>
+  <div class="mode-toggle" id="modeToggle" style="display:none">
+    <button class="mode-btn mode-home" data-mode="daily">🏠 毎日1時間にもどる</button>
     <button class="guide-start-btn" id="guideStart">📋 今日のおすすめ順</button>
     <div class="mode-group">
       <span class="mode-group-label">① おぼえる</span>
@@ -3797,6 +3810,15 @@ document.getElementById('modeToggle').addEventListener('click', function(e){
   if(btn) switchMode(btn.dataset.mode);
 });
 
+// 🧰 練習メニュー: 普段は隠す。押したときだけ9モードを出す（毎日1時間が主役）
+function toggleMenu(){
+  var mt = document.getElementById('modeToggle');
+  var hidden = (mt.style.display === 'none');
+  mt.style.display = hidden ? '' : 'none';
+  var btn = document.getElementById('menuToggle');
+  if(btn){ btn.textContent = hidden ? '🧰 練習メニュー ▴' : '🧰 練習メニュー ▾'; btn.classList.toggle('open', hidden); }
+}
+
 // 🎯 中間集中モード: 3分類（これでいくぞ／必殺／このまま行こうぜ）だけ表示
 function toggleFocus(){
   var root=document.getElementById('root');
@@ -6313,12 +6335,13 @@ function rmToast(msg){
 
 // 時期を開く: ナビ常駐＋「毎日1時間（ホーム）」に着地。毎日は各時期の中に内包される
 function applyPhase(p){
-  document.getElementById('modeToggle').style.display = '';
+  var mt = document.getElementById('modeToggle'); if(mt) mt.style.display = 'none';
+  var mb = document.getElementById('menuToggle'); if(mb){ mb.textContent = '🧰 練習メニュー ▾'; mb.classList.remove('open'); }
   document.getElementById('studyGuide').style.display = '';
   document.getElementById('lvBar').style.display = 'none';
   document.getElementById('testSetBar').style.display = 'none';
   currentPhase = p.key;
-  switchMode('daily'); // まずホーム（毎日1時間）
+  switchMode('daily'); // まずホーム（毎日1時間）。モードは🧰メニューを押したときだけ
 }
 
 // ============ 毎日1時間カレンダー ============

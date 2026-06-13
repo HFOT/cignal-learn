@@ -621,12 +621,22 @@ button{font-family:inherit;color:inherit}
 
 /* ===== MODE TOGGLE ===== */
 .mode-toggle{
-  display:flex;gap:0;padding:0 20px;background:var(--paper);border-bottom:1px solid var(--border);
+  display:flex;gap:0 4px;padding:6px 20px;background:var(--paper);border-bottom:1px solid var(--border);
+  flex-wrap:wrap;align-items:center;
+}
+.mode-group{
+  display:flex;align-items:center;gap:0;margin:3px 10px 3px 0;padding-right:12px;
+  border-right:1px dashed var(--border);
+}
+.mode-group:last-child{border-right:none;padding-right:0;margin-right:0}
+.mode-group-label{
+  font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.03em;
+  margin-right:8px;white-space:nowrap;opacity:.7;
 }
 .mode-btn{
-  padding:9px 22px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);
+  padding:9px 16px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);
   border:none;border-bottom:2px solid transparent;background:transparent;
-  transition:all .15s;letter-spacing:0.05em;
+  transition:all .15s;letter-spacing:0.05em;border-radius:7px 7px 0 0;
 }
 .mode-btn:hover{color:var(--ink)}
 .mode-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
@@ -1210,18 +1220,26 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
     </div>
   </div>
   <div class="mode-toggle" id="modeToggle">
-    <button class="focus-toggle-btn" id="focusToggle" onclick="toggleFocus()">🎯 中間集中</button>
-    <button class="guide-start-btn" id="guideStart">📋 今日の勉強順</button>
-    <button class="mode-btn active" data-mode="learn">LEARN</button>
-    <button class="mode-btn" data-mode="test">TEST</button>
-    <button class="mode-btn" data-mode="summary">要点✓</button>
-    <button class="mode-btn" data-mode="cards">暗記</button>
-    <button class="mode-btn" data-mode="mock">模試</button>
-    <button class="mode-btn mode-train" data-mode="train">🔥 これでいくぞ！</button>
-    <button class="mode-btn mode-finisher" data-mode="finisher">💥 必殺テスト</button>
-    <button class="mode-btn mode-release" data-mode="release">⚡ このまま行こうぜ！</button>
-    <button class="mode-btn mode-matome" data-mode="matome">📐 最終まとめ</button>
-    <button class="mode-btn mode-yomatsu" data-mode="yomatsu">📒 期末つみあげ</button>
+    <button class="guide-start-btn" id="guideStart">📋 今日のおすすめ順</button>
+    <div class="mode-group">
+      <span class="mode-group-label">① おぼえる</span>
+      <button class="mode-btn active" data-mode="learn">LEARN</button>
+      <button class="mode-btn" data-mode="summary">要点✓</button>
+      <button class="mode-btn" data-mode="cards">暗記</button>
+    </div>
+    <div class="mode-group">
+      <span class="mode-group-label">② れんしゅう</span>
+      <button class="mode-btn mode-train" data-mode="train">🔥 これでいくぞ！</button>
+      <button class="mode-btn mode-yomatsu" data-mode="yomatsu">📒 期末つみあげ</button>
+    </div>
+    <div class="mode-group">
+      <span class="mode-group-label">③ 力だめし</span>
+      <button class="mode-btn mode-matome" data-mode="matome">📐 最終まとめ</button>
+      <button class="mode-btn mode-finisher" data-mode="finisher">💥 必殺テスト</button>
+      <button class="mode-btn mode-release" data-mode="release">⚡ このまま行こうぜ！</button>
+      <button class="mode-btn" data-mode="test">TEST</button>
+      <button class="mode-btn" data-mode="mock">模試</button>
+    </div>
   </div>
 
   <div class="study-guide" id="studyGuide"></div>
@@ -8172,9 +8190,13 @@ loadAllowance();
 loadDaily();
 shuffleTrainChoices();
 hwInit();
-renderRoadmap();
 render();
-loadFocus();
+// 起動はホーム（毎日1時間）から。迷ったらここだけでOK
+(function(){
+  var dp = ROADMAP.filter(function(x){ return x.key==='daily1'; })[0];
+  if(dp && dp.ready){ currentPhase = 'daily1'; applyPhase(dp); }
+})();
+renderRoadmap();
 </script>
 </body>
 </html>

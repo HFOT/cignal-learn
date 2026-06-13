@@ -211,6 +211,9 @@ button{font-family:inherit;color:inherit}
 .mode-finisher{background:linear-gradient(135deg,#ff3d77,#c2185b)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
 .mode-matome{background:linear-gradient(135deg,#0aa6a6,#0d7a9c)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
 .mode-yomatsu{background:linear-gradient(135deg,#7c5cff,#a23ca6)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
+.mode-home{background:var(--ok)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important;border-radius:9px!important;padding:8px 15px!important;margin-right:10px;border-bottom:2px solid transparent!important}
+.mode-home:hover{filter:brightness(1.08)}
+.mode-home.active{border-bottom:2px solid transparent!important}
 .train-wrap{max-width:680px;margin:0 auto;padding:6px 4px 28px}
 .train-subjtabs{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px}
 .train-subjtab{padding:7px 17px;border-radius:20px;border:1px solid var(--border);background:var(--paper-2);color:var(--muted);font-weight:700;cursor:pointer;font-size:13px;transition:all .12s}
@@ -1220,6 +1223,7 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
     </div>
   </div>
   <div class="mode-toggle" id="modeToggle">
+    <button class="mode-btn mode-home" data-mode="daily">🏠 毎日1時間</button>
     <button class="guide-start-btn" id="guideStart">📋 今日のおすすめ順</button>
     <div class="mode-group">
       <span class="mode-group-label">① おぼえる</span>
@@ -3702,10 +3706,19 @@ function switchMode(mode){
 
   lvBar.style.display = 'none';
   setBar.style.display = 'none';
+  var subjTabsEl = document.getElementById('subjTabs');
+  if(subjTabsEl) subjTabsEl.style.display = (mode === 'daily') ? 'none' : '';
   testStopTimer();
   mockStopTimer();
 
-  if(mode === 'learn'){
+  if(mode === 'daily'){
+    var pn = (ROADMAP.filter(function(x){ return x.key===currentPhase; })[0]||{name:'テスト'}).name;
+    hdrRight.innerHTML = '';
+    eyebrow.textContent = '毎日1時間 / ' + pn + '対策 つみあげ学習';
+    title.innerHTML = '毎日1時間<em>毎日ひらく・迷ったらここ</em>';
+    dailyState.phase = 'cal';
+    renderDaily();
+  } else if(mode === 'learn'){
     // 選択科目を引き継ぐ（科目が変わったらレベルをリセット）
     if(state.subj !== currentSubj){ state.subj = currentSubj; state.lv = 0; resetLevel(); }
     lvBar.style.display = '';
@@ -6254,16 +6267,14 @@ function resetGameTime(){
 })();
 
 // ============ 1年のロードマップ（テスト時期） ============
+// 2学期制（前期4–9月 / 後期10–3月）。毎日1時間は各時期の中の「ホーム」に内包する
 var ROADMAP = [
-  {key:'mid1',   name:'1学期中間',   month:'6月',     ready:true,  type:'exam'},
-  {key:'daily1', name:'毎日1時間',   month:'中間→期末', ready:true,  type:'daily'},
-  {key:'fin1',   name:'1学期期末',   month:'7月',     ready:false, type:'exam'},
-  {key:'mid2',   name:'2学期中間',   month:'10月',    ready:false, type:'exam'},
-  {key:'daily2', name:'毎日1時間',   month:'中間→期末', ready:false, type:'daily'},
-  {key:'fin2',   name:'2学期期末',   month:'11–12月', ready:false, type:'exam'},
-  {key:'final',  name:'学年末',       month:'2–3月',   ready:false, type:'exam'}
+  {key:'mae_mid', name:'前期中間', month:'6月',     ready:true,  type:'exam'},
+  {key:'mae_fin', name:'前期期末', month:'9月',     ready:true,  type:'exam'},
+  {key:'ato_mid', name:'後期中間', month:'11–12月', ready:false, type:'exam'},
+  {key:'ato_fin', name:'学年末',   month:'2–3月',   ready:false, type:'exam'}
 ];
-var currentPhase = 'mid1';
+var currentPhase = 'mae_fin'; // 前期中間のあと→前期期末(9月)に向けて毎日つみあげ中
 
 function renderRoadmap(){
   var el = document.getElementById('roadmap');
@@ -6300,25 +6311,14 @@ function rmToast(msg){
   setTimeout(function(){ if(t.parentNode) t.remove(); }, 2400);
 }
 
-// フェーズ切替: テスト対策(通常UI) ⇄ 毎日1時間(カレンダー)
+// 時期を開く: ナビ常駐＋「毎日1時間（ホーム）」に着地。毎日は各時期の中に内包される
 function applyPhase(p){
-  var isDaily = (p.type === 'daily');
-  document.getElementById('modeToggle').style.display = isDaily ? 'none' : '';
-  document.getElementById('subjTabs').style.display = isDaily ? 'none' : '';
-  document.getElementById('studyGuide').style.display = isDaily ? 'none' : '';
+  document.getElementById('modeToggle').style.display = '';
+  document.getElementById('studyGuide').style.display = '';
   document.getElementById('lvBar').style.display = 'none';
   document.getElementById('testSetBar').style.display = 'none';
-  var eb = document.getElementById('hdrEyebrow'), tt = document.getElementById('hdrTitle');
-  if(isDaily){
-    if(eb) eb.textContent = '毎日1時間 / 中間→期末 つみあげ学習';
-    if(tt) tt.innerHTML = '毎日1時間<em>カレンダーで習慣化</em>';
-    dailyState.phase = 'cal';
-    renderDaily();
-  } else {
-    if(eb) eb.textContent = 'LEARN / Jr.High 1 — 1学期 中間テスト';
-    if(tt) tt.innerHTML = '学習<em>中1 中間テスト対策</em>';
-    switchMode(currentMode);
-  }
+  currentPhase = p.key;
+  switchMode('daily'); // まずホーム（毎日1時間）
 }
 
 // ============ 毎日1時間カレンダー ============
@@ -8193,8 +8193,9 @@ hwInit();
 render();
 // 起動はホーム（毎日1時間）から。迷ったらここだけでOK
 (function(){
-  var dp = ROADMAP.filter(function(x){ return x.key==='daily1'; })[0];
-  if(dp && dp.ready){ currentPhase = 'daily1'; applyPhase(dp); }
+  var dp = ROADMAP.filter(function(x){ return x.key===currentPhase && x.ready; })[0]
+        || ROADMAP.filter(function(x){ return x.ready; })[0];
+  if(dp){ applyPhase(dp); }
 })();
 renderRoadmap();
 </script>

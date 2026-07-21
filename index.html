@@ -222,6 +222,8 @@ button{font-family:inherit;color:inherit}
 .lv-btn.lv-final.active small{color:#fff}
 .train-cat.final{border-color:#a23ca6;color:#a23ca6;font-weight:700}
 .train-cat.final.on{background:linear-gradient(135deg,#7c5cff,#a23ca6)!important;border-color:transparent!important;color:#fff!important}
+.train-page-ref{font-size:12px;color:#a23ca6;background:rgba(162,60,166,.1);border:1px solid rgba(162,60,166,.35);border-radius:8px;padding:6px 10px;margin-bottom:10px;line-height:1.5}
+.train-page-ref b{font-weight:800}
 .mode-home{background:var(--ok)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important;border-radius:9px!important;padding:8px 15px!important;margin-right:10px;border-bottom:2px solid transparent!important}
 .mode-home:hover{filter:brightness(1.08)}
 .mode-home.active{border-bottom:2px solid transparent!important}
@@ -2288,6 +2290,7 @@ var SUBJECTS = {
       },
       {
         name:'Lv13 動物の分類（脊椎動物）【期末】',
+        page:'20〜21',
         intro:'背骨のある動物＝脊椎動物。魚類・両生類・は虫類・鳥類・哺乳類の5つを、子の生まれ方・呼吸・体表で見分けよう。',
         questions:[
           {q:'ライオンのように、ほかの動物を食べる動物を何という？', choices:['肉食動物','草食動物','雑食動物','脊椎動物'], a:0, expl:'肉食動物。犬歯が発達している。'},
@@ -2324,6 +2327,7 @@ var SUBJECTS = {
       },
       {
         name:'Lv14 光の反射・屈折【期末】',
+        page:'92〜99',
         intro:'光が鏡ではね返ることを反射、境界面で折れ曲がることを屈折という。反射の法則（入射角＝反射角）と、屈折のしかたの違いを整理しよう。',
         questions:[
           {q:'光が鏡などに当たってはね返ることを何というか。', choices:['屈折','反射','全反射','分散'], a:1, expl:'光がはね返る現象を反射という。'},
@@ -2360,6 +2364,7 @@ var SUBJECTS = {
       },
       {
         name:'Lv15 凸レンズのはたらき【期末】',
+        page:'100〜105',
         intro:'凸レンズを通った光は屈折して集まる。焦点・実像・虚像のちがいと、物体の位置によって像の大きさや向きがどう変わるかを整理しよう。',
         questions:[
           {q:'光軸に平行な光が凸レンズに入ったとき、屈折して集まる点を何というか。', choices:['中心点','焦点','虚点','像点'], a:1, expl:'光軸に平行な光は屈折して焦点に集まる。'},
@@ -2390,6 +2395,7 @@ var SUBJECTS = {
       },
       {
         name:'Lv16 動物の分類（無脊椎動物）②【期末】',
+        page:'20',
         intro:'背骨をもたない無脊椎動物にも、体のつくりによる分け方がある。節足動物（外骨格）と軟体動物（外とう膜）のちがいを整理しよう。',
         questions:[
           {q:'背骨をもたない動物をまとめて何というか。', choices:['脊椎動物','無脊椎動物','軟体動物','節足動物'], a:1, expl:'背骨がない動物はすべて無脊椎動物。昆虫や貝、エビなどが含まれる。'},
@@ -2416,6 +2422,7 @@ var SUBJECTS = {
       },
       {
         name:'Lv17 動物の分類（特別な例・応用）③【期末】',
+        page:'21',
         intro:'クジラやコウモリ、ペンギンのように「一見まぎらわしい」動物を、特徴（呼吸・生まれ方・体表）から正しく分類できるようにしよう。',
         questions:[
           {q:'クジラは水中で一生を過ごすが、何類に分類されるか。', choices:['魚類','は虫類','哺乳類','両生類'], a:2, expl:'クジラは肺で呼吸し、母親の体内である程度育ってから生まれる（胎生）ため、水中生活でも哺乳類に分類される。'},
@@ -2441,6 +2448,7 @@ var SUBJECTS = {
       },
       {
         name:'Lv18 光の反射・屈折（作図・鏡の範囲）②【期末】',
+        page:'93〜98',
         intro:'鏡に映って見える範囲や、半円形のガラスでの屈折など、作図・角度の考え方を使う問題を練習しよう。',
         questions:[
           {q:'鏡の前に物体を置いたとき、その物体が鏡に映って見えるかどうかは何によって決まるか。', choices:['物体の色','物体からの光が反射の法則にしたがって目に届くかどうか','物体の大きさだけ','鏡の材質だけ'], a:1, expl:'物体からの光が鏡で反射し、反射の法則（入射角＝反射角）にしたがって目に届く道すじがあるかどうかで、映って見えるか決まる。'},
@@ -2462,6 +2470,7 @@ var SUBJECTS = {
       },
       {
         name:'Lv19 光の反射・屈折（見え方の応用）③【期末】',
+        page:'99・108',
         intro:'水中の物体が浮き上がって見えたり、棒が曲がって見えたりする現象を、光の道すじの図から正しく読みとれるようにしよう。',
         questions:[
           {q:'水中にある硬貨を、水面の上、ななめから見ると、見える位置は実際の位置に対してどうなるか。', choices:['浮き上がって見える（実際より浅く見える）','沈んで見える（実際より深く見える）','横にずれて見える','変わらず見える'], a:0, expl:'硬貨からの光は水中から空気中へ出るとき境界面から遠ざかるように屈折するため、その光の延長線をたどると実際より浅い位置に見える。'},
@@ -2483,6 +2492,7 @@ var SUBJECTS = {
       },
       {
         name:'Lv20 凸レンズのはたらき（実験データ）②【期末】',
+        page:'100〜104',
         intro:'物体の位置を変えていく実験の結果表を読み取り、像の大きさ・向き・できる位置の変化の規則性をつかもう。',
         questions:[
           {q:'凸レンズの実験で、物体を焦点距離の2倍より遠い位置に置いてから少しずつレンズに近づけていくと、スクリーンにできる実像の位置はどうなるか。', choices:['凸レンズに近づく','凸レンズから遠ざかる','変化しない','像がすぐに消える'], a:1, expl:'物体を凸レンズに近づけていくと、鮮明な像ができる位置（スクリーンの位置）はレンズから遠ざかっていく。'},
@@ -2503,6 +2513,7 @@ var SUBJECTS = {
       },
       {
         name:'Lv21 凸レンズのはたらき（チャレンジ）③【期末】',
+        page:'105・109',
         intro:'凸レンズと直方体ガラスを組み合わせた発展的な問題や、身の回りで凸レンズが使われている道具について考えよう。',
         questions:[
           {q:'凸レンズの焦点の内側（焦点とレンズの間）に、光軸に垂直な直方体ガラスを置いた。光軸に平行な光を凸レンズに当てたとき、レンズを出た光は屈折せずに直進する場合と比べてどう進むか。', choices:['ガラスがあってもなくても進み方は同じ','ガラス中でさらに屈折し、焦点にたどりつくのが遅れる（光軸との交点が焦点より遠くなる）','ガラスに当たった時点で光が消える','ガラスが全反射させてしまう'], a:1, expl:'ガラス中では光の速さが遅くなり進み方が変わるため、光軸との交点（実際に光が集まる点）は、ガラスがない場合の焦点よりも凸レンズから遠い位置になる。'},
@@ -3141,7 +3152,7 @@ function renderMain(){
     '</div>';
   }
 
-  var introHtml = state.qi === 0 ? '<div class="intro"><b>'+nameWithFinalBadge(level.name)+'</b><br>'+escapeHtml(level.intro)+'</div>' : '';
+  var introHtml = state.qi === 0 ? '<div class="intro"><b>'+nameWithFinalBadge(level.name)+'</b><br>'+escapeHtml(level.intro)+(level.page?'<div class="train-page-ref" style="margin-top:8px">📘 わかりにくいときは <b>ワーク p.'+escapeHtml(level.page)+'</b> の図を見てみよう</div>':'')+'</div>' : '';
 
   var actionBtn = '';
   if(state.answered){
@@ -7348,7 +7359,7 @@ function trainBaseCats(subj){
   } else {
     var lv = (SUBJECTS[subj] && SUBJECTS[subj].levels) || [];
     cats = lv.map(function(level){
-      return { name: level.name, items: (level.questions||[]).filter(function(q){ return q.choices; }).map(function(q){
+      return { name: level.name, page: level.page||'', items: (level.questions||[]).filter(function(q){ return q.choices; }).map(function(q){
         return { prompt:q.q, choices:q.choices, correct:q.a, expl:q.expl||'' };
       }) };
     });
@@ -7444,6 +7455,7 @@ function renderTrain(){
   var qlabel=it.ja?'次の日本語を 英語に すると？':'正しい答えを えらぼう';
   html+='<div class="train-card">';
   html+='<div class="train-progress">'+(trainState.idx+1)+' / '+cat.items.length+'　'+nameWithFinalBadge(cat.name)+'</div>';
+  if(cat.page){ html+='<div class="train-page-ref">📘 わかりにくいときは <b>ワーク p.'+escapeHtml(cat.page)+'</b> の図を見てみよう</div>'; }
   html+='<div class="train-qlabel">'+qlabel+'</div>';
   html+='<div class="train-prompt">'+(it.ja?furigana(escapeHtml(prompt)):fracText(prompt))+'</div>';
   html+='<div class="train-choices">';

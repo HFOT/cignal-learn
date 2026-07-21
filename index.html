@@ -214,6 +214,14 @@ button{font-family:inherit;color:inherit}
 .mode-finisher{background:linear-gradient(135deg,#ff3d77,#c2185b)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
 .mode-matome{background:linear-gradient(135deg,#0aa6a6,#0d7a9c)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
 .mode-yomatsu{background:linear-gradient(135deg,#7c5cff,#a23ca6)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important}
+/* 📒 期末タグ バッジ（どこで見ても「期末専用」とひと目でわかるように） */
+.final-badge{display:inline-block;margin-left:6px;padding:1px 9px;border-radius:10px;font-size:10px;font-weight:800;letter-spacing:.03em;background:linear-gradient(135deg,#7c5cff,#a23ca6);color:#fff;vertical-align:middle;white-space:nowrap}
+.lv-btn.lv-final{border-color:#a23ca6}
+.lv-btn.lv-final small{color:#a23ca6;font-weight:800}
+.lv-btn.lv-final.active{background:linear-gradient(135deg,#7c5cff,#a23ca6)!important;border-color:transparent!important;color:#fff!important}
+.lv-btn.lv-final.active small{color:#fff}
+.train-cat.final{border-color:#a23ca6;color:#a23ca6;font-weight:700}
+.train-cat.final.on{background:linear-gradient(135deg,#7c5cff,#a23ca6)!important;border-color:transparent!important;color:#fff!important}
 .mode-home{background:var(--ok)!important;color:#fff!important;border:1px solid transparent!important;font-weight:800!important;border-radius:9px!important;padding:8px 15px!important;margin-right:10px;border-bottom:2px solid transparent!important}
 .mode-home:hover{filter:brightness(1.08)}
 .mode-home.active{border-bottom:2px solid transparent!important}
@@ -2938,7 +2946,8 @@ function renderLvBar(){
   for(var i=0;i<levels.length;i++){
     var act = (i === state.lv) ? 'active' : '';
     var done = state.doneLevels[state.subj+'-'+i] ? 'done' : '';
-    html += '<button class="lv-btn '+act+' '+done+'" data-i="'+i+'"><span>Lv'+(i+1)+(done?' ✓':'')+'</span><small>'+levels[i].questions.length+'問</small></button>';
+    var fin = isFinalName(levels[i].name) ? 'lv-final' : '';
+    html += '<button class="lv-btn '+act+' '+done+' '+fin+'" data-i="'+i+'"><span>'+(fin?'📒 ':'')+'Lv'+(i+1)+(done?' ✓':'')+'</span><small>'+levels[i].questions.length+'問</small></button>';
   }
   el.innerHTML = html;
   el.querySelectorAll('.lv-btn').forEach(function(b){
@@ -3003,7 +3012,7 @@ function renderMain(){
     '</div>';
   }
 
-  var introHtml = state.qi === 0 ? '<div class="intro"><b>'+escapeHtml(level.name)+'</b><br>'+escapeHtml(level.intro)+'</div>' : '';
+  var introHtml = state.qi === 0 ? '<div class="intro"><b>'+nameWithFinalBadge(level.name)+'</b><br>'+escapeHtml(level.intro)+'</div>' : '';
 
   var actionBtn = '';
   if(state.answered){
@@ -3170,6 +3179,11 @@ function escapeHtml(s){
     return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
   });
 }
+// 【期末】タグ付き単元を、ひと目で「期末専用」とわかるバッジ表示にする
+function isFinalName(name){ return /【期末】/.test(name||''); }
+function stripFinalTag(name){ return String(name||'').replace(/【期末】/g,'').trim(); }
+function finalBadgeHtml(name){ return isFinalName(name) ? '<span class="final-badge">📒 期末</span>' : ''; }
+function nameWithFinalBadge(name){ return escapeHtml(stripFinalTag(name)) + finalBadgeHtml(name); }
 
 // ===== ふりがな（ルビ）辞書：理科・社会・数学の用語が中心 =====
 var FURIGANA = {
@@ -7242,7 +7256,7 @@ function renderTrain(){
   if(trainScope==='総合'){ var cnm=(TRAIN_DATA[trainState.subj]&&TRAIN_DATA[trainState.subj].name)||(SUBJECTS[trainState.subj]&&SUBJECTS[trainState.subj].name)||trainState.subj; html+='<div class="train-cursubj">'+escapeHtml(cnm)+'</div>'; }
   // 項目チップ（現在の科目の項目、現在地ハイライト）
   html+='<div class="train-cats">';
-  cats.forEach(function(c,ci){ html+='<button class="train-cat'+(ci===trainState.cat?' on':'')+'" data-tcat="'+ci+'">'+furigana(escapeHtml(c.name))+'</button>'; });
+  cats.forEach(function(c,ci){ var fin=isFinalName(c.name)?' final':''; html+='<button class="train-cat'+(ci===trainState.cat?' on':'')+fin+'" data-tcat="'+ci+'">'+furigana(escapeHtml(stripFinalTag(c.name)))+finalBadgeHtml(c.name)+'</button>'; });
   html+='</div>';
   if(!it){ html+='<div class="train-card">この項目は準備中です。</div></div>'; main.innerHTML=html; _rubyMode='std'; bindScopeBar(main, function(){ trainResetFlow(); renderTrain(); }); return; }
   var solved=(trainState.picked!=null && trainState.picked===it.correct);
@@ -7252,7 +7266,7 @@ function renderTrain(){
   var prompt=it.ja||it.prompt;
   var qlabel=it.ja?'次の日本語を 英語に すると？':'正しい答えを えらぼう';
   html+='<div class="train-card">';
-  html+='<div class="train-progress">'+(trainState.idx+1)+' / '+cat.items.length+'　'+escapeHtml(cat.name)+'</div>';
+  html+='<div class="train-progress">'+(trainState.idx+1)+' / '+cat.items.length+'　'+nameWithFinalBadge(cat.name)+'</div>';
   html+='<div class="train-qlabel">'+qlabel+'</div>';
   html+='<div class="train-prompt">'+(it.ja?furigana(escapeHtml(prompt)):fracText(prompt))+'</div>';
   html+='<div class="train-choices">';

@@ -167,6 +167,9 @@ button{font-family:inherit;color:inherit}
 .daily-banner{border-radius:10px;padding:10px 14px;font-size:13px;font-weight:700;text-align:center;margin-bottom:12px}
 .daily-banner.ok{background:rgba(62,209,132,0.15);color:var(--ok);border:1px solid var(--ok)}
 .daily-banner.ng{background:rgba(240,185,11,0.12);color:var(--warn);border:1px solid var(--warn)}
+/* 毎日クイズ：採点後の正誤マーク（test-sheet 内でも効くよう汎用指定） */
+.choice-pill.gr-correct{background:rgba(62,209,132,0.2)!important;border-color:var(--ok)!important;color:var(--ok)!important;font-weight:700}
+.choice-pill.gr-wrong{background:rgba(232,76,76,0.18)!important;border-color:var(--ng)!important;color:var(--ng)!important}
 /* ② 範囲をえらぶ（単元チップ） */
 .unit-group{margin-bottom:12px}
 .unit-subj{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px}
@@ -2310,6 +2313,70 @@ var SUBJECTS = {
           {q:'カナヘビは何類？', choices:['は虫類','両生類','哺乳類','魚類'], a:0, expl:'カナヘビ・トカゲ・ヘビ・カメはは虫類。'},
           {q:'「水中・卵生・えら呼吸・うろこ」の特徴をもつのは？', choices:['両生類','魚類','は虫類','鳥類'], a:1, expl:'これは魚類の特徴。'}
         ]
+      },
+      {
+        name:'Lv14 光の反射・屈折【期末】',
+        intro:'光が鏡ではね返ることを反射、境界面で折れ曲がることを屈折という。反射の法則（入射角＝反射角）と、屈折のしかたの違いを整理しよう。',
+        questions:[
+          {q:'光が鏡などに当たってはね返ることを何というか。', choices:['屈折','反射','全反射','分散'], a:1, expl:'光がはね返る現象を反射という。'},
+          {q:'鏡の面に垂直な線と、鏡に入ってくる光との間の角を何というか。', choices:['反射角','屈折角','入射角','境界角'], a:2, expl:'入ってくる光の角度は入射角。'},
+          {q:'鏡の面に垂直な線と、鏡ではね返った光との間の角を何というか。', choices:['入射角','屈折角','反射角','分散角'], a:2, expl:'はね返った光の角度は反射角。'},
+          {q:'反射の法則とは、入射角と反射角がどうなることか。', choices:['入射角のほうが大きい','反射角のほうが大きい','等しい','関係なくばらばら'], a:2, expl:'反射の法則＝入射角＝反射角。'},
+          {q:'鏡に映って見える物体の像を何というか。', choices:['実像','虚像','倒立像','焦点'], a:1, expl:'鏡に映る像は虚像。'},
+          {q:'鏡に映る像は、物体と鏡の面についてどのような位置にあるか。', choices:['物体と同じ側にある','物体と鏡について対称の位置にある','鏡から無限に遠い','鏡の中心にある'], a:1, expl:'像は鏡に対して物体と線対称の位置にできる。'},
+          {q:'光が空気中からガラスや水などの物質に進むとき、境界面で光が折れ曲がることを何というか。', choices:['反射','屈折','全反射','分散'], a:1, expl:'物質の境界で光が折れ曲がる現象を屈折という。'},
+          {q:'境界面に垂直な線と、境界面に入ってくる光との間の角を何というか。', choices:['入射角','屈折角','反射角','対称角'], a:0, expl:'入ってくる光の角度は入射角。'},
+          {q:'境界面に垂直な線と、屈折して進む光との間の角を何というか。', choices:['入射角','屈折角','反射角','境界角'], a:1, expl:'屈折して進む光の角度は屈折角。'},
+          {q:'光が空気中からガラス（水）中へ進むとき、入射角と屈折角の大小関係は？', choices:['入射角＜屈折角','入射角＝屈折角','入射角＞屈折角','関係ない'], a:2, expl:'空気→ガラス（水）では入射角のほうが大きい。'},
+          {q:'光がガラス（水）中から空気中へ進むとき、入射角と屈折角の大小関係は？', choices:['入射角＜屈折角','入射角＝屈折角','入射角＞屈折角','関係ない'], a:0, expl:'ガラス（水）→空気では屈折角のほうが大きい。'},
+          {q:'光がガラス（水）から空気へ進むとき、入射角を大きくしていくとやがて光はどうなるか。', choices:['屈折せずすべて反射する','屈折角が0になる','光が消える','色が変わる'], a:0, expl:'入射角を大きくすると屈折光がなくなり、全反射が起こる。'},
+          {q:'ガラス（水）から空気へ進む光が、屈折せずにすべて反射する現象を何というか。', choices:['乱反射','屈折','全反射','分散'], a:2, expl:'これを全反射という。光ファイバーなどに利用される。'},
+          {q:'水中の物体を水面の上から見ると、実際の位置より浮き上がって見える。この原因は何か。', choices:['光の反射','光の屈折','全反射','光の直進'], a:1, expl:'水中から空気中へ出る光が屈折するため、浮き上がって見える。'},
+          {q:'ストローを水に入れると曲がって見えるのはなぜか。', choices:['ストローが実際に曲がるから','光が水面で屈折するから','水が濁っているから','目の錯覚だから（原因はない）'], a:1, expl:'水中部分からの光が水面で屈折して進むため、曲がって見える。'},
+          {q:'光がでこぼこした面に当たって、いろいろな方向に反射することを何というか。', choices:['全反射','乱反射','屈折','正反射'], a:1, expl:'物体の表面がでこぼこしていると光は乱反射し、どの方向からも物体が見える。'},
+          {q:'鏡にできるだけ広い範囲を映すには、鏡はどのくらいの大きさが必要か。', choices:['物体と同じ大きさ','物体の半分の大きさ','物体の2倍の大きさ','鏡の大きさは関係ない'], a:1, expl:'自分の全身を鏡で見るには身長の半分の長さの鏡でよい。'},
+          {q:'空気中からガラス中へ進む光で、入射角のほうが屈折角より大きくなるのはなぜか。', choices:['ガラスのほうが密で光が曲がりやすいから','ガラス中では光が進みにくくなるから','ガラスが不透明だから','屈折角のほうが常に大きいから'], a:1, expl:'ガラス（水）中では光の進む速さが遅くなり、境界面に近づくように曲がる。'},
+          {q:'虫めがねを通してものを見たとき、実際より大きく見える像を何というか。', choices:['実像','虚像','反射像','対称像'], a:1, expl:'凸レンズを通して見える大きな像は虚像。'},
+          {q:'光を出さずに他から来た光を反射しているものを何というか。', choices:['光源','物体','反射体','焦点'], a:1, expl:'自ら光を出すものが光源、それ以外はふつう物体。'},
+          {q:'太陽や電灯のように、自ら光を出すものを何というか。', choices:['物体','光源','反射材','鏡'], a:1, expl:'自ら光を発するものを光源という。'},
+          {q:'入射角が0°（境界面に垂直に光が入る）とき、屈折角はいくらか。', choices:['0°','入射角と異なる角度になる','90°','屈折しない場合がある'], a:0, expl:'垂直に入射した光は屈折せずそのまま直進する（屈折角も0°）。'},
+          {q:'水中のコインを、水面の穴から見えるようにするとき、光の道すじはどのように進むか。', choices:['直進するだけ','水面で屈折して目に届く','鏡のように反射するだけ','コインから光は届かない'], a:1, expl:'コインからの光が水面で屈折し、その延長線上に浮き上がって見える。'},
+          {q:'光ファイバーの中で光が外に漏れずに伝わるのは何を利用しているか。', choices:['反射の法則','全反射','乱反射','光の分散'], a:1, expl:'光ファイバーは全反射を繰り返して光を伝える。'},
+          {q:'鏡に対して物体を近づけると、鏡に映る像はどうなるか。', choices:['像も鏡に近づく','像は動かない','像は遠ざかる','像が消える'], a:0, expl:'像は鏡について物体と対称の位置にできるので、物体が近づけば像も近づく。'},
+          {q:'水面に映った金魚の逆さの像は、実際の金魚に対してどのような位置にできるか。', choices:['水面について対称の位置','水面から離れた位置','実物と同じ位置','水中で反射しない'], a:0, expl:'水面での反射も鏡と同じで、水面に対して対称の位置に逆さの像ができる。'},
+          {q:'ガラスの中を進む光の速さは、空気中と比べてどうか。', choices:['速くなる','遅くなる','変わらない','止まる'], a:1, expl:'密な物質ほど光は進みにくくなり、速さが遅くなる。'},
+          {q:'透明なガラスの奥にある物体を見るとき、物体の位置がずれて見えることがあるのはなぜか。', choices:['ガラスを通る光が屈折するから','ガラスが光を吸収するから','ガラスが反射だけするから','目の位置が動くから'], a:0, expl:'ガラスの境界面で光が屈折することで、物体の見かけの位置がずれる。'},
+          {q:'次のうち、光の屈折によって起こる現象はどれか。', choices:['鏡に自分の顔が映る','プールの底が浅く見える','壁に影ができる','黒板の光が反射してまぶしい'], a:1, expl:'水中からの光が屈折するため、プールの底は実際より浅く（近く）見える。'}
+        ]
+      },
+      {
+        name:'Lv15 凸レンズのはたらき【期末】',
+        intro:'凸レンズを通った光は屈折して集まる。焦点・実像・虚像のちがいと、物体の位置によって像の大きさや向きがどう変わるかを整理しよう。',
+        questions:[
+          {q:'光軸に平行な光が凸レンズに入ったとき、屈折して集まる点を何というか。', choices:['中心点','焦点','虚点','像点'], a:1, expl:'光軸に平行な光は屈折して焦点に集まる。'},
+          {q:'凸レンズの中心から焦点までの距離を何というか。', choices:['焦点距離','中心距離','像距離','レンズ幅'], a:0, expl:'レンズの中心から焦点までの距離を焦点距離という。'},
+          {q:'凸レンズを通った光が集まってできる、スクリーンに映せる像を何というか。', choices:['虚像','実像','対称像','焦点像'], a:1, expl:'光が実際に集まってできる像を実像という。'},
+          {q:'凸レンズを通して物体を見たときに見える、実物より大きい像を何というか。', choices:['実像','虚像','逆像','焦点像'], a:1, expl:'スクリーンに映せず、レンズ越しに見える大きな像は虚像。'},
+          {q:'凸レンズの中心を通る光は、屈折せずにどのように進むか。', choices:['光軸に平行に曲がる','そのまま直進する','焦点に集まる','反射する'], a:1, expl:'レンズの中心を通る光はそのまま直進する。'},
+          {q:'焦点を通ってから凸レンズに入った光は、屈折後どのように進むか。', choices:['光軸に平行に進む','そのまま直進する','焦点にもどる','反射する'], a:0, expl:'焦点を通った光は屈折後、光軸に平行に進む。'},
+          {q:'物体を焦点距離の2倍より遠い位置に置いたとき、スクリーンにできる像の大きさは？', choices:['物体より大きい','物体より小さい','物体と同じ','像はできない'], a:1, expl:'焦点距離の2倍より遠いと、実像は物体より小さくなる。'},
+          {q:'物体を焦点距離の2倍の位置に置いたとき、できる実像の大きさは？', choices:['物体より大きい','物体より小さい','物体と同じ大きさ','像はできない'], a:2, expl:'焦点距離の2倍の位置では、物体と同じ大きさの実像ができる。'},
+          {q:'物体を焦点距離の2倍の位置より凸レンズに近づけ、焦点の外側に置いたとき、できる実像の大きさは？', choices:['物体より大きい','物体より小さい','物体と同じ','像はできない'], a:0, expl:'焦点距離の2倍より近く焦点より遠い位置では、物体より大きい実像ができる。'},
+          {q:'物体をちょうど焦点の位置に置いたとき、スクリーンに像はできるか。', choices:['小さい実像ができる','大きい実像ができる','像はできない','虚像だけできる'], a:2, expl:'焦点の位置では光が平行に進むため、実像も虚像もできない。'},
+          {q:'物体を焦点よりも凸レンズに近い位置に置いたとき、レンズを通して見える像は何か。', choices:['小さい実像','物体より大きい正立の虚像','物体と同じ大きさの実像','像は見えない'], a:1, expl:'焦点の内側では実像はできず、実物より大きな正立の虚像が見える。'},
+          {q:'スクリーンにできる実像の上下・左右の向きは、物体と比べてどうなっているか。', choices:['上下だけ逆','左右だけ逆','上下・左右とも逆（倒立）','上下・左右とも同じ（正立）'], a:2, expl:'実像は物体に対して上下左右が逆の倒立の像になる。'},
+          {q:'凸レンズを通して見える虚像の上下・左右の向きは、物体と比べてどうなっているか。', choices:['上下・左右とも逆','上下・左右とも同じ','上下だけ逆','左右だけ逆'], a:1, expl:'虚像は物体と同じ向き（正立）に見える。'},
+          {q:'物体を凸レンズに近づけていくと（焦点距離の2倍より遠い位置から）、実像の大きさはどう変化するか。', choices:['だんだん小さくなる','だんだん大きくなる','変化しない','急に消える'], a:1, expl:'物体をレンズに近づけると、できる実像はだんだん大きくなる。'},
+          {q:'物体を凸レンズに近づけていくとき、スクリーン（像）の位置は凸レンズからどう変化するか。', choices:['近づく','遠ざかる','変化しない','像ができなくなる'], a:1, expl:'物体を近づけると、鮮明な実像ができる位置はレンズから遠ざかる。'},
+          {q:'虫めがねのように、凸レンズを通して物体より大きい虚像を見るには、物体をどこに置けばよいか。', choices:['焦点距離の2倍より遠い位置','焦点距離の2倍の位置','焦点と凸レンズの間','焦点上'], a:2, expl:'焦点の内側（焦点と凸レンズの間）に置くと大きな虚像が見える。'},
+          {q:'凸レンズの上半分を黒い紙でおおうと、スクリーンに映る像はどうなるか。', choices:['像が半分だけ映る','像の形は変わらず暗くなる','像が消える','像が2つになる'], a:1, expl:'レンズの一部をおおっても像全体は映るが、光が減るため暗くなる。'},
+          {q:'カメラのレンズは凸レンズを利用している。フィルムやセンサーにできる像は実像か虚像か。', choices:['実像','虚像','どちらでもない','像はできない'], a:0, expl:'カメラはスクリーン（フィルム・センサー）に実像を映す仕組み。'},
+          {q:'凸レンズによる実像は、物体を焦点に近づけていくとどうなるか。', choices:['小さくなり、レンズに近づく','大きくなり、レンズから遠ざかる','変化しない','虚像に変わる'], a:1, expl:'焦点に近づけるほど実像は大きくなり、できる位置はレンズから遠くなる。'},
+          {q:'虫めがねで見える虚像は、物体と比べてどちら側にできるように見えるか。', choices:['物体と同じ側（物体より遠くに大きく見える）','物体の反対側','レンズの中','焦点の外側だけ'], a:0, expl:'虚像は物体と同じ側に、物体より大きく見える。'},
+          {q:'次のうち、凸レンズによる実像の性質として正しいものはどれか。', choices:['物体と同じ向きに見える','スクリーンに映すことができる','物体より必ず大きい','焦点の内側にできる'], a:1, expl:'実像は光が実際に集まってできるのでスクリーンに映すことができる。'},
+          {q:'凸レンズの中心を通り、レンズ面に垂直な線を何というか。', choices:['焦点線','光軸','境界線','中心軸'], a:1, expl:'レンズの中心を通り面に垂直な線を光軸という。'},
+          {q:'物体を焦点距離の2倍の位置よりもレンズに近づけていくと、実像ができる位置は焦点距離の2倍の位置と比べてどうなるか。', choices:['近くなる','遠くなる','変わらない','像ができなくなる'], a:1, expl:'物体をレンズに近づけると、実像ができる位置はレンズから遠ざかる。'}
+        ]
       }
     ]
   },
@@ -3608,6 +3675,36 @@ var TEST_DATA = {
         {text:'次のうちは虫類はどれか。', type:'choice', choices:['ハト','イモリ','カメ','フナ'], correct:2, point:10},
         {text:'殻のある卵を陸上に産むのは、は虫類とあと1つは？', type:'writing', keywords:['鳥類'], point:10},
         {text:'イモリは何類か。', type:'choice', choices:['両生類','は虫類','魚類','哺乳類'], correct:0, point:10}
+      ]},
+      {name:'光の反射・屈折【期末】', exam:true, questions:[
+        {text:'光が鏡などに当たってはね返ることを何というか。', type:'writing', keywords:['反射'], point:10},
+        {text:'入射角と反射角の関係を何というか。', type:'writing', keywords:['反射の法則'], point:10},
+        {text:'入射角と反射角の大きさの関係は？', type:'choice', choices:['入射角のほうが大きい','反射角のほうが大きい','等しい','関係ない'], correct:2, point:10},
+        {text:'鏡に映る像を何というか。', type:'writing', keywords:['虚像'], point:10},
+        {text:'光が空気中からガラスや水へ進むとき、境界面で折れ曲がることを何というか。', type:'writing', keywords:['屈折'], point:10},
+        {text:'光が空気中からガラス（水）中へ進むとき、入射角と屈折角はどちらが大きいか。', type:'writing', keywords:['入射角'], point:10},
+        {text:'光がガラス（水）中から空気中へ進むとき、入射角と屈折角はどちらが大きいか。', type:'writing', keywords:['屈折角'], point:10},
+        {text:'ガラス（水）から空気へ進む光が、入射角を大きくしていくとすべて反射する現象を何というか。', type:'writing', keywords:['全反射'], point:10},
+        {text:'水中の物体が実際より浮き上がって見える原因は何か。', type:'writing', keywords:['屈折'], point:10},
+        {text:'光がでこぼこの面でいろいろな方向に反射することを何というか。', type:'writing', keywords:['乱反射'], point:10},
+        {text:'鏡で自分の全身を映すには、身長のおよそ何分の1の鏡が必要か。', type:'writing', keywords:['2分の1','半分'], point:10},
+        {text:'光ファイバーの中で光が伝わるのに利用されている現象は？', type:'choice', choices:['反射の法則','全反射','乱反射','屈折角0'], correct:1, point:10},
+        {text:'自ら光を出すものを何というか。', type:'writing', keywords:['光源'], point:10}
+      ]},
+      {name:'凸レンズのはたらき【期末】', exam:true, questions:[
+        {text:'光軸に平行な光が凸レンズで屈折して集まる点を何というか。', type:'writing', keywords:['焦点'], point:10},
+        {text:'凸レンズの中心から焦点までの距離を何というか。', type:'writing', keywords:['焦点距離'], point:10},
+        {text:'凸レンズを通った光が集まってできる、スクリーンに映せる像を何というか。', type:'writing', keywords:['実像'], point:10},
+        {text:'凸レンズを通して見える、実物より大きい像を何というか。', type:'writing', keywords:['虚像'], point:10},
+        {text:'凸レンズの中心を通る光は、屈折後どのように進むか。', type:'writing', keywords:['直進'], point:10},
+        {text:'物体を焦点距離の2倍より遠い位置に置いたとき、できる実像の大きさは？', type:'choice', choices:['物体より大きい','物体より小さい','物体と同じ','像はできない'], correct:1, point:10},
+        {text:'物体を焦点距離の2倍の位置に置いたとき、できる実像の大きさは？', type:'writing', keywords:['同じ'], point:10},
+        {text:'物体をちょうど焦点の位置に置いたとき、像はできるか。', type:'writing', keywords:['できない'], point:10},
+        {text:'物体を焦点よりも凸レンズに近い位置に置いたとき、見える像は何か。', type:'writing', keywords:['虚像'], point:10},
+        {text:'スクリーンにできる実像の向きは、物体と比べてどうなっているか。', type:'choice', choices:['上下・左右とも逆','上下・左右とも同じ','上下だけ逆','左右だけ逆'], correct:0, point:10},
+        {text:'凸レンズを通して見える虚像の向きは、物体と比べてどうなっているか。', type:'writing', keywords:['同じ','正立'], point:10},
+        {text:'物体を凸レンズに近づけていくと、実像ができる位置はレンズからどうなるか。', type:'writing', keywords:['遠ざかる'], point:10},
+        {text:'虫めがねのように大きな虚像を見るには、物体をどこに置けばよいか。', type:'writing', keywords:['焦点の内側','焦点と凸レンズの間'], point:10}
       ]}
     ]
   },
@@ -6637,9 +6734,8 @@ function mathFrac(s){
 
 function renderDaily(){
   if(dailyState.phase === 'gate') renderDailyGate();
-  else if(dailyState.phase === 'ta') renderDailyTimeAttack();
-  else if(dailyState.phase === 'rangepick') renderReviewRange();
-  else if(dailyState.phase === 'review') renderDailyReview();
+  else if(dailyState.phase === 'ta') renderDailyQuiz('q1');
+  else if(dailyState.phase === 'review') renderDailyQuiz('q2');
   else if(dailyState.phase === 'preview') renderDailyPreview();
   else renderDailyCalendar();
 }
@@ -6699,7 +6795,7 @@ function renderDailyCalendar(){
     btnLabel = '▶ 先取りでやってみる';
   } else {
     menuLine = 'Day '+pDay+'：今日の1時間（'+dailyTierLabel(pDay)+'）';
-    subLine = '① 過去の復習＝中間〜昨日までを5分タイムアタック → ② 今日の復習（全問正解で次へ）→ ③ 予習（次の単元を先取り）';
+    subLine = '① 過去の復習（中間〜昨日まで・ランダム・全問正解で次へ）→ ② 今日の復習（ランダム・全問正解で次へ）→ ③ 予習（次の単元を先取り）';
   }
   html += '<div class="daily-today"><div class="dt-date">'+todayKey+'（'+wds[today.getDay()]+'）</div>'+
     '<div class="dt-menu">'+menuLine+'</div>'+
@@ -6734,18 +6830,12 @@ function saveHomeworkLog(g){
 }
 function beginDailyStudy(pDay){
   dailyState.day = pDay;
-  dailyState.items = buildDayItems(pDay);
-  dailyState.answers = {};
-  dailyState.scores = {};
-  dailyState.reviewChecked = false;
-  dailyState.reviewRewarded = false;
   dailyState.pv = buildDayPreview(pDay);
   dailyState.pvAnswers = {};
   dailyState.understood = {};
-  dailyState.unitSel = {};
-  dailyState.ta = { pool: buildTimeAttackPool(pDay), answers:{}, solved:0, correct:0, endAt:0, timer:null };
+  startDailyQuiz('q1','past');
   dailyState.phase = 'ta';
-  renderDailyTimeAttack();
+  renderDailyQuiz('q1');
 }
 function renderDailyGate(){
   var main=document.getElementById('main');
@@ -6791,171 +6881,104 @@ function renderDailyGate(){
 }
 
 var SUBJ_NAME = {en:'英語', math:'数学', jp:'国語', sci:'理科', soc:'社会'};
-// ===== ① 5分タイムアタック（過去問スピード・問題一覧形式） =====
-function renderDailyTimeAttack(){
+// ===== ①② 全問正解まで導く・ランダム選択クイズ（共通エンジン）=====
+// 仕様: 問題は常にランダム / すべて4択 / まちがえた問題だけ次ラウンドへ（位置もランダム）/ 全問正解で達成
+var DAILY_Q_COUNT = 10;
+var DAILY_QUIZ_CFG = {
+  q1: { phase:'ta', title:'① 過去の復習', tag:'中間〜昨日まで・ランダム', scope:'past', reward:5,
+    sub:'中間〜昨日までに習った範囲から ランダム出題。<b>全問正解</b>で次へ進めるよ。まちがえた問題だけ もう一度！',
+    nextLabel:'② 今日の復習へ →', next:function(){ startDailyQuiz('q2','today'); dailyState.phase='review'; renderDailyQuiz('q2'); } },
+  q2: { phase:'review', title:'② 今日の復習', tag:'今日の範囲・ランダム', scope:'today', reward:10,
+    sub:'今日の範囲から ランダム出題。<b>全問正解</b>で予習に進めるよ。まちがえた問題だけ もう一度！',
+    nextLabel:'③ 予習へ進む →', next:function(){ dailyState.phase='preview'; renderDailyPreview(); } }
+};
+// 選択式のみのプール（常にランダム）。past=中間〜昨日の累積範囲 / today=今日の範囲
+function dailyBuildChoicePool(scope){
+  var pool = [];
+  if(scope === 'past'){
+    pool = buildTimeAttackPool(dailyState.day).slice();   // choice-only・累積範囲
+  } else {
+    var sets = dailyTierSets(dailyState.day);
+    DAILY_SUBJS.forEach(function(subj){
+      sets.forEach(function(idx){ var s = TEST_DATA[subj].sets[idx]; if(s) s.questions.forEach(function(q){
+        if(q.choices && q.type !== 'listening' && q.type !== 'fraction') pool.push({ subj:subj, q:q });
+      }); });
+    });
+  }
+  return _finShuffle(pool);
+}
+function dailyMakeItems(pool, n){
+  return pool.slice(0, n).map(function(it){ return { subj:it.subj, q:it.q, order:_finOrder(it.q.choices.length) }; });
+}
+function startDailyQuiz(slot, scope){
+  var items = dailyMakeItems(dailyBuildChoicePool(scope), DAILY_Q_COUNT);
+  dailyState[slot] = { items:items, answers:{}, judged:false, round:1, startCount:items.length, rewarded:false };
+}
+function renderDailyQuiz(slot){
   var main = document.getElementById('main');
-  var ta = dailyState.ta;
-  if(!ta || !ta.pool.length){ endTimeAttack(); return; }
-  if(!ta.answers) ta.answers = {};
-  if(ta.endAt === 0) ta.endAt = Date.now() + TA_SECONDS*1000;
+  var cfg = DAILY_QUIZ_CFG[slot], st = dailyState[slot];
+  if(!st || !st.items.length){ cfg.next(); return; }
   var KANA = ['ア','イ','ウ','エ','オ','カ'];
-  var html = '<div class="daily-wrap">';
-  html += '<div class="ta-bar"><div class="ta-title">① 過去の復習<em>中間〜昨日まで・5分タイムアタック</em></div>'+
-    '<div class="ta-bar-right"><span class="ta-count" id="taCount">答えた '+Object.keys(ta.answers).length+'/'+ta.pool.length+'</span>'+
-    '<div class="ta-timer" id="taTimer">5:00</div></div></div>';
-  html += '<div class="ta-sub" style="margin-bottom:8px">中間〜昨日までに習った範囲から出題。5分で できるだけ多く解こう！（まちがえても止まらず進める）</div>';
+  var total = st.items.length, correctNow = 0;
+  st.items.forEach(function(wi,i){ if(st.answers[i] === wi.q.correct) correctNow++; });
+  var allCorrect = st.judged && correctNow === total;
+  var html = '<div class="daily-wrap"><div class="daily-head"><div class="daily-title">'+cfg.title+'<em>'+cfg.tag+'</em></div></div>';
+  if(st.judged && !allCorrect){
+    html += '<div class="daily-banner ng">まちがいが '+(total-correctNow)+'問。正解は色つきで出てるよ。「もう一度」で のこりだけ！（正解した問題は ○ で固定）</div>';
+  } else if(!st.judged && st.round > 1){
+    html += '<div class="daily-banner ng">のこり '+total+'問！ぜんぶ正解で次へ進めるよ（選択肢の位置はかわるよ）</div>';
+  } else {
+    html += '<div class="dt-sub" style="margin-bottom:10px;color:var(--muted);font-size:12px">'+cfg.sub+'</div>';
+  }
   html += '<div class="test-sheet">';
   var lastSubj = null;
-  for(var i=0;i<ta.pool.length;i++){
-    var item = ta.pool[i], q = item.q;
-    if(item.subj !== lastSubj){ html += '<div class="exam-daimon-head" style="margin:14px 0 8px">'+SUBJ_NAME[item.subj]+'</div>'; lastSubj = item.subj; }
-    _rubyMode = (item.subj==='jp') ? 'jp' : 'std';
+  for(var i=0;i<st.items.length;i++){
+    var wi = st.items[i], q = wi.q, order = wi.order, correctPos = order.indexOf(q.correct), ans = st.answers[i];
+    if(wi.subj !== lastSubj){ html += '<div class="exam-daimon-head" style="margin:14px 0 8px">'+SUBJ_NAME[wi.subj]+'</div>'; lastSubj = wi.subj; }
+    _rubyMode = (wi.subj === 'jp') ? 'jp' : 'std';
     html += '<div class="test-row"><div class="test-q"><span class="num">'+(i+1)+'</span><div style="flex:1;min-width:0">'+fracText(q.text)+'</div></div>';
     html += '<div class="test-a"><div class="choice-row">';
-    for(var c=0;c<q.choices.length;c++){ var sel=(ta.answers[i]===c)?' sel':''; html += '<button class="choice-pill'+sel+'" data-tac="'+i+'" data-c="'+c+'"><span class="kana">'+KANA[c]+'</span>'+fracText(q.choices[c])+'</button>'; }
-    html += '</div></div></div>';
-  }
-  _rubyMode = 'std';
-  html += '</div><div class="actions" style="justify-content:center;margin-top:14px"><button class="btn primary" id="taFinish">採点して復習へ →</button></div></div>';
-  main.innerHTML = html;
-  main.querySelectorAll('.choice-pill[data-tac]').forEach(function(b){
-    b.onclick = function(){
-      var qi = parseInt(b.dataset.tac,10);
-      ta.answers[qi] = parseInt(b.dataset.c,10);
-      var box = b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){ p.classList.remove('sel'); });
-      b.classList.add('sel');
-      var cnt = document.getElementById('taCount'); if(cnt) cnt.textContent = '答えた '+Object.keys(ta.answers).length+'/'+ta.pool.length;
-    };
-  });
-  document.getElementById('taFinish').onclick = function(){ endTimeAttack(); };
-  if(ta.timer) clearInterval(ta.timer);
-  ta.timer = setInterval(function(){
-    var tEl = document.getElementById('taTimer');
-    if(!tEl || dailyState.phase !== 'ta'){ clearInterval(ta.timer); ta.timer=null; return; }
-    var remMs = ta.endAt - Date.now();
-    if(remMs <= 0){ tEl.textContent='0:00'; endTimeAttack(); return; }
-    var sec = Math.ceil(remMs/1000);
-    tEl.textContent = fmtMMSS(sec);
-    tEl.classList.toggle('urgent', sec<=30);
-  }, 250);
-}
-function endTimeAttack(){
-  var ta = dailyState.ta || {pool:[], answers:{}};
-  if(ta.timer){ clearInterval(ta.timer); ta.timer = null; }
-  var solved=0, correct=0;
-  (ta.pool||[]).forEach(function(item,i){ var a = ta.answers ? ta.answers[i] : undefined; if(a!==undefined){ solved++; if(a===item.q.correct) correct++; } });
-  ta.solved = solved; ta.correct = correct;
-  var main = document.getElementById('main');
-  main.innerHTML = '<div class="daily-wrap"><div class="result"><h2>⏱ ① 過去の復習 おわり！</h2>'+
-    '<div class="score">'+solved+' 問</div>'+
-    '<div class="msg" style="line-height:2">5分で <b>'+solved+'問</b> 解いた！（正解 '+correct+'）<br>つぎは「② 今日の復習」。<b>全問正解</b>できたら予習に進めるよ。</div>'+
-    '<div class="actions" style="justify-content:center"><button class="btn primary" id="taToReview">② 今日の復習へ →</button></div></div></div>';
-  document.getElementById('taToReview').onclick = function(){ dailyState.phase='rangepick'; renderReviewRange(); };
-}
-
-// ② 今日の復習の前に「範囲をえらぶ」（任意。おまかせ or 単元選択）
-function renderReviewRange(){
-  var main = document.getElementById('main');
-  if(!dailyState.unitSel) dailyState.unitSel = {};
-  _rubyMode = 'std';
-  var html = '<div class="daily-wrap"><div class="daily-head"><div class="daily-title">② 今日の復習<em>範囲をえらぶ</em></div></div>';
-  html += '<div class="dt-sub" style="margin-bottom:14px;color:var(--muted);font-size:12px">今日 学校でやった単元を選ぶと、その範囲を復習できるよ。<br>選ばなくてもOK →「おまかせ（全範囲）」でいつもの5教科ミックス。</div>';
-  DAILY_SUBJS.forEach(function(subj){
-    html += '<div class="unit-group"><div class="unit-subj">'+SUBJ_NAME[subj]+'</div><div class="unit-chips">';
-    (DAILY_UNITS[subj]||[]).forEach(function(u){ var k=subj+'/'+u.id; var on=dailyState.unitSel[k]?' on':''; html += '<button class="unit-chip'+on+'" data-unit="'+k+'">'+furigana(escapeHtml(u.name))+'</button>'; });
-    html += '</div></div>';
-  });
-  _rubyMode = 'std';
-  html += '<div class="actions" style="justify-content:center;gap:8px;margin-top:16px;flex-wrap:wrap"><button class="btn" id="urAuto">おまかせ（全範囲）で復習</button><button class="btn primary" id="urGo">えらんだ範囲で復習 →</button></div></div>';
-  main.innerHTML = html;
-  main.querySelectorAll('.unit-chip[data-unit]').forEach(function(b){ b.onclick=function(){ var k=b.dataset.unit; dailyState.unitSel[k]=!dailyState.unitSel[k]; b.classList.toggle('on', !!dailyState.unitSel[k]); }; });
-  function startReview(items){ dailyState.items=items; dailyState.answers={}; dailyState.scores={}; dailyState.reviewChecked=false; dailyState.reviewRewarded=false; dailyState.phase='review'; renderDailyReview(); }
-  document.getElementById('urAuto').onclick = function(){ startReview(buildDayItems(dailyState.day)); };
-  document.getElementById('urGo').onclick = function(){ var picked=buildReviewItemsForUnits(dailyState.unitSel); if(!picked.length){ picked=buildDayItems(dailyState.day); } startReview(picked); };
-}
-
-// ===== ② 今日の復習（表示は従来どおり・全問正解で予習へ） =====
-function renderDailyReview(){
-  var main = document.getElementById('main');
-  var items = dailyState.items, KANA = ['ア','イ','ウ','エ','オ','カ'];
-  var checked = dailyState.reviewChecked;
-  var allCorrect = items.length>0 && items.every(function(it,i){ return (dailyState.scores[i]||0) >= 10; });
-  var wrongCount = 0; for(var w=0; w<items.length; w++){ if((dailyState.scores[w]||0) < 10) wrongCount++; }
-
-  var html = '<div class="daily-wrap"><div class="daily-head"><div class="daily-title">Day '+dailyState.day+'<em>② 今日の復習：全問正解で予習へ</em></div></div>';
-  if(checked){
-    html += allCorrect
-      ? '<div class="daily-banner ok">🎉 全問正解！予習に進もう</div>'
-      : '<div class="daily-banner ng">まちがいが '+wrongCount+'問。直して「答え合わせ」！（正解した問題は ○ で固定されるよ）</div>';
-  } else {
-    html += '<div class="dt-sub" style="margin-bottom:10px;color:var(--muted);font-size:12px">5教科を解いて「答え合わせ」。まちがえた問題は正解できるまで直そう。全部○で予習へ（目安40分）。</div>';
-  }
-  html += '<div class="test-sheet">';
-  var lastSubj = null;
-  for(var i=0; i<items.length; i++){
-    var it = items[i], q = it.q, sc = dailyState.scores[i]||0, locked = (sc >= 10);
-    if(it.subj !== lastSubj){ html += '<div class="exam-daimon-head" style="margin:14px 0 8px">'+SUBJ_NAME[it.subj]+'</div>'; lastSubj = it.subj; }
-    _rubyMode = (it.subj === 'jp') ? 'jp' : 'std';
-    html += '<div class="test-row'+(locked?' row-locked':'')+'"><div class="test-q"><span class="num">'+(i+1)+'</span><div style="flex:1;min-width:0">';
-    if(q.type === 'listening'){ html += '🎧 '+escapeHtml(q.text)+'<button class="audio-btn" data-audio="'+escapeHtml(q.audio)+'" style="margin-left:8px">&#x1f50a; 再生</button>'; }
-    else { html += fracText(q.text); }
-    html += '</div></div><div class="test-a" id="dqa-'+i+'">';
-    if(locked){
-      var ctxt; if(q.type==='fraction'){ var rc=fracReduce(q.num,q.den); ctxt=(rc[0]<0?'−':'')+Math.abs(rc[0])+'/'+rc[1]; }
-      else ctxt = q.choices ? q.choices[q.correct] : (q.keywords ? q.keywords.join(', ') : '');
-      html += '<span class="mark ok">○</span> <span class="correct-answer show" style="display:inline">'+fracText(ctxt)+'</span>';
-    } else {
-      if(q.choices){
-        // すべて選択式（分数は4択化済み・リスニングは🎧を聞いて選ぶ）＝打ち込みゼロ
-        html += '<div class="choice-row">';
-        for(var c=0;c<q.choices.length;c++){ var sel=(dailyState.answers[i]===c)?' sel':''; html += '<button class="choice-pill'+sel+'" data-dqc="'+i+'" data-c="'+c+'"><span class="kana">'+KANA[c]+'</span>'+fracText(q.choices[c])+'</button>'; }
-        html += '</div>';
-      } else if(q.type === 'fraction'){
-        var fa = dailyState.answers[i] || {}; var fsign = fa.sign === -1 ? -1 : 1;
-        html += '<div class="frac-input"><button class="frac-sign'+(fsign===-1?' minus':'')+'" data-dq="'+i+'">'+(fsign===-1?'−':'＋')+'</button><div class="frac-stack">';
-        html += '<input class="frac-num" data-dq="'+i+'" inputmode="numeric" value="'+escapeHtml(String(fa.n!=null?fa.n:''))+'" placeholder="分子"><div class="frac-bar"></div>';
-        html += '<input class="frac-den" data-dq="'+i+'" inputmode="numeric" value="'+escapeHtml(String(fa.d!=null?fa.d:''))+'" placeholder="分母"></div></div>';
-      } else {
-        var val = dailyState.answers[i] !== undefined ? String(dailyState.answers[i]) : '';
-        html += '<div class="hw-input-wrap"><input type="text" data-dq="'+i+'" value="'+escapeHtml(val)+'" placeholder="答え"><button class="hw-ico-btn" data-dqhw="'+i+'" title="手書き入力">✍</button></div>';
-      }
-      if(checked){ html += '<div class="dq-retry">× もう一度！</div>'; }
+    for(var p=0;p<order.length;p++){
+      var origIdx = order[p], cls = 'choice-pill';
+      if(st.judged){ if(p===correctPos) cls += ' gr-correct'; else if(ans===origIdx) cls += ' gr-wrong'; }
+      else if(ans===origIdx) cls += ' sel';
+      html += '<button class="'+cls+'" data-dqc="'+i+'" data-c="'+origIdx+'"'+(st.judged?' disabled':'')+'><span class="kana">'+KANA[p]+'</span>'+fracText(q.choices[origIdx])+'</button>';
     }
+    html += '</div>';
+    if(st.judged){ var ok = (ans===q.correct); html += '<div class="dq-retry" style="color:'+(ok?'var(--ok)':'var(--ng)')+'">'+(ok?'○ 正解':'× 正解は '+KANA[correctPos])+(q.expl?'　/　'+escapeHtml(q.expl):'')+'</div>'; }
     html += '</div></div>';
   }
   _rubyMode = 'std';
-  html += '</div><div class="actions" style="justify-content:center;margin-top:14px;gap:8px"><button class="btn" id="dqBack">カレンダーに戻る</button>'+
-    (allCorrect ? '<button class="btn primary" id="dqToPreview">③ 予習へ進む →</button>'
-                : '<button class="btn primary" id="dqCheck">答え合わせ</button>')+
-    '</div></div>';
+  html += '</div><div class="actions" style="justify-content:center;margin-top:14px;gap:8px"><button class="btn" id="dqBack">カレンダーに戻る</button>';
+  if(allCorrect) html += '<button class="btn primary" id="dqNext">'+cfg.nextLabel+'</button>';
+  else if(st.judged) html += '<button class="btn primary" id="dqAgain">🔁 のこり '+(total-correctNow)+'問に もう一度！</button>';
+  else html += '<button class="btn primary" id="dqCheck">答え合わせ</button>';
+  html += '</div></div>';
   main.innerHTML = html;
-
-  main.querySelectorAll('.audio-btn[data-audio]').forEach(function(b){ b.onclick=function(){ speakEnglish(b.dataset.audio, b); }; });
-  main.querySelectorAll('input[type="text"][data-dq]').forEach(function(inp){ var qi=parseInt(inp.dataset.dq,10); inp.oninput=function(){ dailyState.answers[qi]=inp.value; }; });
-  main.querySelectorAll('.hw-ico-btn[data-dqhw]').forEach(function(b){ b.onclick=function(){ var inp=main.querySelector('input[data-dq="'+b.dataset.dqhw+'"]'); openHandwriting(inp, items[parseInt(b.dataset.dqhw,10)].subj==='en'?'en':'ja'); }; });
-  main.querySelectorAll('.choice-pill[data-dqc]').forEach(function(b){ b.onclick=function(){ var qi=parseInt(b.dataset.dqc,10); dailyState.answers[qi]=parseInt(b.dataset.c,10); var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(p){p.classList.remove('sel');}); b.classList.add('sel'); }; });
-  main.querySelectorAll('.frac-input').forEach(function(box){
-    var qi=parseInt(box.querySelector('.frac-num').dataset.dq,10);
-    function ensure(){ var a=dailyState.answers[qi]; if(!a||typeof a!=='object'){a={sign:1,n:'',d:''};dailyState.answers[qi]=a;} return a; }
-    var sg=box.querySelector('.frac-sign'); sg.onclick=function(){ var a=ensure(); a.sign=(a.sign===-1)?1:-1; sg.textContent=a.sign===-1?'−':'＋'; sg.classList.toggle('minus',a.sign===-1); };
-    box.querySelector('.frac-num').oninput=function(){ var a=ensure(); this.value=this.value.replace(/[^0-9]/g,''); a.n=this.value; };
-    box.querySelector('.frac-den').oninput=function(){ var a=ensure(); this.value=this.value.replace(/[^0-9]/g,''); a.d=this.value; };
-  });
+  main.querySelectorAll('.choice-pill[data-dqc]').forEach(function(b){ b.onclick=function(){
+    if(st.judged) return;
+    var qi = parseInt(b.dataset.dqc,10); st.answers[qi] = parseInt(b.dataset.c,10);
+    var box = b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(x){ x.classList.remove('sel'); }); b.classList.add('sel');
+  }; });
   document.getElementById('dqBack').onclick = function(){ dailyState.phase='cal'; renderDailyCalendar(); };
-  var ck = document.getElementById('dqCheck'); if(ck) ck.onclick = function(){ dailyReviewCheck(); };
-  var tp = document.getElementById('dqToPreview'); if(tp) tp.onclick = function(){ dailyState.phase='preview'; renderDailyPreview(); };
+  var ck = document.getElementById('dqCheck'); if(ck) ck.onclick = function(){ dailyQuizJudge(slot); };
+  var ag = document.getElementById('dqAgain'); if(ag) ag.onclick = function(){ dailyQuizNext(slot); };
+  var nx = document.getElementById('dqNext'); if(nx) nx.onclick = function(){ cfg.next(); };
 }
-// 答え合わせ：正解(満点)した問題は固定。全問正解でゲーム時間付与＆予習へ進めるように
-function dailyReviewCheck(){
-  var items = dailyState.items;
-  for(var i=0;i<items.length;i++){
-    if((dailyState.scores[i]||0) >= 10) continue;       // すでに正解済みは固定
-    dailyState.scores[i] = gradeAnswer(items[i].q, dailyState.answers[i]);
-  }
-  dailyState.reviewChecked = true;
-  var allOK = items.length>0 && items.every(function(it,i){ return (dailyState.scores[i]||0) >= 10; });
-  if(allOK && !dailyState.reviewRewarded){ dailyState.reviewRewarded = true; earnYen(10); }
-  renderDailyReview();
+function dailyQuizJudge(slot){
+  var st = dailyState[slot], cfg = DAILY_QUIZ_CFG[slot];
+  st.judged = true;
+  var allOK = st.items.length>0 && st.items.every(function(wi,i){ return st.answers[i] === wi.q.correct; });
+  if(allOK && !st.rewarded){ st.rewarded = true; earnYen(cfg.reward); }
+  renderDailyQuiz(slot);
+  try{ document.querySelector('.main').scrollTop = 0; }catch(e){}
+}
+function dailyQuizNext(slot){
+  var st = dailyState[slot], remain = [];
+  st.items.forEach(function(wi,i){ if(st.answers[i] !== wi.q.correct){ remain.push({ subj:wi.subj, q:wi.q, order:_finOrder(wi.q.choices.length) }); } });
+  st.items = remain; st.answers = {}; st.judged = false; st.round++;
+  renderDailyQuiz(slot);
+  try{ document.querySelector('.main').scrollTop = 0; }catch(e){}
 }
 
 // ③ 予習（調べて予習）：要点とヒントを見ながら次の単元を解く
@@ -6993,7 +7016,7 @@ function renderDailyPreview(){
   main.querySelectorAll('.pv-hint-btn[data-pvh]').forEach(function(b){ b.onclick=function(){ var p=parseInt(b.dataset.pvh,10); var t=pv[p].topic; var wrong=t.check.choices[(t.check.correct+1)%t.check.choices.length]; var el=document.getElementById('pvh-'+p); el.textContent='要点をもう一度読もう。「'+wrong+'」はちがうよ。'; el.style.display='block'; }; });
   main.querySelectorAll('.choice-pill[data-pvc]').forEach(function(b){ b.onclick=function(){ var p=parseInt(b.dataset.pvc,10),c=parseInt(b.dataset.c,10); dailyState.pvAnswers[p]=c; var box=b.closest('.choice-row'); box.querySelectorAll('.choice-pill').forEach(function(x){x.classList.remove('sel');}); b.classList.add('sel'); var ok=(c===pv[p].topic.check.correct); var m=document.getElementById('pvm-'+p); m.textContent=ok?'○ 正解！この調子で先取りしよう':'× もう一度。要点にヒントがあるよ'; m.className='pv-mark '+(ok?'ok':'ng'); }; });
   main.querySelectorAll('.pv-understand[data-pvu]').forEach(function(b){ b.onclick=function(){ var p=parseInt(b.dataset.pvu,10); dailyState.understood[p]=!dailyState.understood[p]; b.classList.toggle('on',dailyState.understood[p]); b.textContent=dailyState.understood[p]?'✓ 理解した！':'理解した ✓'; }; });
-  document.getElementById('pvBack').onclick=function(){ dailyState.phase='review'; renderDailyReview(); };
+  document.getElementById('pvBack').onclick=function(){ dailyState.phase='review'; renderDailyQuiz('q2'); };
   document.getElementById('pvDone').onclick=function(){ dailyFinish(); };
 }
 
@@ -7003,13 +7026,13 @@ function dailyFinish(){
   dailyDone[todayKey]=true; saveDaily();
   if(firstDone) earnYen(10);   // 本日完了でゲーム時間を加算
   var uCount=0; for(var p=0;p<dailyState.pv.length;p++){ if(dailyState.understood[p]) uCount++; }
-  var ta = dailyState.ta || {solved:0, correct:0};
+  var q1 = dailyState.q1 || {startCount:0}, q2 = dailyState.q2 || {startCount:0};
 
   var main=document.getElementById('main');
   var html='<div class="daily-wrap"><div class="result"><h2>本日完了！おつかれさま 🎉</h2>'+
     '<div class="msg" style="margin-top:12px;line-height:2">'+
-    '① 過去の復習（タイムアタック）<b>'+ta.solved+'問</b>（正解 '+ta.correct+'）<br>'+
-    '② 今日の復習 <b>ぜんぶ正解！</b><br>'+
+    '① 過去の復習 <b>全問正解！</b>（'+q1.startCount+'問）<br>'+
+    '② 今日の復習 <b>全問正解！</b>（'+q2.startCount+'問）<br>'+
     '③ 予習 理解 <b>'+uCount+'/'+dailyState.pv.length+'</b><br><br>'+
     '連続 <b>'+dailyStreak()+'</b> 日！ゲーム時間が増えたよ。<br>予習しておくと、授業がぐっとわかる！</div>'+
     '<div class="actions" style="justify-content:center;margin-top:10px"><button class="btn primary" id="dfCal">カレンダーへ →</button></div></div></div>';

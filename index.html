@@ -1225,7 +1225,7 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
       <div class="eyebrow" id="hdrEyebrow">LEARN / Jr.High 1 — 1学期 中間テスト</div>
       <div class="title" id="hdrTitle">学習<em>中1 中間テスト対策</em></div>
     </div>
-    <div class="roadmap" id="roadmap"></div>
+    <div class="roadmap" id="roadmap" style="display:none"></div>
   </div>
 
   <div class="subj-row">
@@ -1247,7 +1247,7 @@ ruby rt{font-size:0.56em;opacity:0.72;font-weight:400;letter-spacing:0;line-heig
     <button id="menuToggle" class="menu-toggle" onclick="toggleMenu()">🧰 練習メニュー ▾</button>
   </div>
   <div class="mode-toggle" id="modeToggle" style="display:none">
-    <button class="mode-btn mode-home" data-mode="daily">🏠 毎日1時間にもどる</button>
+    <button class="mode-btn mode-home" data-mode="daily" style="display:none">🏠 毎日1時間にもどる</button>
     <button class="guide-start-btn" id="guideStart">📋 今日のおすすめ順</button>
     <div class="mode-group">
       <span class="mode-group-label">① おぼえる</span>
@@ -8485,12 +8485,9 @@ loadDaily();
 shuffleTrainChoices();
 hwInit();
 render();
-// 起動はホーム（毎日1時間）から。迷ったらここだけでOK
-(function(){
-  var dp = ROADMAP.filter(function(x){ return x.key===currentPhase && x.ready; })[0]
-        || ROADMAP.filter(function(x){ return x.ready; })[0];
-  if(dp){ applyPhase(dp); }
-})();
+// 起動は「📒 期末つみあげ」から。毎日1時間・ロードマップは非表示（期末対策に集中）
+document.getElementById('studyGuide').style.display = 'none';
+switchMode('yomatsu');
 renderRoadmap();
 </script>
 </body>

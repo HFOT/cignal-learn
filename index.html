@@ -299,6 +299,15 @@ button{font-family:inherit;color:inherit}
 .train-qlabel{font-size:12px;color:var(--accent);font-weight:700;margin-bottom:6px}
 .train-prompt{font-size:23px;font-weight:800;line-height:1.55;margin-bottom:18px}
 .train-choices{display:flex;flex-direction:column;gap:9px}
+.train-order-answer{min-height:44px;border:2px dashed var(--border);border-radius:10px;padding:8px 10px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.train-order-ph{color:var(--muted);font-size:13px}
+.train-order-chip{padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--paper-2);color:var(--ink);font-size:15px;cursor:pointer;transition:all .1s}
+.train-order-chip:hover{border-color:var(--accent)}
+.train-order-chip.placed{background:var(--accent);color:#fff;border-color:transparent;cursor:default}
+.train-order-pool{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:10px}
+.train-order-actions{text-align:center;margin-bottom:6px}
+.train-order-undo{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--paper-2);color:var(--muted);font-size:13px;cursor:pointer}
+.train-order-undo:disabled{opacity:.4;cursor:default}
 .train-choices .tc{padding:12px 15px;border-radius:10px;border:1px solid var(--border);background:var(--paper-2);color:var(--ink);font-size:15px;cursor:pointer;text-align:left;transition:all .12s}
 .train-choices .tc:hover{border-color:var(--accent)}
 .train-choices .tc .kana{font-weight:700;margin-right:9px;color:var(--muted)}
@@ -7770,7 +7779,7 @@ function scopeBarHTML(){
   return h+'</div>';
 }
 function bindScopeBar(main, onChange){ main.querySelectorAll('.train-subjtab[data-tscope]').forEach(function(b){ b.onclick=function(){ if(trainScope===b.dataset.tscope) return; trainScope=b.dataset.tscope; onChange(); }; }); }
-var trainState = { subj:'en', cat:0, idx:0, picked:null, revealed:false, elim:[], done:0, hintShown:false, mode:'train', doneAll:false, yomatsu:false };
+var trainState = { subj:'en', cat:0, idx:0, picked:null, revealed:false, elim:[], done:0, hintShown:false, mode:'train', doneAll:false, yomatsu:false, orderPool:null, orderPicked:[], orderJudged:false, orderCorrect:false, orderWrongFlash:false };
 // 英語＝日本語→英語の連動（手作り）。ヒント/スペシャルヒント/説明つき
 var TRAIN_DATA = {
   en: { name:'英語', cats:[
@@ -7975,6 +7984,69 @@ var TRAIN_DATA = {
       {ja:'eraserの複数形は？', choices:['erasers','eraseres','eraseries','eraser'], correct:0, hint:'通常は-s。', special:'erasers', expl:'erasers。'},
       {ja:'friendの複数形は？', choices:['friends','friendes','friendies','friend'], correct:0, hint:'通常は-s。', special:'friends', expl:'friends。'},
       {ja:'appleの複数形は？', choices:['apples','applies','appleies','apple'], correct:0, hint:'通常は-s。', special:'apples', expl:'apples。'}
+    ]},
+    { name:'単語問題（Unit3-4）【期末】', items:[
+      {qkind:'wordmeaning', ja:'school', choices:['学校','図書館','病院','公園'], correct:0, hint:'建物の名前。', special:'school', expl:'school＝学校。'},
+      {qkind:'wordmeaning', ja:'library', choices:['公園','図書館','駅','神社'], correct:1, hint:'建物の名前。', special:'library', expl:'library＝図書館。'},
+      {qkind:'wordmeaning', ja:'park', choices:['病院','寺','公園','教室'], correct:2, hint:'屋外の場所。', special:'park', expl:'park＝公園。'},
+      {qkind:'wordmeaning', ja:'hospital', choices:['駅','病院','動物園','廊下'], correct:1, hint:'建物の名前。', special:'hospital', expl:'hospital＝病院。'},
+      {qkind:'wordmeaning', ja:'station', choices:['神社','教室','駅','寺'], correct:2, hint:'乗り物に関係する場所。', special:'station', expl:'station＝駅。'},
+      {qkind:'wordmeaning', ja:'temple', choices:['寺','図書館','公園','動物園'], correct:0, hint:'建物の名前。', special:'temple', expl:'temple＝寺。'},
+      {qkind:'wordmeaning', ja:'shrine', choices:['学校','神社','病院','駅'], correct:1, hint:'建物の名前。', special:'shrine', expl:'shrine＝神社。'},
+      {qkind:'wordmeaning', ja:'soccer', choices:['野球','テニス','サッカー','水泳'], correct:2, hint:'スポーツの名前。', special:'soccer', expl:'soccer＝サッカー。'},
+      {qkind:'wordmeaning', ja:'tennis', choices:['テニス','サッカー','野球','バスケットボール'], correct:0, hint:'スポーツの名前。', special:'tennis', expl:'tennis＝テニス。'},
+      {qkind:'wordmeaning', ja:'baseball', choices:['サッカー','テニス','野球','ラグビー'], correct:2, hint:'スポーツの名前。', special:'baseball', expl:'baseball＝野球。'},
+      {qkind:'wordmeaning', ja:'guitar', choices:['ピアノ','ギター','バイオリン','ドラム'], correct:1, hint:'楽器の名前。', special:'guitar', expl:'guitar＝ギター。'},
+      {qkind:'wordmeaning', ja:'piano', choices:['ギター','ドラム','ピアノ','バイオリン'], correct:2, hint:'楽器の名前。', special:'piano', expl:'piano＝ピアノ。'},
+      {qkind:'wordmeaning', ja:'hallway', choices:['教室','廊下','図書館','体育館'], correct:1, hint:'学校の中の場所。', special:'hallway', expl:'hallway＝廊下。'},
+      {qkind:'wordmeaning', ja:'classroom', choices:['廊下','体育館','教室','図書館'], correct:2, hint:'学校の中の場所。', special:'classroom', expl:'classroom＝教室。'},
+      {qkind:'wordmeaning', ja:'zoo', choices:['動物園','水族館','植物園','公園'], correct:0, hint:'動物がいる場所。', special:'zoo', expl:'zoo＝動物園。'},
+      {qkind:'wordmeaning', ja:'game', choices:['宿題','試合・ゲーム','授業','部活'], correct:1, hint:'スポーツや遊びに関係。', special:'game', expl:'game＝試合・ゲーム。'},
+      {qkind:'wordmeaning', ja:'new', choices:['古い','新しい','大きい','小さい'], correct:1, hint:'形容詞。', special:'new', expl:'new＝新しい。'},
+      {qkind:'wordmeaning', ja:'kind', choices:['勇敢な','静かな','親切な','新しい'], correct:2, hint:'形容詞・性格。', special:'kind', expl:'kind＝親切な。'},
+      {qkind:'wordmeaning', ja:'brave', choices:['勇敢な','親切な','静かな','古い'], correct:0, hint:'形容詞・性格。', special:'brave', expl:'brave＝勇敢な。'},
+      {qkind:'wordmeaning', ja:'quiet', choices:['にぎやかな','静かな','新しい','勇敢な'], correct:1, hint:'形容詞・様子。', special:'quiet', expl:'quiet＝静かな。'}
+    ]},
+    { name:'穴埋め問題（Unit3-4）【期末】', items:[
+      {qkind:'fillchoice', ja:'I go to school ( ) bike.', choices:['by','in','on','at'], correct:0, hint:'交通手段はby+乗り物。「私は自転車で学校に行きます。」', special:'by', expl:'by bike（自転車で）。'},
+      {qkind:'fillchoice', ja:'( ) is the park? — It is near the station.', choices:['Where','What','How','When'], correct:0, hint:'場所をたずねる疑問詞。「公園はどこですか。」', special:'Where', expl:'Where is the park?（場所をたずねる）。'},
+      {qkind:'fillchoice', ja:'( ) time is it? — It is three.', choices:['How','What','Where','When'], correct:1, hint:'時刻をたずねる疑問詞。「今何時ですか。」', special:'What', expl:'What time is it?（時刻をたずねる）。'},
+      {qkind:'fillchoice', ja:'( ) do you come to school? — I walk to school.', choices:['How','What','Who','Where'], correct:0, hint:'方法・手段をたずねる疑問詞。「あなたはどうやって学校に来ますか。」', special:'How', expl:'How do you...?（手段をたずねる）。'},
+      {qkind:'fillchoice', ja:'( ) do you practice the guitar? — On Sundays.', choices:['What','Where','When','How'], correct:2, hint:'時をたずねる疑問詞。「あなたはいつギターを練習しますか。」', special:'When', expl:'When do you...?（時をたずねる）。'},
+      {qkind:'fillchoice', ja:'What ( ) do you play? — Soccer and tennis.', choices:['time','sports','many','where'], correct:1, hint:'「あなたは何のスポーツをしますか。」', special:'sports', expl:'What sports do you play?'},
+      {qkind:'fillchoice', ja:'We practice ( ) the hallway.', choices:['on','by','in','under'], correct:2, hint:'「〜の中に」を表す前置詞。「私たちは廊下で練習します。」', special:'in', expl:'in the hallway（廊下の中で）。'},
+      {qkind:'fillchoice', ja:'Be ( ). Don\'t worry.', choices:['brave','bravely','braver','braved'], correct:0, hint:'「勇敢でありなさい。」', special:'brave', expl:'Be brave.（be動詞の命令文）。'},
+      {qkind:'fillchoice', ja:"Don't ( ) in the hallway.", choices:['runs','running','run','ran'], correct:2, hint:'「廊下を走ってはいけません。」', special:'run', expl:"Don't run in the hallway.（禁止の命令文、動詞は原形）。"},
+      {qkind:'fillchoice', ja:'( ) many books do you have?', choices:['How','What','Where','When'], correct:0, hint:'数をたずねる表現。「あなたは何冊の本を持っていますか。」', special:'How', expl:'How many books do you have?'},
+      {qkind:'fillchoice', ja:'We need three ( ).', choices:['tomato','tomatoes','tomatoies','a tomato'], correct:1, hint:'tomatoの複数形。「私たちは3個のトマトが必要です。」', special:'tomatoes', expl:'tomatoは-esで複数形。'},
+      {qkind:'fillchoice', ja:'I have a lot of ( ).', choices:['book','a book','books','the book'], correct:2, hint:'bookの複数形。「私はたくさんの本を持っています。」', special:'books', expl:'a lot of+複数形の名詞。'},
+      {qkind:'fillchoice', ja:'What ( ) that? — It is a kamon.', choices:['am','is','are','do'], correct:1, hint:'「あれは何ですか。」', special:'is', expl:'What is that?'},
+      {qkind:'fillchoice', ja:'I ( ) to the park.', choices:['walk','walks','walking','walked'], correct:0, hint:'「私は公園に歩いて行きます。」主語Iには原形。', special:'walk', expl:'walk to ～（歩いて〜に行く）。'},
+      {qkind:'fillchoice', ja:'( ) your hands.', choices:['Washes','Washing','Wash','Washed'], correct:2, hint:'「手を洗いなさい。」命令文は動詞の原形。', special:'Wash', expl:'Wash your hands.（動詞の原形で始める命令文）。'},
+      {qkind:'fillchoice', ja:'Play this piano, ( ).', choices:['please','very','so','too'], correct:0, hint:'命令文をていねいにする語。「このピアノをひいてください。」', special:'please', expl:'please（命令文の最後につけるとていねいになる）。'}
+    ]},
+    { name:'並べ替え問題（Unit2-4）【期末】', items:[
+      {type:'order', ja:'これは私のネコです。', tokens:['This','is','my','cat','.'], hint:'This is my 〜. の語順。', expl:'This is my cat.'},
+      {type:'order', ja:'あれはあなたの帽子です。', tokens:['That','is','your','cap','.'], hint:'That is your 〜. の語順。', expl:'That is your cap.'},
+      {type:'order', ja:'あれは学校ですか。', tokens:['Is','that','a','school','?'], hint:'be動詞を主語の前に出す疑問文。', expl:'Is that a school?'},
+      {type:'order', ja:'これは私のカップですか。', tokens:['Is','this','my','cup','?'], hint:'Is+主語+....?の語順。', expl:'Is this my cup?'},
+      {type:'order', ja:'私の両親はテニスをすることができます。', tokens:['My','parents','can','play','tennis','.'], hint:'主語+can+動詞の原形。', expl:'My parents can play tennis.'},
+      {type:'order', ja:'あなたは日本の食べ物を作ることができますか。', tokens:['Can','you','make','Japanese','food','?'], hint:'Canを主語の前に出す疑問文。', expl:'Can you make Japanese food?'},
+      {type:'order', ja:'あなたは英語が好きですか。', tokens:['Do','you','like','English','?'], hint:'一般動詞の疑問文はDoで始める。', expl:'Do you like English?'},
+      {type:'order', ja:'あなたはどのように学校に来ますか。', tokens:['How','do','you','come','to','school','?'], hint:'疑問詞Howを文の最初に置く。', expl:'How do you come to school?'},
+      {type:'order', ja:'私は歩いて学校に来ます。', tokens:['I','walk','to','school','.'], hint:'walk to 〜の語順。', expl:'I walk to school.'},
+      {type:'order', ja:'あなたはいつ学校に来ますか。', tokens:['When','do','you','come','to','school','?'], hint:'疑問詞Whenを文の最初に置く。', expl:'When do you come to school?'},
+      {type:'order', ja:'これは何ですか。', tokens:['What','is','this','?'], hint:'疑問詞Whatを文の最初に置く。', expl:'What is this?'},
+      {type:'order', ja:'あちらはだれですか。', tokens:['Who','is','that','?'], hint:'人をたずねる疑問詞Who。', expl:'Who is that?'},
+      {type:'order', ja:'あなたの学校はどこですか。', tokens:['Where','is','your','school','?'], hint:'場所をたずねる疑問詞Where。', expl:'Where is your school?'},
+      {type:'order', ja:'それは公園の近くです。', tokens:['It','is','near','the','park','.'], hint:'It is near 〜.の語順。', expl:'It is near the park.'},
+      {type:'order', ja:'あなたはどこでテニスを練習しますか。', tokens:['Where','do','you','practice','tennis','?'], hint:'一般動詞の文でWhereを使う疑問文。', expl:'Where do you practice tennis?'},
+      {type:'order', ja:'私たちは廊下で練習します。', tokens:['We','practice','in','the','hallway','.'], hint:'practice in 〜の語順。', expl:'We practice in the hallway.'},
+      {type:'order', ja:'今何時ですか。', tokens:['What','time','is','it','?'], hint:'What time is it?の決まった形。', expl:'What time is it?'},
+      {type:'order', ja:'あなたは何のスポーツをしますか。', tokens:['What','sports','do','you','play','?'], hint:'What+名詞...?の語順。', expl:'What sports do you play?'},
+      {type:'order', ja:'あなたは何個のリンゴを持っていますか。', tokens:['How','many','apples','do','you','have','?'], hint:'How many+名詞+do you have?の語順。', expl:'How many apples do you have?'},
+      {type:'order', ja:'前に来なさい。', tokens:['Come','to','the','front','.'], hint:'動詞の原形で始める命令文。', expl:'Come to the front.'},
+      {type:'order', ja:'心配しないで。', tokens:['Don\'t','worry','.'], hint:'Don\'t+動詞の原形の命令文。', expl:'Don\'t worry.'}
     ]}
   ]}
 };
@@ -8023,11 +8095,43 @@ function trainBindTabs(main){
   main.querySelectorAll('.train-subjtab[data-tsubj]').forEach(function(b){ b.onclick=function(){ trainState.subj=b.dataset.tsubj; trainState.cat=0; trainResetItem(); renderTrain(); }; });
   main.querySelectorAll('.train-cat[data-tcat]').forEach(function(b){ b.onclick=function(){ trainState.cat=parseInt(b.dataset.tcat,10); trainResetItem(); renderTrain(); }; });
 }
-function trainResetItem(){ trainState.idx=0; trainState.picked=null; trainState.revealed=false; trainState.elim=[]; trainState.hintShown=false; }
+function trainResetItem(){ trainState.idx=0; trainState.picked=null; trainState.revealed=false; trainState.elim=[]; trainState.hintShown=false; trainState.orderPool=null; trainState.orderPicked=[]; trainState.orderJudged=false; trainState.orderCorrect=false; trainState.orderWrongFlash=false; }
 function trainResetFlow(){
   var subjs=scopeSubjs(); trainState.subj=subjs[0]; trainState.cat=0; trainState.idx=0; trainState.doneAll=false;
   trainState.picked=null; trainState.revealed=false; trainState.elim=[]; trainState.hintShown=false;
+  trainState.orderPool=null; trainState.orderPicked=[]; trainState.orderJudged=false; trainState.orderCorrect=false; trainState.orderWrongFlash=false;
 }
+function _trainShuffleIdx(n){ var o=[]; for(var k=0;k<n;k++) o.push(k); for(var i=o.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=o[i]; o[i]=o[j]; o[j]=t; } return o; }
+// 並べ替え：単語チップをタップした順に並べ、元の順番(0,1,2...)と一致すれば正解
+function trainOrderPick(poolPos){
+  if(trainState.orderJudged && trainState.orderCorrect) return;
+  var idx=trainState.orderPool[poolPos];
+  trainState.orderPool.splice(poolPos,1);
+  trainState.orderPicked.push(idx);
+  trainState.orderWrongFlash=false;
+  var it=trainBaseCats(trainState.subj)[trainState.cat].items[trainState.idx];
+  if(trainState.orderPicked.length===it.tokens.length){
+    var ok=true;
+    for(var i=0;i<it.tokens.length;i++){ if(trainState.orderPicked[i]!==i){ ok=false; break; } }
+    trainState.orderJudged=true; trainState.orderCorrect=ok;
+    if(ok){
+      trainState.done++; var d=document.getElementById('trainDone'); if(d) d.textContent=trainState.done;
+      renderTrain();
+      setTimeout(function(){ if(trainState.mode==='train' && trainState.orderCorrect){ trainAdvance(); } }, 750);
+      return;
+    } else { trainState.orderWrongFlash=true; }
+  }
+  renderTrain();
+}
+function trainOrderUndo(){
+  if(trainState.orderJudged && trainState.orderCorrect) return;
+  if(!trainState.orderPicked.length) return;
+  var idx=trainState.orderPicked.pop();
+  trainState.orderPool.push(idx);
+  trainState.orderJudged=false; trainState.orderWrongFlash=false;
+  renderTrain();
+}
+function trainOrderRetry(){ trainState.orderPool=trainState.orderPool.concat(trainState.orderPicked); trainState.orderPicked=[]; trainState.orderJudged=false; trainState.orderCorrect=false; trainState.orderWrongFlash=false; renderTrain(); }
 // 正解で次へ：項目内→次の項目→（総合なら）次の科目
 function trainAdvance(){
   var subjs=scopeSubjs(); var cats=trainBaseCats(trainState.subj);
@@ -8042,6 +8146,7 @@ function trainAdvance(){
     }
   }
   trainState.picked=null; trainState.revealed=false; trainState.elim=[]; trainState.hintShown=false;
+  trainState.orderPool=null; trainState.orderPicked=[]; trainState.orderJudged=false; trainState.orderCorrect=false; trainState.orderWrongFlash=false;
   renderTrain();
 }
 function renderTrain(){
@@ -8074,32 +8179,51 @@ function renderTrain(){
   cats.forEach(function(c,ci){ var fin=isFinalName(c.name)?' final':''; html+='<button class="train-cat'+(ci===trainState.cat?' on':'')+fin+'" data-tcat="'+ci+'">'+furigana(escapeHtml(stripFinalTag(c.name)))+finalBadgeHtml(c.name)+'</button>'; });
   html+='</div>';
   if(!it){ html+='<div class="train-card">この項目は準備中です。</div></div>'; main.innerHTML=html; _rubyMode='std'; bindScopeBar(main, function(){ trainResetFlow(); renderTrain(); }); return; }
-  var solved=(trainState.picked!=null && trainState.picked===it.correct);
+  var isOrderItem=(it.type==='order');
+  if(isOrderItem && !trainState.orderPool){ trainState.orderPool=_trainShuffleIdx(it.tokens.length); trainState.orderPicked=[]; trainState.orderJudged=false; trainState.orderCorrect=false; trainState.orderWrongFlash=false; }
+  var solved = isOrderItem ? (trainState.orderJudged && trainState.orderCorrect) : (trainState.picked!=null && trainState.picked===it.correct);
   var revealed=trainState.revealed;
   var locked=(solved||revealed);
-  var wrongPick=(trainState.picked!=null && trainState.picked!==it.correct && !revealed);
+  var wrongPick = isOrderItem ? false : (trainState.picked!=null && trainState.picked!==it.correct && !revealed);
   var prompt=it.ja||it.prompt;
-  var qlabel=it.ja?'次の日本語を 英語に すると？':'正しい答えを えらぼう';
+  var qlabel = isOrderItem ? '日本語の意味になるように、単語をタップして並べよう'
+    : it.qkind==='wordmeaning' ? '次の英単語の日本語の意味は？'
+    : it.qkind==='fillchoice' ? '（　）に あてはまる語を えらぼう'
+    : it.ja?'次の日本語を 英語に すると？':'正しい答えを えらぼう';
   html+='<div class="train-card">';
   html+='<div class="train-progress">'+(trainState.idx+1)+' / '+cat.items.length+'　'+nameWithFinalBadge(cat.name)+'</div>';
   if(cat.page){ html+='<div class="train-page-ref">📘 わかりにくいときは <b>ワーク p.'+escapeHtml(cat.page)+'</b> の図を見てみよう</div>'; }
   html+='<div class="train-qlabel">'+qlabel+'</div>';
   html+='<div class="train-prompt">'+(it.ja?furigana(escapeHtml(prompt)):fracText(prompt))+'</div>';
-  html+='<div class="train-choices">';
-  for(var c=0;c<it.choices.length;c++){
-    var cls='tc';
-    if(trainState.elim.indexOf(c)>=0) cls+=' elim';
-    if(locked){ if(c===it.correct) cls+=' correct'; else if(trainState.picked===c) cls+=' wrong'; }
-    else if(wrongPick && trainState.picked===c){ cls+=' wrong'; }
-    var chtxt=it.ja?escapeHtml(it.choices[c]):fracText(it.choices[c]);
-    html+='<button class="'+cls+'" data-tc="'+c+'"'+(locked?' disabled':'')+'><span class="kana">'+KANA[c]+'</span>'+chtxt+'</button>';
+  if(isOrderItem){
+    html+='<div class="train-order-answer">';
+    if(!trainState.orderPicked.length){ html+='<span class="train-order-ph">ここに単語が並ぶよ</span>'; }
+    trainState.orderPicked.forEach(function(idx){ html+='<span class="train-order-chip placed">'+escapeHtml(it.tokens[idx])+'</span>'; });
+    html+='</div>';
+    if(solved){ html+='<div class="train-feedback ok">⭕ 正解！つぎへ進むよ</div>'; }
+    else if(trainState.orderWrongFlash){ html+='<div class="train-feedback ng">❌ 順番がちがうよ。「1つ戻す」でやり直そう！</div>'; }
+    html+='<div class="train-order-pool">';
+    (locked?[]:trainState.orderPool).forEach(function(idx,poolPos){ html+='<button class="train-order-chip" data-poolpos="'+poolPos+'">'+escapeHtml(it.tokens[idx])+'</button>'; });
+    html+='</div>';
+    if(!locked){ html+='<div class="train-order-actions"><button class="train-order-undo" id="tOrderUndo"'+(trainState.orderPicked.length?'':' disabled')+'>⬅ 1つ戻す</button></div>'; }
+  } else {
+    html+='<div class="train-choices">';
+    for(var c=0;c<it.choices.length;c++){
+      var cls='tc';
+      if(trainState.elim.indexOf(c)>=0) cls+=' elim';
+      if(locked){ if(c===it.correct) cls+=' correct'; else if(trainState.picked===c) cls+=' wrong'; }
+      else if(wrongPick && trainState.picked===c){ cls+=' wrong'; }
+      var chtxt=it.ja?escapeHtml(it.choices[c]):fracText(it.choices[c]);
+      html+='<button class="'+cls+'" data-tc="'+c+'"'+(locked?' disabled':'')+'><span class="kana">'+KANA[c]+'</span>'+chtxt+'</button>';
+    }
+    html+='</div>';
+    if(solved){ html+='<div class="train-feedback ok">⭕ 正解！つぎへ進むよ</div>'; }
+    else if(wrongPick){ html+='<div class="train-feedback ng">❌ ちがうよ。ヒントを見て もう一度えらぼう！</div>'; }
   }
-  html+='</div>';
-  if(solved){ html+='<div class="train-feedback ok">⭕ 正解！つぎへ進むよ</div>'; }
-  else if(wrongPick){ html+='<div class="train-feedback ng">❌ ちがうよ。ヒントを見て もう一度えらぼう！</div>'; }
-  html+='<div class="train-help"><button class="hint" id="tHint">💡 ヒント</button><button class="special" id="tSpecial">⭐ スペシャルヒント</button><button class="ans" id="tAns">👀 答えを見る</button></div>';
+  html+='<div class="train-help"><button class="hint" id="tHint">💡 ヒント</button>'+(isOrderItem?'':'<button class="special" id="tSpecial">⭐ スペシャルヒント</button>')+'<button class="ans" id="tAns">👀 答えを見る</button></div>';
   html+='<div class="train-hintbox hint" id="tHintBox" style="display:'+(trainState.hintShown?'block':'none')+'">'+furigana(escapeHtml(trainHintText(it)))+'</div>';
-  html+='<div class="train-hintbox special" id="tSpecialBox" style="display:'+(trainState.elim.length?'block':'none')+'">まちがいを 2つ 消したよ。のこりから えらぼう！</div>';
+  if(!isOrderItem){ html+='<div class="train-hintbox special" id="tSpecialBox" style="display:'+(trainState.elim.length?'block':'none')+'">まちがいを 2つ 消したよ。のこりから えらぼう！</div>'; }
+  if(isOrderItem && revealed && !solved){ html+='<div class="train-hintbox special" style="display:block">正解：'+escapeHtml(it.tokens.join(' '))+'</div>'; }
   html+='<div class="train-expl'+(locked?' show':'')+'" id="tExpl">📘 '+furigana(escapeHtml(it.expl||''))+'</div>';
   if(revealed && !solved){ html+='<div class="train-next"><button id="tNext">つぎへ →</button></div>'; }
   html+='</div></div>';
@@ -8107,15 +8231,20 @@ function renderTrain(){
   _rubyMode='std';
   bindScopeBar(main, function(){ trainResetFlow(); renderTrain(); });
   main.querySelectorAll('.train-cat[data-tcat]').forEach(function(b){ b.onclick=function(){ trainState.cat=parseInt(b.dataset.tcat,10); trainResetItem(); renderTrain(); }; });
-  main.querySelectorAll('.tc[data-tc]').forEach(function(b){ b.onclick=function(){
-    if(locked) return;
-    var c=parseInt(b.dataset.tc,10);
-    trainState.picked=c;
-    if(c===it.correct){ trainState.done++; var d=document.getElementById('trainDone'); if(d) d.textContent=trainState.done; renderTrain(); setTimeout(function(){ if(trainState.mode==='train' && trainState.picked===it.correct){ trainAdvance(); } }, 650); }
-    else { renderTrain(); }
-  }; });
+  if(isOrderItem){
+    if(!locked){ main.querySelectorAll('.train-order-pool .train-order-chip[data-poolpos]').forEach(function(b){ b.onclick=function(){ trainOrderPick(parseInt(b.dataset.poolpos,10)); }; }); }
+    var ou=document.getElementById('tOrderUndo'); if(ou) ou.onclick=trainOrderUndo;
+  } else {
+    main.querySelectorAll('.tc[data-tc]').forEach(function(b){ b.onclick=function(){
+      if(locked) return;
+      var c=parseInt(b.dataset.tc,10);
+      trainState.picked=c;
+      if(c===it.correct){ trainState.done++; var d=document.getElementById('trainDone'); if(d) d.textContent=trainState.done; renderTrain(); setTimeout(function(){ if(trainState.mode==='train' && trainState.picked===it.correct){ trainAdvance(); } }, 650); }
+      else { renderTrain(); }
+    }; });
+    var tsp=document.getElementById('tSpecial'); if(tsp) tsp.onclick=function(){ var wrongs=[]; for(var c=0;c<it.choices.length;c++){ if(c!==it.correct) wrongs.push(c); } trainState.elim=wrongs.slice(0,2); renderTrain(); };
+  }
   document.getElementById('tHint').onclick=function(){ trainState.hintShown=!trainState.hintShown; document.getElementById('tHintBox').style.display=trainState.hintShown?'block':'none'; };
-  document.getElementById('tSpecial').onclick=function(){ var wrongs=[]; for(var c=0;c<it.choices.length;c++){ if(c!==it.correct) wrongs.push(c); } trainState.elim=wrongs.slice(0,2); renderTrain(); };
   document.getElementById('tAns').onclick=function(){ trainState.revealed=true; renderTrain(); };
   var tn=document.getElementById('tNext'); if(tn) tn.onclick=function(){ trainAdvance(); };
 }
@@ -8130,7 +8259,8 @@ function buildFinisherPool(){
   // 項目ごと：科目→項目の順に（シャッフルは項目内のみ）
   subjs.forEach(function(subj){
     trainBaseCats(subj).forEach(function(c){
-      _finShuffle(c.items||[]).slice(0,per).forEach(function(it){ pool.push({subj:subj, cat:c.name, it:it}); });
+      var choiceItems=(c.items||[]).filter(function(it){ return it.type!=='order'; }); // 必殺テストは選択式のみ対象（並べ替えは除外）
+      _finShuffle(choiceItems).slice(0,per).forEach(function(it){ pool.push({subj:subj, cat:c.name, it:it}); });
     });
   });
   return pool;

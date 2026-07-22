@@ -308,6 +308,10 @@ button{font-family:inherit;color:inherit}
 .train-order-actions{text-align:center;margin-bottom:6px}
 .train-order-undo{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--paper-2);color:var(--muted);font-size:13px;cursor:pointer}
 .train-order-undo:disabled{opacity:.4;cursor:default}
+.train-speak{border:none;background:none;cursor:pointer;font-size:18px;vertical-align:middle;padding:2px 6px;border-radius:6px;opacity:.8}
+.train-speak:hover{opacity:1;background:var(--paper-2)}
+.train-speak.playing{opacity:1;animation:speakPulse .5s ease-in-out infinite alternate}
+@keyframes speakPulse{from{transform:scale(1)}to{transform:scale(1.2)}}
 .train-choices .tc{padding:12px 15px;border-radius:10px;border:1px solid var(--border);background:var(--paper-2);color:var(--ink);font-size:15px;cursor:pointer;text-align:left;transition:all .12s}
 .train-choices .tc:hover{border-color:var(--accent)}
 .train-choices .tc .kana{font-weight:700;margin-right:9px;color:var(--muted)}
@@ -8194,7 +8198,8 @@ function renderTrain(){
   html+='<div class="train-progress">'+(trainState.idx+1)+' / '+cat.items.length+'　'+nameWithFinalBadge(cat.name)+'</div>';
   if(cat.page){ html+='<div class="train-page-ref">📘 わかりにくいときは <b>ワーク p.'+escapeHtml(cat.page)+'</b> の図を見てみよう</div>'; }
   html+='<div class="train-qlabel">'+qlabel+'</div>';
-  html+='<div class="train-prompt">'+(it.ja?furigana(escapeHtml(prompt)):fracText(prompt))+'</div>';
+  var speakText = it.qkind==='wordmeaning' ? it.ja : (isOrderItem && locked ? it.tokens.join(' ') : '');
+  html+='<div class="train-prompt">'+(it.ja?furigana(escapeHtml(prompt)):fracText(prompt))+(speakText?' <button class="train-speak" id="tSpeak" title="発音を聞く">🔊</button>':'')+'</div>';
   if(isOrderItem){
     html+='<div class="train-order-answer">';
     if(!trainState.orderPicked.length){ html+='<span class="train-order-ph">ここに単語が並ぶよ</span>'; }
@@ -8247,6 +8252,7 @@ function renderTrain(){
   document.getElementById('tHint').onclick=function(){ trainState.hintShown=!trainState.hintShown; document.getElementById('tHintBox').style.display=trainState.hintShown?'block':'none'; };
   document.getElementById('tAns').onclick=function(){ trainState.revealed=true; renderTrain(); };
   var tn=document.getElementById('tNext'); if(tn) tn.onclick=function(){ trainAdvance(); };
+  var tsk=document.getElementById('tSpeak'); if(tsk) tsk.onclick=function(){ speakEnglish(speakText, tsk); };
 }
 
 // ===== 💥 5科目集中 必殺テスト（5教科ミックス・一気に） =====

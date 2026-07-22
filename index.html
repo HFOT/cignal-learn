@@ -1500,6 +1500,113 @@ var SUBJECTS = {
           {q:'「私の兄はサッカー部に入っています。」を英語にすると？', choices:['My brother is on the soccer team.','My brother is in the soccer.','My brother plays soccer team.','My brother on soccer.'], a:0, expl:'部活は be on the ～ team / be in the ～ club。'},
           {q:'「彼女はテニスが得意です。」を英語にすると？', choices:['She is good at tennis.','She is good tennis.','She can good tennis.','She likes good tennis.'], a:0, expl:'「〜が得意」は be good at ～。'}
         ]
+      },
+      {
+        name:'Lv7 疑問詞 What/How/When【期末】',
+        page:'30〜35',
+        intro:'「これ/あれは何？」はWhat is this/that?、「どうやって？」はHow do you...?、「いつ？」はWhen do you...?で表す。答え方も覚えよう。',
+        questions:[
+          {q:'「これは何ですか。」を英語にすると？', choices:['What is this?','What\'s that?','Is this what?','This is what?'], a:0, expl:'「これは何ですか」はWhat is this?。近くのものはthis。'},
+          {q:'「あれは何ですか。」を英語にすると？', choices:['What is this?','What is that?','That is what?','Is that what?'], a:1, expl:'遠くのものを指すときはthat。What is that?'},
+          {q:'What is this? に対する自然な答え方は？', choices:['It is a notebook.','This is a notebook.','Yes, it is.','I am a notebook.'], a:0, expl:'What...?の疑問文にはIt is ～.で具体的なものの名前を答える。Yes/Noは使わない。'},
+          {q:'「それは家紋です。」を英語にすると？', choices:['It is a kamon.','That is a kamon.','This a kamon.','It a kamon.'], a:0, expl:'具体的なものの名前を答えるときはIt is ～.'},
+          {q:'What is this?の疑問文で、whatはどこに置くか。', choices:['文の最初','文の最後','be動詞のあと','主語のあと'], a:0, expl:'疑問詞whatは必ず文の最初に置き、そのあとに疑問文の語順を続ける。'},
+          {q:'「あなたはどうやって学校に来ますか。」を英語にすると？', choices:['How do you come to school?','What do you come to school?','Do you come to school how?','How you come to school?'], a:0, expl:'方法・手段をたずねるときはHow do you...?で表す。'},
+          {q:'How do you come to school? への答えとして正しいのは？', choices:['I walk to school.','Yes, I do.','I am walk to school.','I come how.'], a:0, expl:'Howの疑問文にはYes/Noを使わず、方法を具体的に答える。walk to ～（歩いて～に行く）。'},
+          {q:'「私は自転車で学校に行きます。」を英語にすると？', choices:['I go to school by bike.','I go to school in bike.','I go by bike to school on.','I bike go to school.'], a:0, expl:'交通手段は「by+乗り物」。by bike（自転車で）。'},
+          {q:'「あなたはどうやって駅へ行きますか。」を英語にすると？', choices:['How do you go to the station?','What do you go to the station?','You go how to the station?','How you go to the station?'], a:0, expl:'How do you go to ～?で手段をたずねる。'},
+          {q:'「私はバスで病院に来ます。」を英語にすると？', choices:['I come to the hospital by bus.','I come by bus to the hospital on.','I am come to the hospital by bus.','I come to the hospital in bus.'], a:0, expl:'by bus（バスで）。乗り物にはbyを使う。'},
+          {q:'「あなたはいつ日本語を勉強しますか。」を英語にすると？', choices:['When do you study Japanese?','What do you study Japanese?','How do you study Japanese?','Do you study Japanese when?'], a:0, expl:'時をたずねるときはWhen do you...?で表す。'},
+          {q:'When do you play baseball? への答えとして正しいのは？', choices:['I play baseball on Sundays.','Yes, I do.','I am baseball on Sundays.','I play when Sundays.'], a:0, expl:'Whenの疑問文にはYes/Noを使わず、時を具体的に答える。on Sundays（日曜日に）。'},
+          {q:'「私は夕食後に宿題をします。」を英語にすると？', choices:['I do my homework after dinner.','I my homework do after dinner.','I do after dinner my homework.','Do I my homework after dinner.'], a:0, expl:'I do my homework after dinner.（動詞do＋目的語my homework＋afterのかたまり）。'},
+          {q:'時を表す語で、（月・季節など）に使う前置詞は？', choices:['in','at','on','before'], a:0, expl:'in（月・季節など）、at（時刻など）、on（曜日・日付など）、before（〜の前に）。'},
+          {q:'時を表す語で、（時刻など）に使う前置詞は？', choices:['in','at','on','before'], a:1, expl:'at（時刻など）に使う。at seven（7時に）のように使う。'},
+          {q:'時を表す語で、（曜日・日付など）に使う前置詞は？', choices:['in','at','on','before'], a:2, expl:'on（曜日・日付など）に使う。on Mondays（月曜日に）のように使う。'},
+          {q:'「山の日はいつですか。」を英語にすると？', choices:['When is yama-no-hi?','What is yama-no-hi?','How is yama-no-hi?','Who is yama-no-hi?'], a:0, expl:'日付・時をたずねるのでWhen is ～?になる。'},
+          {q:'「あなたはいつマンガを読みますか。」を英語にすると？', choices:['When do you read comics?','What do you read comics?','Do you read comics when?','When you read comics?'], a:0, expl:'Whenを文の最初に置き、そのあとに疑問文の語順（do you read comics）を続ける。'},
+          {q:'What is this? やHow do you...? やWhen do you...?のような疑問詞の疑問文に共通するルールは？', choices:['疑問詞を文の最初に置き、そのあとに疑問文の語順を続ける','疑問詞は文の最後に置く','Yes/Noで答える','be動詞は使わない'], a:0, expl:'疑問詞（What/How/When など）は必ず文の最初に置き、あとに疑問文の語順を続ける。答えにはYes/Noを使わない。'},
+          {q:'「あなたはどのようにその寺へ行きますか。」を英語にすると？', choices:['How do you go to the temple?','What do you go to the temple?','Do you go to the temple how?','How you go the temple?'], a:0, expl:'How do you go to ～?で手段をたずねる。'}
+        ]
+      },
+      {
+        name:'Lv8 疑問詞 Where/What time/What sports【期末】',
+        page:'36〜47',
+        intro:'「どこ？」はWhere...?、「何時？」はWhat time is it?、「何のスポーツ？」はWhat+名詞...?で表す。答え方の型を覚えよう。',
+        questions:[
+          {q:'「公園はどこですか。」を英語にすると？', choices:['Where is the park?','What is the park?','Is the park where?','The park is where?'], a:0, expl:'場所をたずねるときはWhere is ～?で表す。'},
+          {q:'Where is the park? への答えとして正しいのは？', choices:['It is near the station.','Yes, it is.','It is the station.','Near the station is it.'], a:0, expl:'Whereの疑問文にはYes/Noを使わず、場所を具体的に答える。near（〜の近くに）。'},
+          {q:'「あなたはどこでサッカーをしますか。」を英語にすると？', choices:['Where do you play soccer?','What do you play soccer?','Do you play soccer where?','Where you play soccer?'], a:0, expl:'一般動詞の文で場所をたずねるときはWhere do you...?。'},
+          {q:'Where do you practice? への答えとして正しいのは？', choices:['We practice in the hallway.','Yes, we do.','We practice hallway.','In the hallway we.'], a:0, expl:'場所を具体的に、前置詞（in/on/by/underなど）を使って答える。'},
+          {q:'（〜の中に）を表す前置詞は？', choices:['in','on','by','under'], a:0, expl:'in（〜の中に）。in the hallway（廊下の中で）。'},
+          {q:'（〜の上に）を表す前置詞は？', choices:['in','on','by','under'], a:1, expl:'on（〜の上に）。on rainy days は「雨の日に」という意味の別用法。'},
+          {q:'（〜のそばに）を表す前置詞は？', choices:['in','on','by','under'], a:2, expl:'by（〜のそばに）。by the park（公園のそばに）。'},
+          {q:'（〜の下に）を表す前置詞は？', choices:['in','on','by','under'], a:3, expl:'under（〜の下に）。'},
+          {q:'「図書館はどこですか。」を英語にすると？', choices:['Where is the library?','What is the library?','The library where is?','Is where the library?'], a:0, expl:'Where is ～?で場所をたずねる。'},
+          {q:'「今何時ですか。」を英語にすると？', choices:['What time is it?','What time do you?','How time is it?','When time is it?'], a:0, expl:'時刻をたずねるときはWhat time is it?で表す。'},
+          {q:'What time is it? への答えとして正しいのは？', choices:['It is three.','I am three.','Yes, it is three.','Three is it.'], a:0, expl:'主語はit、be動詞はisを使い、It is +時刻.で答える。'},
+          {q:'「あなたは何時にテレビを見ますか。」を英語にすると？', choices:['What time do you watch TV?','What time is TV?','When do you watch TV time?','Do you watch TV what time?'], a:0, expl:'「何時に〜しますか」はWhat time do you...?で表す。'},
+          {q:'What time do you get up? の答え方として正しい形は？', choices:['I get up at six.','I am at six.','Yes, I get up.','At six I.'], a:0, expl:'時刻の前にはatをつける。I get up at six.（6時に起きます）。'},
+          {q:'「あなたは何のスポーツをしますか。」を英語にすると？', choices:['What sports do you play?','What time do you play?','Where do you play sports?','Sports do you play what?'], a:0, expl:'「何の〜」とたずねるときはWhat+名詞...?の形。What sports do you play?'},
+          {q:'What sports do you play? への答えとして正しいのは？', choices:['I play soccer and tennis.','Yes, I play.','I am soccer and tennis.','Soccer and tennis I play.'], a:0, expl:'「何のスポーツ」に対しては具体的なスポーツ名で答える。'},
+          {q:'（What+名詞...?）の疑問文で、名詞が複数の物事を予想させる場合に使われる形はどれか。', choices:['名詞を複数形にする','名詞をつけない','be動詞を使わない','whatを省略する'], a:0, expl:'複数のものが予想されるときはWhat sportsのように名詞を複数形にする。'},
+          {q:'「あなたは何冊の本を持っていますか。」を英語にすると？', choices:['How many books do you have?','What many books do you have?','Do you have how many books?','How many books you have?'], a:0, expl:'数をたずねるときはHow many+名詞（複数形）do you have?で表す。'},
+          {q:'How many bags do you have? の答え方として正しいのは？', choices:['I have three bags.','It is three.','Yes, I have.','Three I have bags.'], a:0, expl:'数を具体的に答える。I have+数+名詞（複数形）.'},
+          {q:'How many の後ろの名詞はどんな形にするか。', choices:['複数形','単数形','a/anをつける','形を変えない'], a:0, expl:'How manyのあとの数えられる名詞は複数形にする。'},
+          {q:'「あなたはたくさんの本を持っています。」を英語にすると？', choices:['You have a lot of books.','You have a lot of book.','You have many book.','You a lot of have books.'], a:0, expl:'a lot of+複数形の名詞で「たくさんの〜」を表す。'}
+        ]
+      },
+      {
+        name:'Lv9 命令文（Come/Be/Don\'t）【期末】',
+        page:'48〜49',
+        intro:'相手に指示したり、禁止したりするときに使う命令文。動詞で始める・Beで始める・Don\'tで始める3つの形を整理しよう。',
+        questions:[
+          {q:'命令文で「…しなさい」というときは、文をどう始めるか。', choices:['動詞の原形で始める','主語で始める','be動詞で始める','doで始める'], a:0, expl:'「…しなさい」は主語を省略し、動詞（原形）で文を始める。'},
+          {q:'「前に来なさい。」を英語にすると？', choices:['Come to the front.','You come to the front.','Comes to the front.','Coming to the front.'], a:0, expl:'動詞の原形Comeで文を始める命令文。'},
+          {q:'「このピアノをひいてください。」を英語にすると？', choices:['Play this piano, please.','You play this piano, please.','Playing this piano, please.','Plays this piano, please.'], a:0, expl:'命令文の最後にpleaseをつけると、ていねいな言い方になる。'},
+          {q:'be動詞を使った命令文「…でありなさい」はどんな形で文を始めるか。', choices:['Be','Is','Are','Am'], a:0, expl:'be動詞の命令文はBeで文を始める（主語によって形をかえない）。'},
+          {q:'「勇敢でありなさい。」を英語にすると？', choices:['Be brave.','You are brave.','Being brave.','Brave be.'], a:0, expl:'Be brave.（Beで文を始める）。'},
+          {q:'「親切にしなさい。」を英語にすると？', choices:['Be kind.','You kind.','Kind be.','Is kind.'], a:0, expl:'状態や様子を表す命令文はBe+形容詞.の形。'},
+          {q:'「…してはいけません」という禁止の命令文はどう作るか。', choices:['Don\'t+動詞の原形....','Not+動詞....','動詞+not....','Don\'t is+動詞....'], a:0, expl:'禁止の命令文は動詞の前にDon\'tを置く。'},
+          {q:'「心配しないで。」を英語にすると？', choices:['Don\'t worry.','Not worry.','Worry don\'t.','You don\'t worry.'], a:0, expl:'Don\'t worry.（Don\'t+動詞の原形）。'},
+          {q:'「廊下を走ってはいけません。」を英語にすると？', choices:['Don\'t run in the hallway.','Not run in the hallway.','Run don\'t in the hallway.','Don\'t running in the hallway.'], a:0, expl:'Don\'t run in the hallway.（Don\'t+動詞の原形+場所）。'},
+          {q:'「私のコンピュータを使わないでください。」を英語にすると？', choices:['Don\'t use my computer.','Not use my computer.','Don\'t using my computer.','Use don\'t my computer.'], a:0, expl:'Don\'t use my computer.（禁止の命令文）。'},
+          {q:'「よい子にしていなさい。」を英語にすると？', choices:['Be a good boy.','You a good boy.','A good boy be.','Being a good boy.'], a:0, expl:'Be a good boy.（Be+名詞のかたまり）。'},
+          {q:'「静かにしなさい。」を英語にすると？', choices:['Be quiet.','You quiet.','Quiet be.','Do quiet.'], a:0, expl:'Be quiet.（Be+形容詞）。'},
+          {q:'「今、公園へ行ってはいけません。」を英語にすると？', choices:['Don\'t go to the park now.','Not go to the park now.','Go don\'t to the park now.','Don\'t going to the park now.'], a:0, expl:'Don\'t go to the park now.（Don\'t+動詞の原形+場所+now）。'},
+          {q:'「手を洗いなさい。」を英語にすると？', choices:['Wash your hands.','You wash your hands.','Washing your hands.','Washes your hands.'], a:0, expl:'Wash your hands.（動詞の原形で文を始める）。'},
+          {q:'「静かなスポーツをしなさい。」のように命令文で複数の要素を伝えるとき、動詞のあとに続けるのは？', choices:['目的語や説明の語句','be動詞','別の命令文の主語','疑問詞'], a:0, expl:'動詞のあとに目的語（quiet sportsなど）を続けるのは通常の文と同じ。'},
+          {q:'「テニスをしてはいけません。」を英語にすると？', choices:['Don\'t play tennis.','Not play tennis.','Play don\'t tennis.','Don\'t playing tennis.'], a:0, expl:'Don\'t play tennis.（Don\'t+動詞の原形+目的語）。'},
+          {q:'命令文にpleaseをつける位置として正しいのはどれか。', choices:['文の最初か最後','文の真ん中だけ','動詞の直前だけ','主語の前だけ（命令文に主語はない）'], a:0, expl:'pleaseは文の最初（Please+動詞...）か最後（動詞...,please.）につけることができる。'},
+          {q:'「親切にしてください。」のようにpleaseをつけて命令文をていねいにするとどうなるか。', choices:['Please be kind. または Be kind, please.','Kind please be.','Please kind be.','Be please kind.'], a:0, expl:'pleaseは文頭または文末につける。'},
+          {q:'命令文の主語は文中でどうなっているか。', choices:['省略されている（Youが省略されている）','必ずIになる','必ずWeになる','複数形にする'], a:0, expl:'命令文では主語You（あなた）が省略され、動詞（原形）やBe、Don\'tで文を始める。'}
+        ]
+      },
+      {
+        name:'Lv10 How many・数えられる名詞【期末】',
+        page:'40〜49',
+        intro:'数えられる名詞は複数形にでき、How many...?で数をたずねられる。買い物や持ち物の場面でよく使われる表現を整理しよう。',
+        questions:[
+          {q:'「私は帽子をいくつ持っていますか。」の意味に近い英文はどれか。', choices:['How many caps do you have?','What caps do you have?','Do you have caps?','How caps do you have?'], a:0, expl:'How many+名詞（複数形）do you have?で数をたずねる。'},
+          {q:'「私は中国に住む友達を1人持っています。」＝「中国に住む友達が1人います」を英語にすると？', choices:['I have a friend who lives in China.','I have friend who live in China.','I friend have who lives in China.','I have a friend live in China.'], a:0, expl:'a friend（1人の友達）＋live→livesにするのは関係詞節の主語が三人称単数のため。'},
+          {q:'「私はたくさんの本を持っています。」を英語にすると？', choices:['I have a lot of books.','I have a lot of book.','I have many book.','I have lot books.'], a:0, expl:'a lot of+複数形の名詞。'},
+          {q:'「私たちは3個のトマトが必要です。」を英語にすると？', choices:['We need three tomatoes.','We need three tomato.','We needs three tomatoes.','Three tomatoes we need.'], a:0, expl:'tomatoの複数形はtomatoes。3個なのでthree tomatoes。'},
+          {q:'tomatoの複数形として正しいものは？', choices:['tomatos','tomatoes','tomatoies','tomato\'s'], a:1, expl:'oで終わる語の一部（tomato等）は-esをつけて複数形にする。'},
+          {q:'「私たちは玉ねぎを2個必要とします。」を英語にすると？', choices:['We need two onions.','We need two onion.','We needs two onions.','Two onions we need.'], a:0, expl:'onionの複数形はonions。two onions。'},
+          {q:'「今何時ですか。」と尋ね、時刻をたずねる会話でよく使われる文はどれか。', choices:['What time is it now?','What time you now?','Is it what time now?','Now what time it is?'], a:0, expl:'What time is it now?（今何時ですか）。'},
+          {q:'「私はノート1冊と消しゴムを何個か必要です。」を英語にすると？', choices:['I need a notebook and some erasers.','I need a notebook and some eraser.','I need notebook and some erasers.','I need a notebook and erasers some.'], a:0, expl:'数えられる名詞の複数形の前にsome（いくつかの）をつけられる。a notebook（単数）とsome erasers（複数）。'},
+          {q:'「私はTシャツを何枚か見つけました。」を英語にすると？', choices:['I found some T-shirts.','I found some T-shirt.','I find some T-shirts.','I found T-shirts some.'], a:0, expl:'someのあとの数えられる名詞は複数形。T-shirts。'},
+          {q:'「あきらは、家に遊びに来たジョンに、自分の服を見せています。」という場面で、「Tシャツを何枚持っているの？」を英語にすると？', choices:['How many T-shirts do you have?','How many T-shirt do you have?','Do you have how many T-shirts?','What many T-shirts do you have?'], a:0, expl:'How many+複数形の名詞+do you have?'},
+          {q:'How many T-shirts do you have? に対し「10枚持っているよ。」と答える英語は？', choices:['I have ten T-shirts.','I have ten T-shirt.','Ten I have T-shirts.','I ten have T-shirts.'], a:0, expl:'数字+複数形の名詞で答える。'},
+          {q:'「あなたは公園で友達に会おうとしています。」という場面で、「〜をしないで」と注意する命令文の形はどれになるか。', choices:['Don\'t+動詞の原形....','Not+動詞....','動詞+not....','Never mind.'], a:0, expl:'注意・禁止をするときはDon\'t+動詞の原形の命令文を使う。'},
+          {q:'「あなたは公園で友達に注意しようとしています。走ってはいけません。」を英語にすると？', choices:['Don\'t run.','Not run.','Run don\'t.','Runs don\'t.'], a:0, expl:'Don\'t run.（禁止の命令文）。'},
+          {q:'買い物の場面で「私はりんごをいくつ欲しいですか」と尋ねる文はどれか。', choices:['How many apples do you want?','What many apples do you want?','Do you want how many apples?','How apples many do you want?'], a:0, expl:'How many apples do you want?（いくつのりんごが欲しいですか）。'},
+          {q:'「私はコンピュータを使わないでください。」ではなく「私のコンピュータを使わないで」と伝える命令文の主語はどうなっているか。', choices:['主語は省略され、動詞の前にDon\'tがつく','主語はIのまま','主語はweになる','主語は省略されない'], a:0, expl:'命令文は主語（You）を省略し、Don\'t+動詞の原形で文を始める。'},
+          {q:'「大型スーパー」のように大きさを表す形容詞largeがつく名詞の複数形の作り方の基本ルールは？', choices:['多くはそのまま-sをつける','必ず-esをつける','必ず不規則変化する','複数形にしない'], a:0, expl:'多くの名詞は語尾に-sをつけて複数形にする（bookなら books）。'},
+          {q:'「私は本を何冊か必要としています。」を英語にすると？', choices:['I need some books.','I need some book.','I need book some.','Some I need books.'], a:0, expl:'some+複数形の名詞（books）。'},
+          {q:'「私たちは食べ物や飲み物、本、文房具などをここで買うことができます。」のように「〜など」と付け加える表現は？', choices:['and so on','and more','so more','and after'], a:0, expl:'..., and so on＝「…など」という意味で、例を列挙したあとに使う。'},
+          {q:'「たった1つしかない」という意味を表す語はどれか。', choices:['only','many','some','a lot of'], a:0, expl:'only（ただ〜だけ）。We have only one.（1つしかありません）。'},
+          {q:'「それでは、まず食料を買いましょう。」を表す英語の組み立てとして正しいのはどれか。', choices:['Let\'s buy the food first.','Let\'s the food buy first.','First let\'s buy the food, then.','Buy let\'s the food first.'], a:0, expl:'Let\'s+動詞の原形....で「〜しましょう」。firstは「最初に」という意味で文末に置くことが多い。'}
+        ]
       }
     ]
   },
@@ -3793,6 +3900,43 @@ var TEST_DATA = {
         {passage:'Aki: Ellen, this is Mike. He is my brother.\nEllen: Hi, Mike. Can you play soccer?\nMike: Yes, I can. I\'m on the soccer team. I can cook well, too. I\'m in the cooking club.', text:'Mike はサッカーができますか。Yes / No で答えなさい。', type:'choice', choices:['Yes, he can.','No, he can\'t.','Yes, he is.','No, he isn\'t.'], correct:0, point:10},
         {passage:'Aki: Ellen, this is Mike. He is my brother.\nEllen: Hi, Mike. Can you play soccer?\nMike: Yes, I can. I\'m on the soccer team. I can cook well, too. I\'m in the cooking club.', text:'Mike が入っている部活を、日本語で2つ書きなさい。', type:'choice', choices:['サッカー部と料理部（クッキング部）','サッカー部とテニス部','野球部と美術部','料理部と吹奏楽部'], correct:0, point:10},
         {passage:'Aki: Ellen, this is Mike. He is my brother.\nEllen: Hi, Mike. Can you play soccer?\nMike: Yes, I can. I\'m on the soccer team. I can cook well, too. I\'m in the cooking club.', text:'Mike と Aki の関係は？', type:'choice', choices:['兄弟','親子','先生と生徒','友達だけ'], correct:0, point:10}
+      ]},
+      {name:'疑問詞 What/How/When【期末】', exam:true, questions:[
+        {text:'「これは何ですか。」を英語で書きなさい。', type:'writing', keywords:['What','is','this'], point:10},
+        {text:'「あなたはどうやって学校に来ますか。」を英語で書きなさい。', type:'writing', keywords:['How','do','you','come'], point:10},
+        {text:'「私は歩いて学校に来ます。」を英語で書きなさい。', type:'writing', keywords:['I','walk','to','school'], point:10},
+        {text:'「あなたはいつ日本語を勉強しますか。」を英語で書きなさい。', type:'writing', keywords:['When','do','you','study'], point:10},
+        {text:'When do you play baseball? — I play baseball ( ) Sundays. に入る語は？', type:'choice', choices:['on','in','at','by'], correct:0, point:10},
+        {text:'（時刻など）に使う前置詞は？', type:'choice', choices:['at','in','on','before'], correct:0, point:10},
+        {text:'（月・季節など）に使う前置詞は？', type:'choice', choices:['in','at','on','before'], correct:0, point:10},
+        {text:'疑問詞（What/How/Whenなど）は文のどこに置くか。', type:'writing', keywords:['最初'], point:10}
+      ]},
+      {name:'疑問詞 Where/What time/What sports【期末】', exam:true, questions:[
+        {text:'「公園はどこですか。」を英語で書きなさい。', type:'writing', keywords:['Where','is','the','park'], point:10},
+        {text:'「今何時ですか。」を英語で書きなさい。', type:'writing', keywords:['What','time','is','it'], point:10},
+        {text:'What time is it? — ( ) is three. に入る語は？', type:'choice', choices:['It','This','That','I'], correct:0, point:10},
+        {text:'「あなたは何のスポーツをしますか。」を英語で書きなさい。', type:'writing', keywords:['What','sports','do','you','play'], point:10},
+        {text:'（〜の中に）を表す前置詞は？', type:'choice', choices:['in','on','by','under'], correct:0, point:10},
+        {text:'「あなたは何冊の本を持っていますか。」を英語で書きなさい。', type:'writing', keywords:['How','many','books','do','you','have'], point:10},
+        {text:'How manyのあとの数えられる名詞はどんな形にするか。', type:'writing', keywords:['複数形'], point:10}
+      ]},
+      {name:'命令文（Come/Be/Don\'t）【期末】', exam:true, questions:[
+        {text:'「前に来なさい。」を英語で書きなさい。', type:'writing', keywords:['Come','to','the','front'], point:10},
+        {text:'「勇敢でありなさい。」を英語で書きなさい。', type:'writing', keywords:['Be','brave'], point:10},
+        {text:'「心配しないで。」を英語で書きなさい。', type:'writing', keywords:['Don\'t','worry'], point:10},
+        {text:'「静かにしなさい。」を英語で書きなさい。', type:'writing', keywords:['Be','quiet'], point:10},
+        {text:'「私のコンピュータを使わないでください。」を英語で書きなさい。', type:'writing', keywords:['Don\'t','use','my','computer'], point:10},
+        {text:'命令文の主語はどうなっているか。', type:'writing', keywords:['省略'], point:10},
+        {text:'命令文をていねいにする語は？', type:'choice', choices:['please','very','so','too'], correct:0, point:10}
+      ]},
+      {name:'How many・数えられる名詞【期末】', exam:true, questions:[
+        {text:'「私はたくさんの本を持っています。」を英語で書きなさい。', type:'writing', keywords:['I','have','a','lot','of','books'], point:10},
+        {text:'tomatoの複数形を書きなさい。', type:'writing', keywords:['tomatoes'], point:10},
+        {text:'「私たちは3個のトマトが必要です。」を英語で書きなさい。', type:'writing', keywords:['We','need','three','tomatoes'], point:10},
+        {text:'「あなたはTシャツを何枚持っているの？」を英語で書きなさい。', type:'writing', keywords:['How','many','T-shirts','do','you','have'], point:10},
+        {text:'「10枚持っているよ。」を英語で書きなさい。', type:'writing', keywords:['I','have','ten','T-shirts'], point:10},
+        {text:'「…など」を表す表現は？', type:'choice', choices:['and so on','and more','so more','and after'], correct:0, point:10},
+        {text:'「それでは、まず食料を買いましょう。」を英語で書きなさい。', type:'writing', keywords:['Let\'s','buy','the','food','first'], point:10}
       ]}
     ]
   },
@@ -7608,6 +7752,74 @@ var TRAIN_DATA = {
       {ja:'お元気ですか。— 元気です、ありがとう。', choices:['I\'m fine, thank you.','You\'re welcome.','See you.','Good night.'], correct:0, hint:'How are you? の答え。', special:'I\'m fine, thank you.', expl:'I\'m fine, thank you.'},
       {ja:'あなたのお名前は何ですか。', choices:['What is your name?','How is your name?','Who is your name?','Where is your name?'], correct:0, hint:'名前を聞く＝What。', special:'What is your name?', expl:'What is your name?'},
       {ja:'お会いできてうれしいです。', choices:['Nice to meet you.','See you later.','Thank you very much.','You are welcome.'], correct:0, hint:'初対面のあいさつ。', special:'Nice to meet you.', expl:'Nice to meet you.'}
+    ]},
+    { name:'疑問詞 What/How/When【期末】', items:[
+      {ja:'これは何ですか。', choices:['What is this?','What is that?','Is this what?','This is what.'], correct:0, hint:'近くのものはthis。', special:'What is this?', expl:'What is this? 近くのものをたずねるときはthis。'},
+      {ja:'あれは何ですか。', choices:['What is that?','What is this?','That is what?','Is that what.'], correct:0, hint:'遠くのものはthat。', special:'What is that?', expl:'What is that? 遠くのものをたずねるときはthat。'},
+      {ja:'それは家紋です。', choices:['It is a kamon.','That is a kamon.','This a kamon.','It a kamon.'], correct:0, hint:'具体的な名前はIt is〜.', special:'It is a kamon.', expl:'What...?の答えはIt is〜.で具体的に。'},
+      {ja:'それはノートです。', choices:['It is a notebook.','That\'s a notebook.','It a notebook.','This a notebook.'], correct:0, hint:'It is〜.で答える。', special:'It is a notebook.', expl:'It is a notebook. 具体的なものの名前を答える。'},
+      {ja:'あなたはどうやって学校に来ますか。', choices:['How do you come to school?','What do you come to school?','Do you come to school how?','How you come to school?'], correct:0, hint:'手段はHow do you...?', special:'How do you come to school?', expl:'方法・手段をたずねるときはHow do you...?'},
+      {ja:'私は歩いて学校に来ます。', choices:['I walk to school.','I am walk to school.','I walk school.','I come walk to school.'], correct:0, hint:'walk to〜（歩いて〜に行く）。', special:'I walk to school.', expl:'walk to ～で「歩いて～に行く（来る）」。'},
+      {ja:'私は自転車で学校に行きます。', choices:['I go to school by bike.','I go to school in bike.','I bike go to school.','I go by bike to school on.'], correct:0, hint:'乗り物はby+乗り物。', special:'I go to school by bike.', expl:'交通手段はby bike（自転車で）のようにbyを使う。'},
+      {ja:'あなたはどうやって駅へ行きますか。', choices:['How do you go to the station?','What do you go to the station?','You go how to the station?','How you go to the station?'], correct:0, hint:'How do you go to〜?', special:'How do you go to the station?', expl:'How do you go to ～?で手段をたずねる。'},
+      {ja:'私は歩いて病院へ来ます。', choices:['I walk to the hospital.','I am walk to the hospital.','I walk hospital.','I to walk the hospital.'], correct:0, hint:'walk to〜。', special:'I walk to the hospital.', expl:'walk to the hospital.（歩いて病院に来ます）。'},
+      {ja:'あなたはいつ日本語を勉強しますか。', choices:['When do you study Japanese?','What do you study Japanese?','How do you study Japanese?','Do you study Japanese when?'], correct:0, hint:'時はWhen do you...?', special:'When do you study Japanese?', expl:'時をたずねるときはWhen do you...?'},
+      {ja:'私は日曜日に野球をします。', choices:['I play baseball on Sundays.','I play baseball in Sundays.','I am baseball on Sundays.','I play on Sundays baseball.'], correct:0, hint:'曜日にはon。', special:'I play baseball on Sundays.', expl:'曜日の前にはonをつける。on Sundays。'},
+      {ja:'私は夕食後に宿題をします。', choices:['I do my homework after dinner.','I my homework do after dinner.','I do after dinner my homework.','Do I my homework after dinner.'], correct:0, hint:'do my homework。', special:'I do my homework after dinner.', expl:'I do my homework after dinner.（動詞do＋目的語＋afterのかたまり）。'},
+      {ja:'山の日はいつですか。', choices:['When is yama-no-hi?','What is yama-no-hi?','How is yama-no-hi?','Who is yama-no-hi?'], correct:0, hint:'日付をたずねるのでWhen。', special:'When is yama-no-hi?', expl:'日付・時をたずねるのでWhen is ～?になる。'},
+      {ja:'あなたはいつマンガを読みますか。', choices:['When do you read comics?','What do you read comics?','Do you read comics when?','When you read comics?'], correct:0, hint:'Whenを文頭に。', special:'When do you read comics?', expl:'Whenを文の最初に置き、疑問文の語順を続ける。'},
+      {ja:'あなたはどのようにその寺へ行きますか。', choices:['How do you go to the temple?','What do you go to the temple?','Do you go to the temple how?','How you go the temple?'], correct:0, hint:'How do you go to〜?', special:'How do you go to the temple?', expl:'How do you go to ～?で手段をたずねる。'}
+    ]},
+    { name:'疑問詞 Where/What time/What sports【期末】', items:[
+      {ja:'公園はどこですか。', choices:['Where is the park?','What is the park?','Is the park where?','The park is where?'], correct:0, hint:'場所はWhere is〜?', special:'Where is the park?', expl:'場所をたずねるときはWhere is ～?'},
+      {ja:'それは駅の近くです。', choices:['It is near the station.','It is the station.','Near the station is it.','It the station near.'], correct:0, hint:'near＝〜の近くに。', special:'It is near the station.', expl:'It is near the station.（駅の近くです）。'},
+      {ja:'あなたはどこでサッカーをしますか。', choices:['Where do you play soccer?','What do you play soccer?','Do you play soccer where?','Where you play soccer?'], correct:0, hint:'一般動詞はWhere do you...?', special:'Where do you play soccer?', expl:'一般動詞の文で場所をたずねるときはWhere do you...?'},
+      {ja:'私たちは廊下で練習します。', choices:['We practice in the hallway.','We practice hallway.','In the hallway we.','We in practice the hallway.'], correct:0, hint:'in the hallway（廊下の中で）。', special:'We practice in the hallway.', expl:'in（〜の中に）を使う。'},
+      {ja:'図書館はどこですか。', choices:['Where is the library?','What is the library?','The library where is?','Is where the library?'], correct:0, hint:'Where is〜?', special:'Where is the library?', expl:'Where is ～?で場所をたずねる。'},
+      {ja:'今何時ですか。', choices:['What time is it?','What time do you?','How time is it?','When time is it?'], correct:0, hint:'時刻はWhat time is it?', special:'What time is it?', expl:'時刻をたずねるときはWhat time is it?'},
+      {ja:'3時です。', choices:['It is three.','I am three.','Yes, it is three.','Three is it.'], correct:0, hint:'It is+時刻.', special:'It is three.', expl:'主語it・be動詞isでIt is+時刻.と答える。'},
+      {ja:'あなたは何時にテレビを見ますか。', choices:['What time do you watch TV?','What time is TV?','When do you watch TV time?','Do you watch TV what time?'], correct:0, hint:'What time do you...?', special:'What time do you watch TV?', expl:'「何時に〜しますか」はWhat time do you...?'},
+      {ja:'私は6時に起きます。', choices:['I get up at six.','I am at six.','Yes, I get up.','At six I.'], correct:0, hint:'時刻の前はat。', special:'I get up at six.', expl:'時刻の前にはatをつける。'},
+      {ja:'あなたは何のスポーツをしますか。', choices:['What sports do you play?','What time do you play?','Where do you play sports?','Sports do you play what?'], correct:0, hint:'What sports do you...?', special:'What sports do you play?', expl:'「何の〜」はWhat+名詞...?の形。'},
+      {ja:'私はサッカーとテニスをします。', choices:['I play soccer and tennis.','Yes, I play.','I am soccer and tennis.','Soccer and tennis I play.'], correct:0, hint:'具体的なスポーツ名で答える。', special:'I play soccer and tennis.', expl:'What sports...?には具体的なスポーツ名で答える。'},
+      {ja:'あなたは何冊の本を持っていますか。', choices:['How many books do you have?','What many books do you have?','Do you have how many books?','How many books you have?'], correct:0, hint:'How many+複数形。', special:'How many books do you have?', expl:'数をたずねるときはHow many+名詞（複数形）do you have?'},
+      {ja:'私は3冊の本を持っています。', choices:['I have three bags.','It is three.','Yes, I have.','Three I have bags.'], correct:0, hint:'数字+複数形で答える。', special:'I have three bags.', expl:'数を具体的に答える。'},
+      {ja:'あなたはたくさんの本を持っています。', choices:['You have a lot of books.','You have a lot of book.','You have many book.','You a lot of have books.'], correct:0, hint:'a lot of+複数形。', special:'You have a lot of books.', expl:'a lot of+複数形の名詞で「たくさんの〜」。'},
+      {ja:'ロンドンは何時ですか。', choices:['What time is it in London?','What time is London?','Is it what time in London?','London is what time?'], correct:0, hint:'in London（場所）を追加。', special:'What time is it in London?', expl:'What time is it in+場所?で「〜は何時ですか」。'}
+    ]},
+    { name:'命令文（Come/Be/Don\'t）【期末】', items:[
+      {ja:'前に来なさい。', choices:['Come to the front.','You come to the front.','Comes to the front.','Coming to the front.'], correct:0, hint:'動詞の原形で始める。', special:'Come to the front.', expl:'命令文は動詞の原形で文を始める。'},
+      {ja:'このピアノをひいてください。', choices:['Play this piano, please.','You play this piano, please.','Playing this piano, please.','Plays this piano, please.'], correct:0, hint:'pleaseでていねいに。', special:'Play this piano, please.', expl:'命令文の最後にpleaseをつけるとていねいになる。'},
+      {ja:'勇敢でありなさい。', choices:['Be brave.','You are brave.','Being brave.','Brave be.'], correct:0, hint:'Beで始める。', special:'Be brave.', expl:'be動詞の命令文はBeで文を始める。'},
+      {ja:'親切にしなさい。', choices:['Be kind.','You kind.','Kind be.','Is kind.'], correct:0, hint:'Be+形容詞。', special:'Be kind.', expl:'状態を表す命令文はBe+形容詞.'},
+      {ja:'心配しないで。', choices:['Don\'t worry.','Not worry.','Worry don\'t.','You don\'t worry.'], correct:0, hint:'Don\'t+動詞の原形。', special:'Don\'t worry.', expl:'禁止の命令文はDon\'t+動詞の原形。'},
+      {ja:'廊下を走ってはいけません。', choices:['Don\'t run in the hallway.','Not run in the hallway.','Run don\'t in the hallway.','Don\'t running in the hallway.'], correct:0, hint:'Don\'t run〜。', special:'Don\'t run in the hallway.', expl:'Don\'t run in the hallway.（禁止の命令文）。'},
+      {ja:'私のコンピュータを使わないでください。', choices:['Don\'t use my computer.','Not use my computer.','Don\'t using my computer.','Use don\'t my computer.'], correct:0, hint:'Don\'t use〜。', special:'Don\'t use my computer.', expl:'Don\'t use my computer.（禁止の命令文）。'},
+      {ja:'よい子にしていなさい。', choices:['Be a good boy.','You a good boy.','A good boy be.','Being a good boy.'], correct:0, hint:'Be+名詞。', special:'Be a good boy.', expl:'Be a good boy.（Be+名詞のかたまり）。'},
+      {ja:'静かにしなさい。', choices:['Be quiet.','You quiet.','Quiet be.','Do quiet.'], correct:0, hint:'Be+形容詞。', special:'Be quiet.', expl:'Be quiet.（Be+形容詞）。'},
+      {ja:'今、公園へ行ってはいけません。', choices:['Don\'t go to the park now.','Not go to the park now.','Go don\'t to the park now.','Don\'t going to the park now.'], correct:0, hint:'Don\'t go〜now。', special:'Don\'t go to the park now.', expl:'Don\'t go to the park now.'},
+      {ja:'手を洗いなさい。', choices:['Wash your hands.','You wash your hands.','Washing your hands.','Washes your hands.'], correct:0, hint:'動詞の原形で始める。', special:'Wash your hands.', expl:'Wash your hands.（動詞の原形で文を始める）。'},
+      {ja:'テニスをしてはいけません。', choices:['Don\'t play tennis.','Not play tennis.','Play don\'t tennis.','Don\'t playing tennis.'], correct:0, hint:'Don\'t play〜。', special:'Don\'t play tennis.', expl:'Don\'t play tennis.（禁止の命令文）。'},
+      {ja:'親切にしてください。', choices:['Be kind, please.','Kind please be.','Please kind be.','Be please kind.'], correct:0, hint:'please を文末に。', special:'Be kind, please.', expl:'pleaseは文頭または文末につけられる。'},
+      {ja:'走ってはいけません。', choices:['Don\'t run.','Not run.','Run don\'t.','Runs don\'t.'], correct:0, hint:'Don\'t run.', special:'Don\'t run.', expl:'Don\'t run.（禁止の命令文）。'},
+      {ja:'ボランティアで町を訪れる外国人のために案内しなさい。', choices:['Guide foreign visitors in the town.','You guide foreign visitors.','Guiding foreign visitors.','Guides foreign visitors.'], correct:0, hint:'動詞の原形で始める。', special:'Guide foreign visitors in the town.', expl:'命令文は主語を省略し動詞の原形で始める。'}
+    ]},
+    { name:'How many・数えられる名詞【期末】', items:[
+      {ja:'私はたくさんの本を持っています。', choices:['I have a lot of books.','I have a lot of book.','I have many book.','I have lot books.'], correct:0, hint:'a lot of+複数形。', special:'I have a lot of books.', expl:'a lot of+複数形の名詞。'},
+      {ja:'私たちは3個のトマトが必要です。', choices:['We need three tomatoes.','We need three tomato.','We needs three tomatoes.','Three tomatoes we need.'], correct:0, hint:'tomatoの複数形はtomatoes。', special:'We need three tomatoes.', expl:'tomatoは-esで複数形にする。'},
+      {ja:'私たちは玉ねぎを2個必要とします。', choices:['We need two onions.','We need two onion.','We needs two onions.','Two onions we need.'], correct:0, hint:'onionの複数形はonions。', special:'We need two onions.', expl:'onionは-sで複数形にする。'},
+      {ja:'私はノート1冊と消しゴムを何個か必要です。', choices:['I need a notebook and some erasers.','I need a notebook and some eraser.','I need notebook and some erasers.','I need a notebook and erasers some.'], correct:0, hint:'someのあとは複数形。', special:'I need a notebook and some erasers.', expl:'some+複数形の名詞（erasers）。'},
+      {ja:'私はTシャツを何枚か見つけました。', choices:['I found some T-shirts.','I found some T-shirt.','I find some T-shirts.','I found T-shirts some.'], correct:0, hint:'someのあとは複数形。', special:'I found some T-shirts.', expl:'some T-shirts（何枚かのTシャツ）。'},
+      {ja:'あなたはTシャツを何枚持っているの？', choices:['How many T-shirts do you have?','How many T-shirt do you have?','Do you have how many T-shirts?','What many T-shirts do you have?'], correct:0, hint:'How many+複数形+do you have?', special:'How many T-shirts do you have?', expl:'How many T-shirts do you have?'},
+      {ja:'10枚持っているよ。', choices:['I have ten T-shirts.','I have ten T-shirt.','Ten I have T-shirts.','I ten have T-shirts.'], correct:0, hint:'数字+複数形。', special:'I have ten T-shirts.', expl:'数字+複数形の名詞で答える。'},
+      {ja:'私はりんごをいくつか欲しいですか、と尋ねる文。', choices:['How many apples do you want?','What many apples do you want?','Do you want how many apples?','How apples many do you want?'], correct:0, hint:'How many apples...?', special:'How many apples do you want?', expl:'How many apples do you want?（りんごをいくつ欲しいですか）。'},
+      {ja:'私は本を何冊か必要としています。', choices:['I need some books.','I need some book.','I need book some.','Some I need books.'], correct:0, hint:'some+複数形。', special:'I need some books.', expl:'some+複数形の名詞（books）。'},
+      {ja:'食べ物や飲み物、本、文房具などをここで買えます。', choices:['We can buy food, drink, books, and so on here.','We can buy food, drink, books, and more here.','We can buy food, drink, books, so more here.','We can buy food, drink, books, and after here.'], correct:0, hint:'and so on＝〜など。', special:'and so on', expl:'..., and so onで「…など」という意味。'},
+      {ja:'トマトは1つしかありません。', choices:['We have only one.','We have only ones.','We only have.','Only we have one.'], correct:0, hint:'only ただ〜だけ。', special:'We have only one.', expl:'only（ただ〜だけ）を使う。'},
+      {ja:'それでは、まず食料を買いましょう。', choices:['Let\'s buy the food first.','Let\'s the food buy first.','First let\'s buy the food, then.','Buy let\'s the food first.'], correct:0, hint:'Let\'s+動詞の原形。', special:'Let\'s buy the food first.', expl:'Let\'s+動詞の原形....で「〜しましょう」。'},
+      {ja:'私は中国に住む友達を1人持っています。', choices:['I have a friend who lives in China.','I have friend who live in China.','I friend have who lives in China.','I have a friend live in China.'], correct:0, hint:'三人称単数はlives。', special:'I have a friend who lives in China.', expl:'関係詞節の主語が三人称単数なのでlivesになる。'},
+      {ja:'私は日本にたくさんの友達がいます。', choices:['I have many friends in Japan.','I have many friend in Japan.','I have a many friends in Japan.','Many friends I have in Japan.'], correct:0, hint:'many+複数形。', special:'I have many friends in Japan.', expl:'many+複数形の名詞。'},
+      {ja:'私は5冊のノートを持っています。', choices:['I have five notebooks.','I have five notebook.','Five I have notebooks.','I five have notebooks.'], correct:0, hint:'数字+複数形。', special:'I have five notebooks.', expl:'数字のあとの数えられる名詞は複数形にする。'}
     ]}
   ]}
 };

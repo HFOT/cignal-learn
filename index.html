@@ -233,6 +233,7 @@ button{font-family:inherit;color:inherit}
 .train-page-ref b{font-weight:800}
 /* 🗾 都道府県マップクイズ */
 .jmap-wrap{max-width:640px;margin:0 auto;padding:6px 4px 28px;text-align:center}
+.jmap-wrap-wide{max-width:960px}
 .jmap-modebar{display:flex;gap:8px;justify-content:center;margin-bottom:12px}
 .jmap-modebtn{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:var(--paper-2);color:var(--muted);font-weight:700;cursor:pointer;font-size:13px;transition:all .12s}
 .jmap-modebtn:hover{border-color:var(--accent)}
@@ -260,7 +261,7 @@ button{font-family:inherit;color:inherit}
 .jmap-credit{font-size:9px;color:var(--muted);margin-top:4px;opacity:.7}
 .jmap-view-hint{font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5}
 .jmap-svgbox.jmap-view{padding:6px}
-.jmap-svgbox.jmap-view .jp-map-svg{max-width:100%}
+.jmap-svgbox.jmap-view .jp-map-svg{max-width:900px;width:100%;height:auto}
 .jmap-info{background:var(--paper);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;justify-content:center;min-height:22px}
 .jmap-info b{font-size:20px;font-weight:800;color:var(--accent)}
 .jmap-info span{font-size:14px;color:var(--ink)}
@@ -9004,7 +9005,7 @@ function jmapBindModeBar(main){
 function renderJmapOverview(){
   var main=document.getElementById('main');
   var sel=jmapState.sel;
-  var html='<div class="jmap-wrap">';
+  var html='<div class="jmap-wrap jmap-wrap-wide">';
   html+=jmapModeBarHtml();
   html+='<div class="jmap-view-hint">地図の県をタップすると、県名と県庁所在地が出るよ。色は8地方区分。</div>';
   if(sel){ var p=JP_PREF[sel]; html+='<div class="jmap-info"><b>'+escapeHtml(p.ja)+'</b><span>県庁所在地：'+escapeHtml(p.cap)+'</span><span class="jmap-info-region">'+JP_REGION_NAME[JP_REGION[sel]]+'地方</span></div>'; }

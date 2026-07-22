@@ -308,6 +308,9 @@ button{font-family:inherit;color:inherit}
 .train-order-actions{text-align:center;margin-bottom:6px}
 .train-order-undo{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--paper-2);color:var(--muted);font-size:13px;cursor:pointer}
 .train-order-undo:disabled{opacity:.4;cursor:default}
+.train-song-row{text-align:center;margin:-4px 0 12px}
+.train-song-btn{padding:8px 18px;border-radius:20px;border:none;background:linear-gradient(135deg,#ff8fb3,#a23ca6);color:#fff;font-weight:800;font-size:13px;cursor:pointer}
+.train-song-btn:hover{filter:brightness(1.08)}
 .train-speak{border:none;background:none;cursor:pointer;font-size:18px;vertical-align:middle;padding:2px 6px;border-radius:6px;opacity:.8}
 .train-speak:hover{opacity:1;background:var(--paper-2)}
 .train-speak.playing{opacity:1;animation:speakPulse .5s ease-in-out infinite alternate}
@@ -8205,6 +8208,7 @@ function renderTrain(){
   html+='<div class="train-cats">';
   cats.forEach(function(c,ci){ var fin=isFinalName(c.name)?' final':''; html+='<button class="train-cat'+(ci===trainState.cat?' on':'')+fin+'" data-tcat="'+ci+'">'+furigana(escapeHtml(stripFinalTag(c.name)))+finalBadgeHtml(c.name)+'</button>'; });
   html+='</div>';
+  if(trainState.subj==='en' && RHYTHM_DATA.en['疑問詞と命令文の歌【期末】']){ html+='<div class="train-song-row"><button class="train-song-btn" id="tSongBtn">🎵 歌で覚える（疑問詞・命令文）</button></div>'; }
   if(!it){ html+='<div class="train-card">この項目は準備中です。</div></div>'; main.innerHTML=html; _rubyMode='std'; bindScopeBar(main, function(){ trainResetFlow(); renderTrain(); }); return; }
   var isOrderItem=(it.type==='order');
   if(isOrderItem && !trainState.orderPool){ trainState.orderPool=_trainShuffleIdx(it.tokens.length); trainState.orderPicked=[]; trainState.orderJudged=false; trainState.orderCorrect=false; trainState.orderWrongFlash=false; }
@@ -8259,6 +8263,7 @@ function renderTrain(){
   _rubyMode='std';
   bindScopeBar(main, function(){ trainResetFlow(); renderTrain(); });
   main.querySelectorAll('.train-cat[data-tcat]').forEach(function(b){ b.onclick=function(){ trainState.cat=parseInt(b.dataset.tcat,10); trainResetItem(); renderTrain(); }; });
+  var songBtn=document.getElementById('tSongBtn'); if(songBtn) songBtn.onclick=function(){ openChantPlayer('en','疑問詞と命令文の歌【期末】'); };
   if(isOrderItem){
     if(!locked){ main.querySelectorAll('.train-order-pool .train-order-chip[data-poolpos]').forEach(function(b){ b.onclick=function(){ trainOrderPick(parseInt(b.dataset.poolpos,10)); }; }); }
     var ou=document.getElementById('tOrderUndo'); if(ou) ou.onclick=trainOrderUndo;
